@@ -11,8 +11,13 @@ import java.util.List;
 @RequestMapping("/race")
 public class RaceController {
 
+    private final RaceService raceService;
+
+    // Constructor injection
     @Autowired
-    private RaceService raceService;
+    public RaceController(RaceService raceService) {
+        this.raceService = raceService;
+    }
 
     // GET-запрос с Query Parameters
     @GetMapping("/info")
@@ -22,7 +27,6 @@ public class RaceController {
     }
 
     // GET-запрос с Path Parameters
-
     @GetMapping("/{id}")
     public Race getRaceById(@PathVariable int id) {
         return raceService.getRaceById(id);
