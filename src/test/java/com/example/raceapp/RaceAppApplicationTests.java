@@ -8,6 +8,7 @@ class RaceAppApplicationTests {
 
     @Test
     void contextLoads() {
+        //dummy while tests are not used
     }
 
 }
