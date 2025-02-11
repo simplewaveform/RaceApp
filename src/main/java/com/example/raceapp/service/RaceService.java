@@ -1,24 +1,31 @@
 package com.example.raceapp.service;
 
 import com.example.raceapp.model.Race;
+import com.example.raceapp.repository.RaceRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Optional;
 
 @Service
 public class RaceService {
-    private final List<Race> races = new ArrayList<>();
+    private final RaceRepository raceRepository;
 
-    public RaceService() {
-        races.add(new Race(1, "Grand Prix", 2024));
-        races.add(new Race(2, "Le Mans", 2023));
+    @Autowired
+    public RaceService(RaceRepository raceRepository) {
+        this.raceRepository = raceRepository;
+    }
+
+    public Race getRaceById(Long id) {
+        return raceRepository.findById(id).orElse(null);
     }
 
     public List<Race> getAllRaces() {
-        return races;
+        return raceRepository.findAll();
     }
 
-    public Race getRaceById(int id) {
-        return races.stream().filter(r -> r.getId() == id).findFirst().orElse(null);
+    public Race saveRace(Race race) {
+        return raceRepository.save(race);
     }
 }
