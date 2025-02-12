@@ -5,6 +5,7 @@ import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,6 +21,7 @@ public class PilotService {
      *
      * @param pilotDao the PilotDao instance to interact with the data layer
      */
+    @Autowired
     public PilotService(PilotDao pilotDao) {
         this.pilotDao = pilotDao;
     }

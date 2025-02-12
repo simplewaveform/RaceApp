@@ -62,4 +62,14 @@ public class CarService {
     public void deleteCar(Long id) {
         carDao.deleteById(id);
     }
+
+    /**
+     * Retrieves cars by their brand.
+     *
+     * @param brand the brand of the cars to filter by
+     * @return a list of {@link Car} entities with the specified brand
+     */
+    public List<Car> getCarsByBrand(String brand) {
+        return carDao.findByBrand(brand);
+    }
 }

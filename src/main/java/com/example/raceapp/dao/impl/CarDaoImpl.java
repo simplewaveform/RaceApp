@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Transactional
 public class CarDaoImpl implements CarDao {
-
     @PersistenceContext
     private EntityManager entityManager;
 
@@ -68,5 +67,18 @@ public class CarDaoImpl implements CarDao {
         if (car != null) {
             entityManager.remove(car);
         }
+    }
+
+    /**
+     * Retrieves cars by their brand.
+     *
+     * @param brand the brand of the cars to filter by
+     * @return a list of {@link Car} entities with the specified brand
+     */
+    @Override
+    public List<Car> findByBrand(String brand) {
+        return entityManager.createQuery("SELECT c FROM Car c WHERE c.brand = :brand", Car.class)
+                .setParameter("brand", brand)
+                .getResultList();
     }
 }

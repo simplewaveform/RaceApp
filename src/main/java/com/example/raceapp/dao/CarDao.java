@@ -3,12 +3,13 @@ package com.example.raceapp.dao;
 import com.example.raceapp.model.Car;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 /**
  * Data Access Object (DAO) interface for managing {@link Car} entities.
  */
+@Repository
 public interface CarDao {
-
     /**
      * Saves a car entity.
      *
@@ -38,4 +39,12 @@ public interface CarDao {
      * @param id the car ID
      */
     void deleteById(Long id);
+
+    /**
+     * Retrieves cars by their brand.
+     *
+     * @param brand the brand of the cars to filter by
+     * @return a list of {@link Car} entities with the specified brand
+     */
+    List<Car> findByBrand(String brand);
 }

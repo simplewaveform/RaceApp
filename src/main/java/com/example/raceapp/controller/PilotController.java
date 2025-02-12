@@ -6,13 +6,7 @@ import com.example.raceapp.service.PilotService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller for managing pilots.
@@ -64,7 +58,11 @@ public class PilotController {
     @GetMapping("/{id}")
     public ResponseEntity<Pilot> getPilotById(@PathVariable Long id) {
         Pilot pilot = pilotService.getPilotById(id);
-        return ResponseEntity.ok(pilot);
+        if (pilot != null) {
+            return ResponseEntity.ok(pilot);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     /**
@@ -83,11 +81,10 @@ public class PilotController {
      * Endpoint to delete a pilot by their ID.
      *
      * @param id the ID of the pilot to delete
-     * @return HTTP status 204 (No Content) upon successful deletion
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePilot(@PathVariable Long id) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePilot(@PathVariable Long id) {
         pilotService.deletePilot(id);
-        return ResponseEntity.noContent().build();
     }
 }

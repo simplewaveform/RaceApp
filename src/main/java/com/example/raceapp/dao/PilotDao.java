@@ -4,13 +4,14 @@ import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
 /**
  * DAO interface for managing Pilot entities in the database.
  * Provides methods to save, find, delete pilots and retrieve races for a pilot.
  */
+@Repository
 public interface PilotDao {
-
     /**
      * Saves the given pilot to the database.
      *

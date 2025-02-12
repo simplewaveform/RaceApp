@@ -1,10 +1,12 @@
 package com.example.raceapp.service;
 
+import com.example.raceapp.dao.PilotDao;
 import com.example.raceapp.dao.RaceDao;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,14 +16,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class RaceService {
     private final RaceDao raceDao;
+    private final PilotDao pilotDao;
 
     /**
-     * Constructor to initialize the RaceService with a RaceDao dependency.
+     * Constructor to initialize the RaceService with a RaceDao and PilotDao dependency.
      *
      * @param raceDao the RaceDao instance for performing database operations.
+     * @param pilotDao the PilotDao instance for performing database operations.
      */
-    public RaceService(RaceDao raceDao) {
+    @Autowired
+    public RaceService(RaceDao raceDao, PilotDao pilotDao) {
         this.raceDao = raceDao;
+        this.pilotDao = pilotDao;
     }
 
     /**
@@ -71,5 +77,25 @@ public class RaceService {
      */
     public List<Pilot> getPilotsForRace(Long id) {
         return raceDao.getPilotsForRace(id);
+    }
+
+    /**
+     * Adds a pilot to a race.
+     *
+     * @param raceId the ID of the race
+     * @param pilotId the ID of the pilot to add
+     * @return the updated race entity
+     */
+    public Race addPilotToRace(Long raceId, Long pilotId) {
+        Race race = raceDao.findById(raceId).orElse(null);
+        Pilot pilot = pilotDao.findById(pilotId).orElse(null);
+
+        if (race != null && pilot != null) {
+            race.getPilots().add(pilot);
+            pilot.getRaces().add(race);
+            return raceDao.save(race);
+        }
+
+        return null;
     }
 }

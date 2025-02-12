@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
 
 /**
  * Controller for managing cars.
@@ -46,13 +46,18 @@ public class CarController {
     }
 
     /**
-     * Retrieves all cars.
+     * Retrieves all cars. Optionally filters by brand if provided.
      *
+     * @param brand the brand of the cars to filter by (optional)
      * @return a {@link ResponseEntity} containing a list of cars and HTTP status 200 OK
      */
     @GetMapping("/all")
-    public ResponseEntity<List<Car>> getAllCars() {
-        return ResponseEntity.ok(carService.getAllCars());
+    public ResponseEntity<List<Car>> getAllCars(@RequestParam(required = false) String brand) {
+        if (brand != null) {
+            return ResponseEntity.ok(carService.getCarsByBrand(brand));
+        } else {
+            return ResponseEntity.ok(carService.getAllCars());
+        }
     }
 
     /**

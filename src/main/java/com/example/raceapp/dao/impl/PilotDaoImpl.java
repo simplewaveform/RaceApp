@@ -17,7 +17,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Transactional
 public class PilotDaoImpl implements PilotDao {
-
     @PersistenceContext
     private EntityManager entityManager;
 
