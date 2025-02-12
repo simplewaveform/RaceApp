@@ -1,14 +1,24 @@
 package com.example.raceapp.model;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+/**
+ * Entity class representing a Race.
+ * A race is associated with multiple pilots and cars.
+ */
 @Entity
 @Table(name = "races")
 public class Race {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,7 +37,6 @@ public class Race {
     @ManyToMany(mappedBy = "races")
     private Set<Car> cars = new HashSet<>();
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }

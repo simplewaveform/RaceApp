@@ -1,11 +1,23 @@
 package com.example.raceapp.model;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
+/**
+ * Entity representing a pilot.
+ * This class stores information about the pilot such as name, age, experience,
+ * the cars they own, and the races they participate in.
+ */
 @Entity
 @Table(name = "pilots")
 public class Pilot {
@@ -28,7 +40,6 @@ public class Pilot {
     )
     private Set<Race> races = new HashSet<>();
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
