@@ -1,7 +1,10 @@
 package com.example.raceapp.model;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "pilots")
@@ -14,8 +17,16 @@ public class Pilot {
     private int age;
     private int experience;
 
-    @ManyToMany(mappedBy = "pilots")
-    private List<Race> races; // Список гонок, в которых участвует пилот
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Car> cars = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "race_pilot",
+            joinColumns = @JoinColumn(name = "pilot_id"),
+            inverseJoinColumns = @JoinColumn(name = "race_id")
+    )
+    private Set<Race> races = new HashSet<>();
 
     // Геттеры и сеттеры
     public Long getId() {
@@ -50,11 +61,11 @@ public class Pilot {
         this.experience = experience;
     }
 
-    public List<Race> getRaces() {
+    public Set<Race> getRaces() {
         return races;
     }
 
-    public void setRaces(List<Race> races) {
+    public void setRaces(Set<Race> races) {
         this.races = races;
     }
 }

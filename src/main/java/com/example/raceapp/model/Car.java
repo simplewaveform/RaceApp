@@ -1,6 +1,8 @@
 package com.example.raceapp.model;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -14,27 +16,17 @@ public class Car {
     private String model;
     private int power;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pilot_id")
+    private Pilot owner;
+
     @ManyToMany
     @JoinTable(
             name = "race_car",
             joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "race_id")
     )
-    private Set<Race> races;
-
-    @ManyToOne
-    @JoinColumn(name = "pilot_id")
-    private Pilot owner;
-
-    public Car() {
-    }
-
-    public Car(String brand, String model, int power, Pilot owner) {
-        this.brand = brand;
-        this.model = model;
-        this.power = power;
-        this.owner = owner;
-    }
+    private Set<Race> races = new HashSet<>();
 
     // Геттеры и сеттеры
     public Long getId() {

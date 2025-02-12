@@ -1,6 +1,8 @@
 package com.example.raceapp.model;
 
 import jakarta.persistence.*;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -14,12 +16,16 @@ public class Race {
     private String name;
     private int year;
 
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<Pilot> pilots; // Список пилотов, участвующих в гонке
+    @ManyToMany
+    @JoinTable(
+            name = "race_pilot",
+            joinColumns = @JoinColumn(name = "race_id"),
+            inverseJoinColumns = @JoinColumn(name = "pilot_id")
+    )
+    private Set<Pilot> pilots = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Car> cars;
-
+    @ManyToMany(mappedBy = "races")
+    private Set<Car> cars = new HashSet<>();
 
     // Геттеры и сеттеры
     public Long getId() {
@@ -46,11 +52,11 @@ public class Race {
         this.year = year;
     }
 
-    public List<Pilot> getPilots() {
+    public Set<Pilot> getPilots() {
         return pilots;
     }
 
-    public void setPilots(List<Pilot> pilots) {
+    public void setPilots(Set<Pilot> pilots) {
         this.pilots = pilots;
     }
 }

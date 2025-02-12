@@ -1,8 +1,8 @@
 package com.example.raceapp.service;
 
+import com.example.raceapp.dao.RaceDao;
+import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
-import com.example.raceapp.repository.RaceRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,22 +10,30 @@ import java.util.Optional;
 
 @Service
 public class RaceService {
-    private final RaceRepository raceRepository;
+    private final RaceDao raceDao;
 
-    @Autowired
-    public RaceService(RaceRepository raceRepository) {
-        this.raceRepository = raceRepository;
+    public RaceService(RaceDao raceDao) {
+        this.raceDao = raceDao;
     }
 
-    public Race getRaceById(Long id) {
-        return raceRepository.findById(id).orElse(null);
+    public Race saveRace(Race race) { // <- Метод сохранения гонки
+        return raceDao.save(race);
     }
 
     public List<Race> getAllRaces() {
-        return raceRepository.findAll();
+        return raceDao.findAll();
     }
 
-    public Race saveRace(Race race) {
-        return raceRepository.save(race);
+    public Race getRaceById(Long id) {
+        Optional<Race> race = raceDao.findById(id);
+        return race.orElse(null);
+    }
+
+    public void deleteRace(Long id) {
+        raceDao.deleteById(id);
+    }
+
+    public List<Pilot> getPilotsForRace(Long id) { // <- Метод получения пилотов для гонки
+        return raceDao.getPilotsForRace(id);
     }
 }
