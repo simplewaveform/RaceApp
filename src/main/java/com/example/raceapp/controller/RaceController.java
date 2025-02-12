@@ -103,7 +103,8 @@ public class RaceController {
      * @return the updated race entity
      */
     @PostMapping("/{raceId}/pilot/{pilotId}")
-    public ResponseEntity<Race> addPilotToRace(@PathVariable Long raceId, @PathVariable Long pilotId) {
+    public ResponseEntity<Race> addPilotToRace(@PathVariable Long raceId,
+                                               @PathVariable Long pilotId) {
         Race updatedRace = raceService.addPilotToRace(raceId, pilotId);
         if (updatedRace != null) {
             return ResponseEntity.ok(updatedRace);
