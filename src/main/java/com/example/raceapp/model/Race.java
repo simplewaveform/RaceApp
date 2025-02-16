@@ -2,6 +2,7 @@ package com.example.raceapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,9 +20,8 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "races")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Race {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,31 +29,25 @@ public class Race {
     private String name;
     private Integer year;
 
-    /**
-     * The pilots participating in the race.
-     * Ignored in JSON serialization to prevent circular references.
-     */
     @ManyToMany
     @JoinTable(
             name = "race_pilot",
             joinColumns = @JoinColumn(name = "race_id"),
             inverseJoinColumns = @JoinColumn(name = "pilot_id")
     )
-    @JsonIgnore
+    @JsonManagedReference("race-pilots")
     private Set<Pilot> pilots = new HashSet<>();
 
-    /**
-     * The cars participating in the race.
-     * Ignored in JSON serialization to prevent circular references.
-     */
     @ManyToMany
     @JoinTable(
             name = "race_car",
             joinColumns = @JoinColumn(name = "race_id"),
             inverseJoinColumns = @JoinColumn(name = "car_id")
     )
-    @JsonIgnore
+    @JsonIgnore // Prevent serialization/deserialization of this field
     private Set<Car> cars = new HashSet<>();
+
+    //Getters and setters...
 
     public Long getId() {
         return id;

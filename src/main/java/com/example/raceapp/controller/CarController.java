@@ -70,7 +70,7 @@ public class CarController {
     /**
      * Fully updates a car entity by its ID.
      *
-     * @param id  the ID of the car to update.
+     * @param id the ID of the car to update.
      * @param car the updated car data.
      * @return the updated car entity.
      */
@@ -82,7 +82,7 @@ public class CarController {
     /**
      * Partially updates a car entity by its ID.
      *
-     * @param id  the ID of the car to update.
+     * @param id the ID of the car to update.
      * @param car the partial car data.
      * @return the updated car entity.
      */

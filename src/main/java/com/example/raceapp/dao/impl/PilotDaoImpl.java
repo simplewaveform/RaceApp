@@ -35,7 +35,11 @@ public class PilotDaoImpl implements PilotDao {
 
     @Override
     public List<Pilot> findAll() {
-        return entityManager.createQuery("SELECT p FROM Pilot p", Pilot.class).getResultList();
+        return entityManager.createQuery(
+                        "SELECT DISTINCT p FROM Pilot p "
+                                + "LEFT JOIN FETCH p.cars "
+                                + "LEFT JOIN FETCH p.races", Pilot.class)
+                .getResultList();
     }
 
     @Override

@@ -35,7 +35,11 @@ public class RaceDaoImpl implements RaceDao {
 
     @Override
     public List<Race> findAll() {
-        return entityManager.createQuery("SELECT r FROM Race r", Race.class).getResultList();
+        return entityManager.createQuery(
+                        "SELECT DISTINCT r FROM Race r "
+                                + "LEFT JOIN FETCH r.pilots "
+                                + "LEFT JOIN FETCH r.cars", Race.class)
+                .getResultList();
     }
 
     @Override

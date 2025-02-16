@@ -57,13 +57,19 @@ public class RaceController {
     }
 
     /**
-     * Retrieves all races.
+     * Retrieves all races with their associated pilots and cars.
      *
      * @return a list of all races.
      */
     @GetMapping("/all")
     public ResponseEntity<List<Race>> getAllRaces() {
-        return ResponseEntity.ok(raceService.getAllRaces());
+        List<Race> races = raceService.getAllRaces();
+        // Manually fetching associated entities to ensure they are included in the response
+        races.forEach(race -> {
+            race.getPilots().size(); // Initialize lazy-loaded collection
+            race.getCars().size(); // Initialize lazy-loaded collection
+        });
+        return ResponseEntity.ok(races);
     }
 
     /**

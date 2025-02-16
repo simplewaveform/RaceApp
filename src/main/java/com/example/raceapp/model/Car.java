@@ -1,24 +1,20 @@
 package com.example.raceapp.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Main class for car model.
+ * Entity class representing a Car.
+ * A car can be owned by one pilot and participate in multiple races.
  */
 @Entity
 @Table(name = "cars")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +26,7 @@ public class Car {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pilot_id")
-    @JsonBackReference(value = "car-owner")  // Исправленный JsonBackReference
+    @JsonBackReference("car-owner")
     private Pilot owner;
 
     @ManyToMany
@@ -39,10 +35,11 @@ public class Car {
             joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "race_id")
     )
-    @JsonBackReference(value = "car-race")  // Уникальное имя для связи с гонками
+    @JsonIgnore // Prevent serialization/deserialization of this field
     private Set<Race> races = new HashSet<>();
 
-    // Getters and Setters
+
+    // Getters and setters
 
     public Long getId() {
         return id;

@@ -1,7 +1,6 @@
 package com.example.raceapp.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,9 +18,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "pilots")
-@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonIgnoreProperties(ignoreUnknown = true) // Add this line
 public class Pilot {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,21 +29,15 @@ public class Pilot {
     private Integer age;
     private Integer experience;
 
-    /**
-     * The cars owned by the pilot.
-     * Ignored in JSON serialization to prevent circular references.
-     */
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
+    @JsonIgnore // Replace @JsonManagedReference
     private Set<Car> cars = new HashSet<>();
 
-    /**
-     * The races in which the pilot participates.
-     * Ignored in JSON serialization to prevent circular references.
-     */
     @ManyToMany(mappedBy = "pilots")
-    @JsonIgnore
+    @JsonIgnore // Replace @JsonBackReference
     private Set<Race> races = new HashSet<>();
+
+    // Getters and Setters
 
     public Long getId() {
         return id;

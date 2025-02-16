@@ -79,13 +79,13 @@ public class CarService {
      */
     public Optional<Car> partialUpdateCar(Long id, Car carDetails) {
         return carDao.findById(id).map(car -> {
-            if (carDetails.getBrand() != null) {
+            if (carDetails.getBrand() != null && !carDetails.getBrand().isEmpty()) {
                 car.setBrand(carDetails.getBrand());
             }
-            if (carDetails.getModel() != null) {
+            if (carDetails.getModel() != null && !carDetails.getModel().isEmpty()) {
                 car.setModel(carDetails.getModel());
             }
-            if (carDetails.getPower() != 0) {
+            if (carDetails.getPower() > 0) { // Проверка на положительное значение
                 car.setPower(carDetails.getPower());
             }
             return carDao.save(car);
