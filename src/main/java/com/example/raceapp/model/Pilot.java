@@ -1,12 +1,12 @@
 package com.example.raceapp.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -30,16 +30,14 @@ public class Pilot {
     private int experience;
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Set<Car> cars = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "race_pilot",
-            joinColumns = @JoinColumn(name = "pilot_id"),
-            inverseJoinColumns = @JoinColumn(name = "race_id")
-    )
+    @ManyToMany(mappedBy = "pilots")
+    @JsonBackReference
     private Set<Race> races = new HashSet<>();
 
+    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -70,6 +68,14 @@ public class Pilot {
 
     public void setExperience(int experience) {
         this.experience = experience;
+    }
+
+    public Set<Car> getCars() {
+        return cars;
+    }
+
+    public void setCars(Set<Car> cars) {
+        this.cars = cars;
     }
 
     public Set<Race> getRaces() {

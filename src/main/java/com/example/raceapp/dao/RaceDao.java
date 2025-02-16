@@ -37,7 +37,7 @@ public interface RaceDao {
     List<Race> findAll();
 
     /**
-     * Deletes a race by its ID.
+     * Delete s a race by its ID.
      *
      * @param id the ID of the race to be deleted.
      */

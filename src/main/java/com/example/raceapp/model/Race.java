@@ -1,5 +1,6 @@
 package com.example.raceapp.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,11 +33,19 @@ public class Race {
             joinColumns = @JoinColumn(name = "race_id"),
             inverseJoinColumns = @JoinColumn(name = "pilot_id")
     )
+    @JsonManagedReference
     private Set<Pilot> pilots = new HashSet<>();
 
-    @ManyToMany(mappedBy = "races")
+    @ManyToMany
+    @JoinTable(
+            name = "race_car",
+            joinColumns = @JoinColumn(name = "race_id"),
+            inverseJoinColumns = @JoinColumn(name = "car_id")
+    )
+    @JsonManagedReference
     private Set<Car> cars = new HashSet<>();
 
+    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
@@ -67,5 +76,13 @@ public class Race {
 
     public void setPilots(Set<Pilot> pilots) {
         this.pilots = pilots;
+    }
+
+    public Set<Car> getCars() {
+        return cars;
+    }
+
+    public void setCars(Set<Car> cars) {
+        this.cars = cars;
     }
 }

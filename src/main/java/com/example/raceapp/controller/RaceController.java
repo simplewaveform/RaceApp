@@ -8,8 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -87,7 +89,7 @@ public class RaceController {
     /**
      * Endpoint to delete a race by its ID.
      *
-     * @param id the ID of the race to delete
+     * @param id the ID of the race to delete.
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -98,9 +100,9 @@ public class RaceController {
     /**
      * Endpoint to add a pilot to a race.
      *
-     * @param raceId the ID of the race
-     * @param pilotId the ID of the pilot to add
-     * @return the updated race entity
+     * @param raceId the ID of the race.
+     * @param pilotId the ID of the pilot to add.
+     * @return the updated race entity.
      */
     @PostMapping("/{raceId}/pilot/{pilotId}")
     public ResponseEntity<Race> addPilotToRace(@PathVariable Long raceId,
@@ -111,5 +113,52 @@ public class RaceController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Endpoint to fully update a race by its ID.
+     *
+     * @param id the ID of the race to update.
+     * @param raceDetails the race details to update.
+     * @return the updated race entity.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Race> updateRace(@PathVariable Long id, @RequestBody Race raceDetails) {
+        Race race = raceService.getRaceById(id);
+        if (race == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        race.setName(raceDetails.getName());
+        race.setYear(raceDetails.getYear());
+
+        Race updatedRace = raceService.saveRace(race);
+        return ResponseEntity.ok(updatedRace);
+    }
+
+    /**
+     * Endpoint to partially update a race by its ID.
+     *
+     * @param id the ID of the race to update.
+     * @param raceDetails the race details to update.
+     * @return the updated race entity.
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<Race> partialUpdateRace(@PathVariable Long id,
+                                                  @RequestBody Race raceDetails) {
+        Race race = raceService.getRaceById(id);
+        if (race == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (raceDetails.getName() != null) {
+            race.setName(raceDetails.getName());
+        }
+        if (raceDetails.getYear() != 0) {
+            race.setYear(raceDetails.getYear());
+        }
+
+        Race updatedRace = raceService.saveRace(race);
+        return ResponseEntity.ok(updatedRace);
     }
 }

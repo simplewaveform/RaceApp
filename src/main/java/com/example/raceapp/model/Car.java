@@ -1,5 +1,6 @@
 package com.example.raceapp.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
-
 
 /**
  * Main class for car model.
@@ -30,6 +30,7 @@ public class Car {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pilot_id")
+    @JsonBackReference
     private Pilot owner;
 
     @ManyToMany
@@ -38,9 +39,11 @@ public class Car {
             joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "race_id")
     )
+    @JsonBackReference
     private Set<Race> races = new HashSet<>();
 
-    // Геттеры и сеттеры
+    // Getters and Setters
+
     public Long getId() {
         return id;
     }

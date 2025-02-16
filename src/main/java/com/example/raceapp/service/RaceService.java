@@ -82,9 +82,9 @@ public class RaceService {
     /**
      * Adds a pilot to a race.
      *
-     * @param raceId the ID of the race
-     * @param pilotId the ID of the pilot to add
-     * @return the updated race entity
+     * @param raceId the ID of the race.
+     * @param pilotId the ID of the pilot to add.
+     * @return the updated race entity.
      */
     public Race addPilotToRace(Long raceId, Long pilotId) {
         Race race = raceDao.findById(raceId).orElse(null);
@@ -97,5 +97,16 @@ public class RaceService {
         }
 
         return null;
+    }
+
+    /**
+     * Retrieves a pilot by their ID.
+     *
+     * @param id the ID of the pilot to retrieve.
+     * @return the pilot if found, or null if not found.
+     */
+    public Pilot getPilotById(Long id) {
+        Optional<Pilot> pilot = pilotDao.findById(id);
+        return pilot.orElse(null);
     }
 }
