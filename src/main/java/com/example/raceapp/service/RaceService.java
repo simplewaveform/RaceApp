@@ -1,8 +1,6 @@
 package com.example.raceapp.service;
 
-import com.example.raceapp.dao.PilotDao;
 import com.example.raceapp.dao.RaceDao;
-import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import java.util.List;
 import java.util.Optional;
@@ -10,103 +8,92 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * Service class that handles business logic related to races.
- * Interacts with the RaceDao for CRUD operations and other race-related functionality.
+ * Service for managing Race entities.
+ * Provides business logic for Race CRUD operations.
  */
 @Service
 public class RaceService {
     private final RaceDao raceDao;
-    private final PilotDao pilotDao;
 
     /**
-     * Constructor to initialize the RaceService with a RaceDao and PilotDao dependency.
+     * Constructor for the RaceService class.
      *
-     * @param raceDao the RaceDao instance for performing database operations.
-     * @param pilotDao the PilotDao instance for performing database operations.
+     * @param raceDao The RaceDao instance to be injected into this service.
      */
     @Autowired
-    public RaceService(RaceDao raceDao, PilotDao pilotDao) {
+    public RaceService(RaceDao raceDao) {
         this.raceDao = raceDao;
-        this.pilotDao = pilotDao;
     }
 
     /**
-     * Saves a race entity to the database.
+     * Creates a new Race entity.
      *
-     * @param race the race entity to save.
-     * @return the saved race entity.
+     * @param race the Race to create.
+     * @return the saved Race entity.
      */
-    public Race saveRace(Race race) {
+    public Race createRace(Race race) {
         return raceDao.save(race);
     }
 
     /**
-     * Retrieves all races from the database.
+     * Retrieves a Race by its ID.
      *
-     * @return a list of all races.
+     * @param id the ID of the Race.
+     * @return an Optional containing the Race if found, or empty otherwise.
+     */
+    public Optional<Race> getRaceById(Long id) {
+        return raceDao.findById(id);
+    }
+
+    /**
+     * Retrieves all Races.
+     *
+     * @return a list of all Races.
      */
     public List<Race> getAllRaces() {
         return raceDao.findAll();
     }
 
     /**
-     * Retrieves a race by its ID.
+     * Fully updates a Race entity.
      *
-     * @param id the ID of the race to retrieve.
-     * @return the race if found, or null if not found.
+     * @param id the ID of the Race.
+     * @param raceDetails the new Race data.
+     * @return an Optional containing the updated Race if found, or empty otherwise.
      */
-    public Race getRaceById(Long id) {
-        Optional<Race> race = raceDao.findById(id);
-        return race.orElse(null);
+    public Optional<Race> updateRace(Long id, Race raceDetails) {
+        return raceDao.findById(id).map(race -> {
+            race.setName(raceDetails.getName());
+            race.setYear(raceDetails.getYear());
+            return raceDao.save(race);
+        });
     }
 
     /**
-     * Deletes a race by its ID.
+     * Partially updates a Race entity.
      *
-     * @param id the ID of the race to delete.
+     * @param id the ID of the Race.
+     * @param raceDetails the partial Race data.
+     * @return an Optional containing the updated Race if found, or empty otherwise.
+     */
+    public Optional<Race> partialUpdateRace(Long id, Race raceDetails) {
+        return raceDao.findById(id).map(race -> {
+            if (raceDetails.getName() != null) {
+                race.setName(raceDetails.getName());
+            }
+            if (raceDetails.getYear() != 0) {
+                race.setYear(raceDetails.getYear());
+            }
+            return raceDao.save(race);
+        });
+    }
+
+    /**
+     * Deletes a Race by its ID.
+     *
+     * @param id the ID of the Race to delete.
      */
     public void deleteRace(Long id) {
         raceDao.deleteById(id);
-    }
-
-    /**
-     * Retrieves all pilots participating in a specific race.
-     *
-     * @param id the ID of the race for which to retrieve the pilots.
-     * @return a list of pilots participating in the specified race.
-     */
-    public List<Pilot> getPilotsForRace(Long id) {
-        return raceDao.getPilotsForRace(id);
-    }
-
-    /**
-     * Adds a pilot to a race.
-     *
-     * @param raceId the ID of the race.
-     * @param pilotId the ID of the pilot to add.
-     * @return the updated race entity.
-     */
-    public Race addPilotToRace(Long raceId, Long pilotId) {
-        Race race = raceDao.findById(raceId).orElse(null);
-        Pilot pilot = pilotDao.findById(pilotId).orElse(null);
-
-        if (race != null && pilot != null) {
-            race.getPilots().add(pilot);
-            pilot.getRaces().add(race);
-            return raceDao.save(race);
-        }
-
-        return null;
-    }
-
-    /**
-     * Retrieves a pilot by their ID.
-     *
-     * @param id the ID of the pilot to retrieve.
-     * @return the pilot if found, or null if not found.
-     */
-    public Pilot getPilotById(Long id) {
-        Optional<Pilot> pilot = pilotDao.findById(id);
-        return pilot.orElse(null);
     }
 }

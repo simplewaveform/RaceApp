@@ -1,93 +1,100 @@
 package com.example.raceapp.controller;
 
 import com.example.raceapp.model.Pilot;
-import com.example.raceapp.model.Race;
 import com.example.raceapp.service.PilotService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller for managing pilots.
- * Provides endpoints to create, retrieve, and delete pilots, as well as get a pilot's races.
+ * Controller for managing Pilot entities.
+ * Provides CRUD operations for Pilot.
  */
 @RestController
-@RequestMapping("/pilot")
+@RequestMapping("/pilots")
 public class PilotController {
     private final PilotService pilotService;
 
     /**
-     * Constructor to inject the PilotService.
+     * Constructor for the PilotController class.
      *
-     * @param pilotService the service to manage pilot data
+     * @param pilotService The PilotService instance to be injected into this controller.
      */
     public PilotController(PilotService pilotService) {
         this.pilotService = pilotService;
     }
 
     /**
-     * Endpoint to create a new pilot.
+     * Creates a new pilot entity.
      *
-     * @param pilot the pilot data to create
-     * @return the created pilot with HTTP status 201 (Created)
+     * @param pilot the pilot object received in the request body.
+     * @return the created pilot with HTTP status 201 (Created).
      */
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<Pilot> createPilot(@RequestBody Pilot pilot) {
-        Pilot createdPilot = pilotService.createPilot(pilot);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPilot);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pilotService.createPilot(pilot));
     }
 
     /**
-     * Endpoint to retrieve all pilots.
+     * Retrieves a pilot by its ID.
      *
-     * @return a list of all pilots with HTTP status 200 (OK)
-     */
-    @GetMapping("/all")
-    public ResponseEntity<List<Pilot>> getAllPilots() {
-        List<Pilot> pilots = pilotService.getAllPilots();
-        return ResponseEntity.ok(pilots);
-    }
-
-    /**
-     * Endpoint to retrieve a pilot by their ID.
-     *
-     * @param id the ID of the pilot
-     * @return the pilot with the specified ID, or 404 if not found
+     * @param id the ID of the pilot.
+     * @return the pilot if found, or 404 if not found.
      */
     @GetMapping("/{id}")
     public ResponseEntity<Pilot> getPilotById(@PathVariable Long id) {
-        Pilot pilot = pilotService.getPilotById(id);
-        if (pilot != null) {
-            return ResponseEntity.ok(pilot);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.of(pilotService.getPilotById(id));
     }
 
     /**
-     * Endpoint to retrieve all races a specific pilot is participating in.
+     * Retrieves all pilots.
      *
-     * @param id the ID of the pilot
-     * @return a list of races the pilot is part of
+     * @return a list of all pilots.
      */
-    @GetMapping("/{id}/races")
-    public ResponseEntity<List<Race>> getRacesForPilot(@PathVariable Long id) {
-        List<Race> races = pilotService.getRacesForPilot(id);
-        return ResponseEntity.ok(races);
+    @GetMapping("/all")
+    public ResponseEntity<List<Pilot>> getAllPilots() {
+        return ResponseEntity.ok(pilotService.getAllPilots());
     }
 
     /**
-     * Endpoint to delete a pilot by their ID.
+     * Fully updates a pilot entity by its ID.
      *
-     * @param id the ID of the pilot to delete
+     * @param id the ID of the pilot to update.
+     * @param pilot the updated pilot data.
+     * @return the updated pilot entity.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<Pilot> updatePilot(@PathVariable Long id, @RequestBody Pilot pilot) {
+        return ResponseEntity.of(pilotService.updatePilot(id, pilot));
+    }
+
+    /**
+     * Partially updates a pilot entity by its ID.
+     *
+     * @param id the ID of the pilot to update.
+     * @param pilot the partial pilot data.
+     * @return the updated pilot entity.
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<Pilot> partialUpdatePilot(@PathVariable Long id,
+                                                    @RequestBody Pilot pilot) {
+        return ResponseEntity.of(pilotService.partialUpdatePilot(id, pilot));
+    }
+
+    /**
+     * Deletes a pilot by its ID.
+     *
+     * @param id the ID of the pilot to delete.
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

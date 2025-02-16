@@ -1,52 +1,43 @@
 package com.example.raceapp.dao;
 
 import com.example.raceapp.model.Pilot;
-import com.example.raceapp.model.Race;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 /**
- * DAO interface for managing Pilot entities in the database.
- * Provides methods to save, find, delete pilots and retrieve races for a pilot.
+ * DAO interface for Pilot entity.
+ * Defines database operations for Pilot.
  */
 @Repository
 public interface PilotDao {
     /**
-     * Saves the given pilot to the database.
+     * Saves a Pilot entity.
      *
-     * @param pilot the pilot to save
-     * @return the saved pilot entity
+     * @param pilot the Pilot to save.
+     * @return the saved Pilot entity.
      */
     Pilot save(Pilot pilot);
 
     /**
-     * Finds a pilot by their ID.
+     * Finds a Pilot by its ID.
      *
-     * @param id the ID of the pilot to find
-     * @return an Optional containing the found pilot, or an empty Optional if not found
+     * @param id the Pilot ID.
+     * @return an Optional containing the Pilot, or empty if not found.
      */
     Optional<Pilot> findById(Long id);
 
     /**
-     * Finds all pilots in the database.
+     * Retrieves all Pilots.
      *
-     * @return a list of all pilots
+     * @return a list of all Pilots.
      */
     List<Pilot> findAll();
 
     /**
-     * Deletes a pilot by their ID.
+     * Deletes a Pilot by its ID.
      *
-     * @param id the ID of the pilot to delete
+     * @param id the Pilot ID.
      */
     void deleteById(Long id);
-
-    /**
-     * Retrieves all races a specific pilot is participating in.
-     *
-     * @param pilotId the ID of the pilot
-     * @return a list of races the pilot is part of
-     */
-    List<Race> getRacesForPilot(Long pilotId);
 }

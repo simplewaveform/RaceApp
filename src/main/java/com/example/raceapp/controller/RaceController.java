@@ -1,6 +1,5 @@
 package com.example.raceapp.controller;
 
-import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import com.example.raceapp.service.RaceService;
 import java.util.List;
@@ -18,76 +17,81 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Controller class for managing Race-related operations.
- * Provides endpoints to add, retrieve, and get pilots for races.
+ * Controller for managing Race entities.
+ * Provides CRUD operations for Race.
  */
 @RestController
-@RequestMapping("/race")
+@RequestMapping("/races")
 public class RaceController {
     private final RaceService raceService;
 
     /**
-     * Constructor to inject the RaceService.
+     * Constructor for the RaceController class.
      *
-     * @param raceService the service used to handle race-related logic.
+     * @param raceService The RaceService instance to be injected into this controller.
      */
     public RaceController(RaceService raceService) {
         this.raceService = raceService;
     }
 
     /**
-     * Endpoint to add a new race.
+     * Creates a new race entity.
      *
-     * @param race the race object to be created.
-     * @return the created race object along with a CREATED status.
+     * @param race the race object received in the request body.
+     * @return the created race with HTTP status 201 (Created).
      */
-    @PostMapping("/add")
-    public ResponseEntity<Race> addRace(@RequestBody Race race) {
-        Race createdRace = raceService.saveRace(race);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdRace);
+    @PostMapping
+    public ResponseEntity<Race> createRace(@RequestBody Race race) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(raceService.createRace(race));
     }
 
     /**
-     * Endpoint to retrieve all races.
+     * Retrieves a race by its ID.
+     *
+     * @param id the ID of the race.
+     * @return the race if found, or 404 if not found.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Race> getRaceById(@PathVariable Long id) {
+        return ResponseEntity.of(raceService.getRaceById(id));
+    }
+
+    /**
+     * Retrieves all races.
      *
      * @return a list of all races.
      */
     @GetMapping("/all")
     public ResponseEntity<List<Race>> getAllRaces() {
-        List<Race> races = raceService.getAllRaces();
-        return ResponseEntity.ok(races);
+        return ResponseEntity.ok(raceService.getAllRaces());
     }
 
     /**
-     * Endpoint to retrieve a race by its ID.
+     * Fully updates a race entity by its ID.
      *
-     * @param id the ID of the race to be retrieved.
-     * @return the race object with the given ID, or 404 if not found.
+     * @param id the ID of the race to update.
+     * @param race the updated race data.
+     * @return the updated race entity.
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<Race> getRaceById(@PathVariable Long id) {
-        Race race = raceService.getRaceById(id);
-        if (race != null) {
-            return ResponseEntity.ok(race);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @PutMapping("/{id}")
+    public ResponseEntity<Race> updateRace(@PathVariable Long id, @RequestBody Race race) {
+        return ResponseEntity.of(raceService.updateRace(id, race));
     }
 
     /**
-     * Endpoint to retrieve all pilots participating in a specific race.
+     * Partially updates a race entity by its ID.
      *
-     * @param id the ID of the race to get pilots for.
-     * @return a list of pilots participating in the specified race.
+     * @param id the ID of the race to update.
+     * @param race the partial race data.
+     * @return the updated race entity.
      */
-    @GetMapping("/{id}/pilots")
-    public ResponseEntity<List<Pilot>> getPilotsForRace(@PathVariable Long id) {
-        List<Pilot> pilots = raceService.getPilotsForRace(id);
-        return ResponseEntity.ok(pilots);
+    @PatchMapping("/{id}")
+    public ResponseEntity<Race> partialUpdateRace(@PathVariable Long id, @RequestBody Race race) {
+        return ResponseEntity.of(raceService.partialUpdateRace(id, race));
     }
 
     /**
-     * Endpoint to delete a race by its ID.
+     * Deletes a race by its ID.
      *
      * @param id the ID of the race to delete.
      */
@@ -95,70 +99,5 @@ public class RaceController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRace(@PathVariable Long id) {
         raceService.deleteRace(id);
-    }
-
-    /**
-     * Endpoint to add a pilot to a race.
-     *
-     * @param raceId the ID of the race.
-     * @param pilotId the ID of the pilot to add.
-     * @return the updated race entity.
-     */
-    @PostMapping("/{raceId}/pilot/{pilotId}")
-    public ResponseEntity<Race> addPilotToRace(@PathVariable Long raceId,
-                                               @PathVariable Long pilotId) {
-        Race updatedRace = raceService.addPilotToRace(raceId, pilotId);
-        if (updatedRace != null) {
-            return ResponseEntity.ok(updatedRace);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    /**
-     * Endpoint to fully update a race by its ID.
-     *
-     * @param id the ID of the race to update.
-     * @param raceDetails the race details to update.
-     * @return the updated race entity.
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<Race> updateRace(@PathVariable Long id, @RequestBody Race raceDetails) {
-        Race race = raceService.getRaceById(id);
-        if (race == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        race.setName(raceDetails.getName());
-        race.setYear(raceDetails.getYear());
-
-        Race updatedRace = raceService.saveRace(race);
-        return ResponseEntity.ok(updatedRace);
-    }
-
-    /**
-     * Endpoint to partially update a race by its ID.
-     *
-     * @param id the ID of the race to update.
-     * @param raceDetails the race details to update.
-     * @return the updated race entity.
-     */
-    @PatchMapping("/{id}")
-    public ResponseEntity<Race> partialUpdateRace(@PathVariable Long id,
-                                                  @RequestBody Race raceDetails) {
-        Race race = raceService.getRaceById(id);
-        if (race == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (raceDetails.getName() != null) {
-            race.setName(raceDetails.getName());
-        }
-        if (raceDetails.getYear() != 0) {
-            race.setYear(raceDetails.getYear());
-        }
-
-        Race updatedRace = raceService.saveRace(race);
-        return ResponseEntity.ok(updatedRace);
     }
 }

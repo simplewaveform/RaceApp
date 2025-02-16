@@ -1,6 +1,7 @@
 package com.example.raceapp.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,10 +15,11 @@ import java.util.Set;
 
 /**
  * Entity class representing a Race.
- * A race is associated with multiple pilots and cars.
+ * A race can have multiple pilots and cars participating.
  */
 @Entity
 @Table(name = "races")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Race {
 
     @Id
@@ -25,27 +27,34 @@ public class Race {
     private Long id;
 
     private String name;
-    private int year;
+    private Integer year;
 
+    /**
+     * The pilots participating in the race.
+     * Ignored in JSON serialization to prevent circular references.
+     */
     @ManyToMany
     @JoinTable(
             name = "race_pilot",
             joinColumns = @JoinColumn(name = "race_id"),
             inverseJoinColumns = @JoinColumn(name = "pilot_id")
     )
-    @JsonManagedReference
+    @JsonIgnore
     private Set<Pilot> pilots = new HashSet<>();
 
+    /**
+     * The cars participating in the race.
+     * Ignored in JSON serialization to prevent circular references.
+     */
     @ManyToMany
     @JoinTable(
             name = "race_car",
             joinColumns = @JoinColumn(name = "race_id"),
             inverseJoinColumns = @JoinColumn(name = "car_id")
     )
-    @JsonManagedReference
+    @JsonIgnore
     private Set<Car> cars = new HashSet<>();
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
@@ -62,11 +71,11 @@ public class Race {
         this.name = name;
     }
 
-    public int getYear() {
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 

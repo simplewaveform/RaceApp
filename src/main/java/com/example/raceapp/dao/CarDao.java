@@ -6,45 +6,38 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 /**
- * Data Access Object (DAO) interface for managing {@link Car} entities.
+ * DAO interface for Car entity.
+ * Defines database operations for Car.
  */
 @Repository
 public interface CarDao {
     /**
-     * Saves a car entity.
+     * Saves a Car entity.
      *
-     * @param car the {@link Car} object to save
-     * @return the saved {@link Car} object
+     * @param car the Car to save.
+     * @return the saved Car entity.
      */
     Car save(Car car);
 
     /**
-     * Finds a car by its ID.
+     * Finds a Car by its ID.
      *
-     * @param id the car ID
-     * @return an {@link Optional} containing the found {@link Car}, or empty if not found
+     * @param id the Car ID.
+     * @return an Optional containing the Car, or empty if not found.
      */
     Optional<Car> findById(Long id);
 
     /**
-     * Retrieves all cars.
+     * Retrieves all Cars.
      *
-     * @return a list of all {@link Car} entities
+     * @return a list of all Cars.
      */
     List<Car> findAll();
 
     /**
-     * Deletes a car by its ID.
+     * Deletes a Car by its ID.
      *
-     * @param id the car ID
+     * @param id the Car ID.
      */
     void deleteById(Long id);
-
-    /**
-     * Retrieves cars by their brand.
-     *
-     * @param brand the brand of the cars to filter by
-     * @return a list of {@link Car} entities with the specified brand
-     */
-    List<Car> findByBrand(String brand);
 }

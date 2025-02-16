@@ -1,7 +1,7 @@
 package com.example.raceapp.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,30 +14,38 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Entity representing a pilot.
- * This class stores information about the pilot such as name, age, experience,
- * the cars they own, and the races they participate in.
+ * Entity class representing a Pilot.
+ * A pilot can own multiple cars and participate in multiple races.
  */
 @Entity
 @Table(name = "pilots")
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Pilot {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-    private int age;
-    private int experience;
+    private Integer age;
+    private Integer experience;
 
+    /**
+     * The cars owned by the pilot.
+     * Ignored in JSON serialization to prevent circular references.
+     */
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonIgnore
     private Set<Car> cars = new HashSet<>();
 
+    /**
+     * The races in which the pilot participates.
+     * Ignored in JSON serialization to prevent circular references.
+     */
     @ManyToMany(mappedBy = "pilots")
-    @JsonBackReference
+    @JsonIgnore
     private Set<Race> races = new HashSet<>();
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -54,19 +62,19 @@ public class Pilot {
         this.name = name;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
-    public int getExperience() {
+    public Integer getExperience() {
         return experience;
     }
 
-    public void setExperience(int experience) {
+    public void setExperience(Integer experience) {
         this.experience = experience;
     }
 

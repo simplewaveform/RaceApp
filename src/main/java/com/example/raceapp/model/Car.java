@@ -30,7 +30,7 @@ public class Car {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pilot_id")
-    @JsonBackReference
+    @JsonBackReference(value = "car-owner")  // Исправленный JsonBackReference
     private Pilot owner;
 
     @ManyToMany
@@ -39,7 +39,7 @@ public class Car {
             joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "race_id")
     )
-    @JsonBackReference
+    @JsonBackReference(value = "car-race")  // Уникальное имя для связи с гонками
     private Set<Race> races = new HashSet<>();
 
     // Getters and Setters
