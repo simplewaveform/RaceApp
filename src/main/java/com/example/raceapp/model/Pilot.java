@@ -37,7 +37,6 @@ public class Pilot {
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private Set<Car> cars = new HashSet<>();
 
-
     @ManyToMany(mappedBy = "pilots")
     @JsonIgnore // Replace @JsonBackReference
     private Set<Race> races = new HashSet<>();
