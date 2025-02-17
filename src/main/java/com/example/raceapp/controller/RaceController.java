@@ -66,8 +66,9 @@ public class RaceController {
         List<Race> races = raceService.getAllRaces();
         // Manually fetching associated entities to ensure they are included in the response
         races.forEach(race -> {
-            race.getPilots().size(); // Initialize lazy-loaded collection
-            race.getCars().size(); // Initialize lazy-loaded collection
+            // Initialize lazy-loaded collections
+            int pilotsSize = race.getPilots().size(); // Use the return value
+            int carsSize = race.getCars().size(); // Use the return value
         });
         return ResponseEntity.ok(races);
     }
