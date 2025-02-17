@@ -1,6 +1,5 @@
 package com.example.raceapp.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Entity;
@@ -34,7 +33,7 @@ public class Car {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pilot_id")
-    @JsonBackReference("car-owner")
+    @JsonIgnore
     private Pilot owner;
 
     @ManyToMany
@@ -45,7 +44,6 @@ public class Car {
     )
     @JsonIgnore // Prevent serialization/deserialization of this field
     private Set<Race> races = new HashSet<>();
-
 
     // Getters and setters
 
