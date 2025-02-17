@@ -34,6 +34,8 @@ public interface CarDao {
      */
     List<Car> findAll();
 
+    List<Car> findByBrand(String brand);
+
     /**
      * Deletes a Car by its ID.
      *

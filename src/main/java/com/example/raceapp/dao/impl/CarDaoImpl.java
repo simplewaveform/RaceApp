@@ -4,6 +4,7 @@ import com.example.raceapp.dao.CarDao;
 import com.example.raceapp.model.Car;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Repository;
  * Implementation of CarDao using JPA and EntityManager.
  */
 @Repository
-@Transactional
 public class CarDaoImpl implements CarDao {
     @PersistenceContext
     private EntityManager entityManager;
@@ -36,6 +36,14 @@ public class CarDaoImpl implements CarDao {
     @Override
     public List<Car> findAll() {
         return entityManager.createQuery("SELECT c FROM Car c", Car.class).getResultList();
+    }
+
+    @Override
+    public List<Car> findByBrand(String brand) {
+        TypedQuery<Car> query = entityManager.createQuery(
+                "SELECT c FROM Car c WHERE c.brand = :brand", Car.class);
+        query.setParameter("brand", brand);
+        return query.getResultList();
     }
 
     @Override

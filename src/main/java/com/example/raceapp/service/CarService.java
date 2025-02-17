@@ -54,6 +54,10 @@ public class CarService {
         return carDao.findAll();
     }
 
+    public List<Car> getCarsByBrand(String brand) {
+        return carDao.findByBrand(brand);
+    }
+
     /**
      * Fully updates a Car entity.
      *
