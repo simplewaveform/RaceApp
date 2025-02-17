@@ -34,6 +34,11 @@ public interface CarDao {
      */
     List<Car> findAll();
 
+    /**
+     * Retrieves a Cars by its brand.
+     *
+     * @return a list Cars with requested brand.
+     */
     List<Car> findByBrand(String brand);
 
     /**

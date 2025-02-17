@@ -54,6 +54,11 @@ public class CarService {
         return carDao.findAll();
     }
 
+    /**
+     * Retrieves a Cars by its brand.
+     *
+     * @return a list Cars with requested brand.
+     */
     public List<Car> getCarsByBrand(String brand) {
         return carDao.findByBrand(brand);
     }
