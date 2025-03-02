@@ -21,7 +21,7 @@ public class CarService {
     }
 
     public Optional<Car> getCarById(Long id) {
-        return carRepository.findById(id);
+        return carRepository.findById(id); // Использует EntityGraph
     }
 
     public List<Car> searchCars(String brand, String model, Integer power, Long ownerId) {

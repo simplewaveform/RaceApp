@@ -21,7 +21,7 @@ public class PilotService {
     }
 
     public Optional<Pilot> getPilotById(Long id) {
-        return pilotRepository.findByIdWithCars(id);
+        return pilotRepository.findById(id);
     }
 
     public List<Pilot> searchPilots(String name, Integer age, Integer experience) {

@@ -2,13 +2,17 @@ package com.example.raceapp.repository;
 
 import com.example.raceapp.model.Car;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+
 @Repository
 public interface CarRepository extends JpaRepository<Car, Long> {
+    @EntityGraph(attributePaths = {"owner", "races"})
     @Query("SELECT c FROM Car c WHERE "
             + "(:brand IS NULL OR c.brand = :brand) AND "
             + "(:model IS NULL OR c.model = :model) AND "
@@ -19,4 +23,8 @@ public interface CarRepository extends JpaRepository<Car, Long> {
             @Param("model") String model,
             @Param("power") Integer power,
             @Param("ownerId") Long ownerId);
+
+    @EntityGraph(attributePaths = {"owner", "races"})
+    @Override
+    Optional<Car> findById(Long id);
 }

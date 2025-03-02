@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
 @Repository
 public interface PilotRepository extends JpaRepository<Pilot, Long> {
+    @EntityGraph(attributePaths = {"cars"})
     @Query("SELECT p FROM Pilot p WHERE "
             + "(:name IS NULL OR p.name = :name) AND "
             + "(:age IS NULL OR p.age = :age) AND "
@@ -22,6 +22,6 @@ public interface PilotRepository extends JpaRepository<Pilot, Long> {
             @Param("experience") Integer experience);
 
     @EntityGraph(attributePaths = {"cars"})
-    @Query("SELECT p FROM Pilot p WHERE p.id = :id")
-    Optional<Pilot> findByIdWithCars(@Param("id") Long id);
+    @Override
+    Optional<Pilot> findById(Long id);
 }

@@ -21,7 +21,7 @@ public class RaceService {
     }
 
     public Optional<Race> getRaceById(Long id) {
-        return raceRepository.findById(id);
+        return raceRepository.findById(id); // Использует EntityGraph
     }
 
     public List<Race> searchRaces(String name, Integer year) {
