@@ -16,6 +16,12 @@ import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a race entity in the racing application.
+ * This class is mapped to the "races" table in the database
+ * ыand contains information about the race,
+ * including its name, year, participating pilots, and participating cars.
+ */
 @Entity
 @Table(name = "races")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -45,7 +51,59 @@ public class Race {
     @JsonIgnore
     private Set<Car> cars = new HashSet<>();
 
+    /**
+     * Default constructor for the Race entity.
+     * Required by JPA for creating instances of this class.
+     */
+    public Race() {
+    }
+
+    /**
+     * Adds a pilot to the set of pilots participating in this race.
+     * Ensures that the relationship between the race and the pilot is properly maintained.
+     *
+     * @param pilot The pilot to be added to the race's pilot set.
+     */
+    public void addPilot(Pilot pilot) {
+        this.pilots.add(pilot);
+        pilot.getRaces().add(this);
+    }
+
+    /**
+     * Removes a pilot from the set of pilots participating in this race.
+     * Ensures that the relationship between the race and the pilot is properly removed.
+     *
+     * @param pilot The pilot to be removed from the race's pilot set.
+     */
+    public void removePilot(Pilot pilot) {
+        this.pilots.remove(pilot);
+        pilot.getRaces().remove(this);
+    }
+
+    /**
+     * Adds a car to the set of cars participating in this race.
+     * Ensures that the relationship between the race and the car is properly maintained.
+     *
+     * @param car The car to be added to the race's car set.
+     */
+    public void addCar(Car car) {
+        this.cars.add(car);
+        car.getRaces().add(this);
+    }
+
+    /**
+     * Removes a car from the set of cars participating in this race.
+     * Ensures that the relationship between the race and the car is properly removed.
+     *
+     * @param car The car to be removed from the race's car set.
+     */
+    public void removeCar(Car car) {
+        this.cars.remove(car);
+        car.getRaces().remove(this);
+    }
+
     // Геттеры и сеттеры
+
     public Long getId() {
         return id;
     }
@@ -85,5 +143,4 @@ public class Race {
     public void setCars(Set<Car> cars) {
         this.cars = cars;
     }
-
 }

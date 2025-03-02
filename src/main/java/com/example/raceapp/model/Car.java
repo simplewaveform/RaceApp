@@ -15,6 +15,11 @@ import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a car entity in the racing application.
+ * This class is mapped to the "cars" table in the database and contains information about the car,
+ * including its brand, model, power, owner (Pilot), and the races it participates in.
+ */
 @Entity
 @Table(name = "cars")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -41,7 +46,35 @@ public class Car {
     @JsonIgnore
     private Set<Race> races = new HashSet<>();
 
-    // Геттеры и сеттеры
+    /**
+     * Default constructor for the Car entity.
+     * Required by JPA for creating instances of this class.
+     */
+    public Car() {
+    }
+
+    /**
+     * Adds a race to the set of races this car participates in.
+     * Ensures that the relationship between the car and the race is properly maintained.
+     *
+     * @param race The race to be added to the car's race set.
+     */
+    public void addRace(Race race) {
+        this.races.add(race);
+        race.getCars().add(this);
+    }
+
+    /**
+     * Removes a race from the set of races this car participates in.
+     * Ensures that the relationship between the car and the race is properly removed.
+     *
+     * @param race The race to be removed from the car's race set.
+     */
+    public void removeRace(Race race) {
+        this.races.remove(race);
+        race.getCars().remove(this);
+    }
+
     public Long getId() {
         return id;
     }
@@ -89,5 +122,4 @@ public class Car {
     public void setRaces(Set<Race> races) {
         this.races = races;
     }
-
 }

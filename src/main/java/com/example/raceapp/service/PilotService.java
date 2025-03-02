@@ -7,23 +7,54 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service class for managing Pilot entities.
+ * Provides business logic for creating, retrieving, updating, and deleting pilots.
+ */
 @Service
 @Transactional
 public class PilotService {
     private final PilotRepository pilotRepository;
 
+    /**
+     * Constructs a new PilotService with the specified PilotRepository.
+     *
+     * @param pilotRepository The repository responsible for pilot-related database operations.
+     */
     public PilotService(PilotRepository pilotRepository) {
         this.pilotRepository = pilotRepository;
     }
 
+    /**
+     * Creates a new pilot and saves it to the database.
+     *
+     * @param pilot The pilot object to be created.
+     * @return The created pilot object.
+     */
     public Pilot createPilot(Pilot pilot) {
         return pilotRepository.save(pilot);
     }
 
+    /**
+     * Retrieves a pilot by its unique identifier.
+     *
+     * @param id The unique identifier of the pilot to retrieve.
+     * @return An Optional containing the pilot if found, or an empty Optional if not found.
+     */
     public Optional<Pilot> getPilotById(Long id) {
         return pilotRepository.findById(id);
     }
 
+    /**
+     * Searches for pilots based on optional filtering criteria.
+     * If no filtering criteria are provided, retrieves all pilots.
+     *
+     * @param name       (Optional) The name of the pilot to filter by.
+     * @param age        (Optional) The age of the pilot to filter by.
+     * @param experience (Optional) The experience of the pilot to filter by.
+     * @return A list of pilots matching the provided filtering criteria, or all pilots if no
+     *         criteria are provided.
+     */
     public List<Pilot> searchPilots(String name, Integer age, Integer experience) {
         if (name != null || age != null || experience != null) {
             return pilotRepository.findByNameOrAgeOrExperience(name, age, experience);
@@ -31,6 +62,15 @@ public class PilotService {
         return pilotRepository.findAll();
     }
 
+    /**
+     * Updates an existing pilot by replacing its data with the provided pilot object.
+     * The pilot ID in the path must match the ID of the pilot being updated.
+     *
+     * @param id          The unique identifier of the pilot to update.
+     * @param pilotDetails The updated pilot object containing new data.
+     * @return An Optional containing the updated pilot if successful, or an empty Optional if not
+     *         found.
+     */
     public Optional<Pilot> updatePilot(Long id, Pilot pilotDetails) {
         return pilotRepository.findById(id).map(pilot -> {
             pilot.setName(pilotDetails.getName());
@@ -40,6 +80,15 @@ public class PilotService {
         });
     }
 
+    /**
+     * Partially updates an existing pilot.
+     * Only the fields present in the provided pilot object will be updated.
+     *
+     * @param id          The unique identifier of the pilot to partially update.
+     * @param pilotDetails The partial pilot object containing updated fields.
+     * @return An Optional containing the updated pilot if successful, or an empty Optional if not
+     *         found.
+     */
     public Optional<Pilot> partialUpdatePilot(Long id, Pilot pilotDetails) {
         return pilotRepository.findById(id).map(pilot -> {
             if (pilotDetails.getName() != null) {
@@ -55,6 +104,11 @@ public class PilotService {
         });
     }
 
+    /**
+     * Deletes a pilot by its unique identifier.
+     *
+     * @param id The unique identifier of the pilot to delete.
+     */
     public void deletePilot(Long id) {
         pilotRepository.deleteById(id);
     }
