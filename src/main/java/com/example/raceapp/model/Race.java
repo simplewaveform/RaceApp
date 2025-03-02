@@ -52,13 +52,6 @@ public class Race {
     private Set<Car> cars = new HashSet<>();
 
     /**
-     * Default constructor for the Race entity.
-     * Required by JPA for creating instances of this class.
-     */
-    public Race() {
-    }
-
-    /**
      * Adds a pilot to the set of pilots participating in this race.
      * Ensures that the relationship between the race and the pilot is properly maintained.
      *
