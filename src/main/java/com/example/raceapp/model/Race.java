@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,10 +16,6 @@ import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Entity class representing a Race.
- * A race can have multiple pilots and cars participating.
- */
 @Entity
 @Table(name = "races")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -30,7 +27,7 @@ public class Race {
     private String name;
     private Integer year;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "race_pilot",
             joinColumns = @JoinColumn(name = "race_id"),
@@ -39,54 +36,24 @@ public class Race {
     @JsonManagedReference("race-pilots")
     private Set<Pilot> pilots = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "race_car",
             joinColumns = @JoinColumn(name = "race_id"),
             inverseJoinColumns = @JoinColumn(name = "car_id")
     )
-    @JsonIgnore // Prevent serialization/deserialization of this field
+    @JsonIgnore
     private Set<Car> cars = new HashSet<>();
 
-    //Getters and setters...
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public Set<Pilot> getPilots() {
-        return pilots;
-    }
-
-    public void setPilots(Set<Pilot> pilots) {
-        this.pilots = pilots;
-    }
-
-    public Set<Car> getCars() {
-        return cars;
-    }
-
-    public void setCars(Set<Car> cars) {
-        this.cars = cars;
-    }
+    // Геттеры и сеттеры
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public Integer getYear() { return year; }
+    public void setYear(Integer year) { this.year = year; }
+    public Set<Pilot> getPilots() { return pilots; }
+    public void setPilots(Set<Pilot> pilots) { this.pilots = pilots; }
+    public Set<Car> getCars() { return cars; }
+    public void setCars(Set<Car> cars) { this.cars = cars; }
 }

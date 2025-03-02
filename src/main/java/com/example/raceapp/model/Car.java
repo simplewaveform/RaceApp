@@ -15,10 +15,6 @@ import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Entity class representing a Car.
- * A car can be owned by one pilot and participate in multiple races.
- */
 @Entity
 @Table(name = "cars")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -36,17 +32,16 @@ public class Car {
     @JsonIgnore
     private Pilot owner;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "race_car",
             joinColumns = @JoinColumn(name = "car_id"),
             inverseJoinColumns = @JoinColumn(name = "race_id")
     )
-    @JsonIgnore // Prevent serialization/deserialization of this field
+    @JsonIgnore
     private Set<Race> races = new HashSet<>();
 
-    // Getters and setters
-
+    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
@@ -94,4 +89,5 @@ public class Car {
     public void setRaces(Set<Race> races) {
         this.races = races;
     }
+
 }

@@ -1,99 +1,57 @@
 package com.example.raceapp.service;
 
-import com.example.raceapp.dao.RaceDao;
 import com.example.raceapp.model.Race;
+import com.example.raceapp.repository.RaceRepository;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Service for managing Race entities.
- * Provides business logic for Race CRUD operations.
- */
 @Service
+@Transactional
 public class RaceService {
-    private final RaceDao raceDao;
+    private final RaceRepository raceRepository;
 
-    /**
-     * Constructor for the RaceService class.
-     *
-     * @param raceDao The RaceDao instance to be injected into this service.
-     */
-    @Autowired
-    public RaceService(RaceDao raceDao) {
-        this.raceDao = raceDao;
+    public RaceService(RaceRepository raceRepository) {
+        this.raceRepository = raceRepository;
     }
 
-    /**
-     * Creates a new Race entity.
-     *
-     * @param race the Race to create.
-     * @return the saved Race entity.
-     */
     public Race createRace(Race race) {
-        return raceDao.save(race);
+        return raceRepository.save(race);
     }
 
-    /**
-     * Retrieves a Race by its ID.
-     *
-     * @param id the ID of the Race.
-     * @return an Optional containing the Race if found, or empty otherwise.
-     */
     public Optional<Race> getRaceById(Long id) {
-        return raceDao.findById(id);
+        return raceRepository.findById(id);
     }
 
-    /**
-     * Retrieves all Races.
-     *
-     * @return a list of all Races.
-     */
-    public List<Race> getAllRaces() {
-        return raceDao.findAll();
+    public List<Race> searchRaces(String name, Integer year) {
+        if (name != null || year != null) {
+            return raceRepository.findByNameOrYear(name, year);
+        }
+        return raceRepository.findAll();
     }
 
-    /**
-     * Fully updates a Race entity.
-     *
-     * @param id the ID of the Race.
-     * @param raceDetails the new Race data.
-     * @return an Optional containing the updated Race if found, or empty otherwise.
-     */
     public Optional<Race> updateRace(Long id, Race raceDetails) {
-        return raceDao.findById(id).map(race -> {
+        return raceRepository.findById(id).map(race -> {
             race.setName(raceDetails.getName());
             race.setYear(raceDetails.getYear());
-            return raceDao.save(race);
+            return raceRepository.save(race);
         });
     }
 
-    /**
-     * Partially updates a Race entity.
-     *
-     * @param id the ID of the Race.
-     * @param raceDetails the partial Race data.
-     * @return an Optional containing the updated Race if found, or empty otherwise.
-     */
     public Optional<Race> partialUpdateRace(Long id, Race raceDetails) {
-        return raceDao.findById(id).map(race -> {
+        return raceRepository.findById(id).map(race -> {
             if (raceDetails.getName() != null) {
                 race.setName(raceDetails.getName());
             }
-            if (raceDetails.getYear() != 0) {
+            if (raceDetails.getYear() != null) {
                 race.setYear(raceDetails.getYear());
             }
-            return raceDao.save(race);
+            return raceRepository.save(race);
         });
     }
 
-    /**
-     * Deletes a Race by its ID.
-     *
-     * @param id the ID of the Race to delete.
-     */
     public void deleteRace(Long id) {
-        raceDao.deleteById(id);
+        raceRepository.deleteById(id);
     }
 }

@@ -2,11 +2,11 @@ package com.example.raceapp.model;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,14 +16,9 @@ import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Entity class representing a Pilot.
- * A pilot can own multiple cars and participate in multiple races.
- */
 @Entity
 @Table(name = "pilots")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-@JsonIgnoreProperties(ignoreUnknown = true) // Add this line
 public class Pilot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,16 +28,16 @@ public class Pilot {
     private Integer age;
     private Integer experience;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST,
+                                             CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private Set<Car> cars = new HashSet<>();
 
-    @ManyToMany(mappedBy = "pilots")
-    @JsonIgnore // Replace @JsonBackReference
+    @ManyToMany(mappedBy = "pilots", fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Race> races = new HashSet<>();
 
-    // Getters and Setters
-
+    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
@@ -90,4 +85,5 @@ public class Pilot {
     public void setRaces(Set<Race> races) {
         this.races = races;
     }
+
 }

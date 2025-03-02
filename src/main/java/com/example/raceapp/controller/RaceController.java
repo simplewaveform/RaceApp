@@ -13,89 +13,47 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Controller for managing Race entities.
- * Provides CRUD operations for Race.
- */
 @RestController
 @RequestMapping("/races")
 public class RaceController {
     private final RaceService raceService;
 
-    /**
-     * Constructor for the RaceController class.
-     *
-     * @param raceService The RaceService instance to be injected into this controller.
-     */
     public RaceController(RaceService raceService) {
         this.raceService = raceService;
     }
 
-    /**
-     * Creates a new race entity.
-     *
-     * @param race the race object received in the request body.
-     * @return the created race with HTTP status 201 (Created).
-     */
     @PostMapping
     public ResponseEntity<Race> createRace(@RequestBody Race race) {
         return ResponseEntity.status(HttpStatus.CREATED).body(raceService.createRace(race));
     }
 
-    /**
-     * Retrieves a race by its ID.
-     *
-     * @param id the ID of the race.
-     * @return the race if found, or 404 if not found.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<Race> getRaceById(@PathVariable Long id) {
         return ResponseEntity.of(raceService.getRaceById(id));
     }
 
-    /**
-     * Retrieves all races with their associated pilots and cars.
-     *
-     * @return a list of all races.
-     */
-    @GetMapping("/all")
-    public ResponseEntity<List<Race>> getAllRaces() {
-        List<Race> races = raceService.getAllRaces();
+    @GetMapping
+    public ResponseEntity<List<Race>> getRaces(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer year) {
+        List<Race> races = raceService.searchRaces(name, year);
         return ResponseEntity.ok(races);
     }
 
-    /**
-     * Fully updates a race entity by its ID.
-     *
-     * @param id the ID of the race to update.
-     * @param race the updated race data.
-     * @return the updated race entity.
-     */
     @PutMapping("/{id}")
     public ResponseEntity<Race> updateRace(@PathVariable Long id, @RequestBody Race race) {
         return ResponseEntity.of(raceService.updateRace(id, race));
     }
 
-    /**
-     * Partially updates a race entity by its ID.
-     *
-     * @param id the ID of the race to update.
-     * @param race the partial race data.
-     * @return the updated race entity.
-     */
     @PatchMapping("/{id}")
     public ResponseEntity<Race> partialUpdateRace(@PathVariable Long id, @RequestBody Race race) {
         return ResponseEntity.of(raceService.partialUpdateRace(id, race));
     }
 
-    /**
-     * Deletes a race by its ID.
-     *
-     * @param id the ID of the race to delete.
-     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteRace(@PathVariable Long id) {
