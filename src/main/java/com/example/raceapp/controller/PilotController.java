@@ -51,7 +51,8 @@ public class PilotController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Pilot> partialUpdatePilot(@PathVariable Long id, @RequestBody Pilot pilot) {
+    public ResponseEntity<Pilot> partialUpdatePilot(@PathVariable Long id,
+                                                    @RequestBody Pilot pilot) {
         return ResponseEntity.of(pilotService.partialUpdatePilot(id, pilot));
     }
 

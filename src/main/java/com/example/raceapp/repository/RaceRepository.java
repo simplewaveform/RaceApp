@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RaceRepository extends JpaRepository<Race, Long> {
-    @Query("SELECT r FROM Race r WHERE " +
-            "(:name IS NULL OR r.name = :name) AND " +
-            "(:year IS NULL OR r.year = :year)")
+    @Query("SELECT r FROM Race r WHERE "
+            + "(:name IS NULL OR r.name = :name) AND "
+            + "(:year IS NULL OR r.year = :year)")
     List<Race> findByNameOrYear(
             @Param("name") String name,
             @Param("year") Integer year);

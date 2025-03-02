@@ -29,7 +29,7 @@ public class Pilot {
     private Integer experience;
 
     @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST,
-                                             CascadeType.MERGE}, fetch = FetchType.LAZY)
+                                              CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private Set<Car> cars = new HashSet<>();
 
