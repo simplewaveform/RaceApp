@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -15,29 +13,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CarRepository extends JpaRepository<Car, Long> {
-
-    /**
-     * Retrieves a list of cars based on optional filtering criteria.
-     * The query supports filtering by brand, model, power, and owner ID.
-     * If a parameter is null, it is ignored in the filtering process.
-     *
-     * @param brand   (Optional) The brand of the car to filter by.
-     * @param model   (Optional) The model of the car to filter by.
-     * @param power   (Optional) The power of the car to filter by.
-     * @param ownerId (Optional) The ID of the owner (Pilot) to filter by.
-     * @return A list of cars matching the provided filtering criteria.
-     */
-    @EntityGraph(attributePaths = {"owner", "races"})
-    @Query("SELECT c FROM Car c WHERE "
-            + "(:brand IS NULL OR c.brand = :brand) AND "
-            + "(:model IS NULL OR c.model = :model) AND "
-            + "(:power IS NULL OR c.power = :power) AND "
-            + "(:ownerId IS NULL OR c.owner.id = :ownerId)")
-    List<Car> findByBrandOrModelOrPowerOrOwnerId(
-            @Param("brand") String brand,
-            @Param("model") String model,
-            @Param("power") Integer power,
-            @Param("ownerId") Long ownerId);
 
     /**
      * Retrieves a car by its unique identifier, including its associated owner and races.
@@ -49,4 +24,44 @@ public interface CarRepository extends JpaRepository<Car, Long> {
     @EntityGraph(attributePaths = {"owner", "races"})
     @Override
     Optional<Car> findById(Long id);
+
+    /**
+     * Retrieves a list of cars based on the brand.
+     * Uses an entity graph to eagerly fetch the related entities (owner and races).
+     *
+     * @param brand The brand of the car to filter by.
+     * @return A list of cars matching the provided brand.
+     */
+    @EntityGraph(attributePaths = {"owner", "races"})
+    List<Car> findByBrand(String brand);
+
+    /**
+     * Retrieves a list of cars based on the model.
+     * Uses an entity graph to eagerly fetch the related entities (owner and races).
+     *
+     * @param model The model of the car to filter by.
+     * @return A list of cars matching the provided model.
+     */
+    @EntityGraph(attributePaths = {"owner", "races"})
+    List<Car> findByModel(String model);
+
+    /**
+     * Retrieves a list of cars based on the power.
+     * Uses an entity graph to eagerly fetch the related entities (owner and races).
+     *
+     * @param power The power of the car to filter by.
+     * @return A list of cars matching the provided power.
+     */
+    @EntityGraph(attributePaths = {"owner", "races"})
+    List<Car> findByPower(Integer power);
+
+    /**
+     * Retrieves a list of cars based on the owner ID.
+     * Uses an entity graph to eagerly fetch the related entities (owner and races).
+     *
+     * @param ownerId The ID of the owner (Pilot) to filter by.
+     * @return A list of cars matching the provided owner ID.
+     */
+    @EntityGraph(attributePaths = {"owner", "races"})
+    List<Car> findByOwnerId(Long ownerId);
 }

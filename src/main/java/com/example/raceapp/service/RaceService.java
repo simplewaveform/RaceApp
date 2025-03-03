@@ -2,6 +2,8 @@ package com.example.raceapp.service;
 
 import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.RaceRepository;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -19,8 +21,7 @@ public class RaceService {
     /**
      * Constructs a new RaceService with the specified RaceRepository.
      *
-     * @param raceRepository The repository responsible for
-     *                       handling race-related database operations.
+     * @param raceRepository The repository responsible for handling race-related database operations.
      */
     public RaceService(RaceRepository raceRepository) {
         this.raceRepository = raceRepository;
@@ -57,10 +58,22 @@ public class RaceService {
      *         criteria are provided.
      */
     public List<Race> searchRaces(String name, Integer year) {
-        if (name != null || year != null) {
-            return raceRepository.findByNameOrYear(name, year);
+        List<Race> races = new ArrayList<>();
+
+        if (name != null) {
+            races.addAll(raceRepository.findByName(name));
         }
-        return raceRepository.findAll();
+        if (year != null) {
+            races.addAll(raceRepository.findByYear(year));
+        }
+
+        // Если ни один критерий не был указан, вернуть все гонки
+        if (name == null && year == null) {
+            return raceRepository.findAll();
+        }
+
+        // Удаление дубликатов
+        return new ArrayList<>(new HashSet<>(races));
     }
 
     /**

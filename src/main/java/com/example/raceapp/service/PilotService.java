@@ -2,6 +2,8 @@ package com.example.raceapp.service;
 
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.repository.PilotRepository;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -56,10 +58,25 @@ public class PilotService {
      *         criteria are provided.
      */
     public List<Pilot> searchPilots(String name, Integer age, Integer experience) {
-        if (name != null || age != null || experience != null) {
-            return pilotRepository.findByNameOrAgeOrExperience(name, age, experience);
+        List<Pilot> pilots = new ArrayList<>();
+
+        if (name != null) {
+            pilots.addAll(pilotRepository.findByName(name));
         }
-        return pilotRepository.findAll();
+        if (age != null) {
+            pilots.addAll(pilotRepository.findByAge(age));
+        }
+        if (experience != null) {
+            pilots.addAll(pilotRepository.findByExperience(experience));
+        }
+
+        // Если ни один критерий не был указан, вернуть всех пилотов
+        if (name == null && age == null && experience == null) {
+            return pilotRepository.findAll();
+        }
+
+        // Удаление дубликатов
+        return new ArrayList<>(new HashSet<>(pilots));
     }
 
     /**

@@ -2,6 +2,8 @@ package com.example.raceapp.service;
 
 import com.example.raceapp.model.Car;
 import com.example.raceapp.repository.CarRepository;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -57,10 +59,28 @@ public class CarService {
      * @return A list of cars matching the criteria, or all cars if no criteria are provided.
      */
     public List<Car> searchCars(String brand, String model, Integer power, Long ownerId) {
-        if (brand != null || model != null || power != null || ownerId != null) {
-            return carRepository.findByBrandOrModelOrPowerOrOwnerId(brand, model, power, ownerId);
+        List<Car> cars = new ArrayList<>();
+
+        if (brand != null) {
+            cars.addAll(carRepository.findByBrand(brand));
         }
-        return carRepository.findAll();
+        if (model != null) {
+            cars.addAll(carRepository.findByModel(model));
+        }
+        if (power != null) {
+            cars.addAll(carRepository.findByPower(power));
+        }
+        if (ownerId != null) {
+            cars.addAll(carRepository.findByOwnerId(ownerId));
+        }
+
+        // Если ни один критерий не был указан, вернуть все автомобили
+        if (brand == null && model == null && power == null && ownerId == null) {
+            return carRepository.findAll();
+        }
+
+        // Удаление дубликатов
+        return new ArrayList<>(new HashSet<>(cars));
     }
 
     /**
