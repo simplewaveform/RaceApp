@@ -21,7 +21,8 @@ public class RaceService {
     /**
      * Constructs a new RaceService with the specified RaceRepository.
      *
-     * @param raceRepository The repository responsible for handling race-related database operations.
+     * @param raceRepository The repository responsible for
+     *                       handling race-related database operations.
      */
     public RaceService(RaceRepository raceRepository) {
         this.raceRepository = raceRepository;
