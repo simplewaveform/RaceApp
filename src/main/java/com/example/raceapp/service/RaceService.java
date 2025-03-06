@@ -59,7 +59,7 @@ public class RaceService {
     public List<RaceDto> getAllRaces() {
         return raceRepository.findAll().stream()
                 .map(this::mapToRaceDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
