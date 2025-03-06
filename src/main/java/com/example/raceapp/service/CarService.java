@@ -33,6 +33,12 @@ public class CarService {
         this.pilotRepository = pilotRepository;
     }
 
+    /**
+     * Maps a Car entity to a CarDto.
+     *
+     * @param car the entity to convert.
+     * @return corresponding DTO.
+     */
     private CarDto mapToCarDto(Car car) {
         CarDto carDto = new CarDto();
         carDto.setId(car.getId());
@@ -45,6 +51,12 @@ public class CarService {
         return carDto;
     }
 
+    /**
+     * Maps a CarDto to a Car entity.
+     *
+     * @param carDto the DTO to convert.
+     * @return corresponding entity.
+     */
     private Car mapToCar(CarDto carDto) {
         Car car = new Car();
         car.setBrand(carDto.getBrand());
@@ -61,8 +73,8 @@ public class CarService {
     /**
      * Creates a new car.
      *
-     * @param carDto Dto with car data.
-     * @return Created car Dto.
+     * @param carDto DTO containing car data.
+     * @return created car DTO.
      */
     public CarDto createCar(CarDto carDto) {
         Car car = mapToCar(carDto);
@@ -72,21 +84,21 @@ public class CarService {
     /**
      * Retrieves a car by ID.
      *
-     * @param id Car ID.
-     * @return Optional containing car Dto.
+     * @param id the ID of the car to retrieve.
+     * @return Optional containing the car DTO, or empty if not found.
      */
     public Optional<CarDto> getCarById(Long id) {
         return carRepository.findById(id).map(this::mapToCarDto);
     }
 
     /**
-     * Searches cars by filters.
+     * Searches cars by optional filters.
      *
-     * @param brand Brand filter.
-     * @param model Model filter.
-     * @param power Power filter.
-     * @param ownerId Owner ID filter.
-     * @return List of matching cars.
+     * @param brand the brand filter (optional).
+     * @param model the model filter (optional).
+     * @param power the power filter (optional).
+     * @param ownerId the owner ID filter (optional).
+     * @return list of matching car DTOs.
      */
     public List<CarDto> searchCars(String brand, String model, Integer power, Long ownerId) {
         Specification<Car> spec = (root, query, cb) -> {
@@ -109,11 +121,11 @@ public class CarService {
     }
 
     /**
-     * Updates a car.
+     * Updates an existing car.
      *
-     * @param id Car ID.
-     * @param carDto Updated data.
-     * @return Optional containing updated car Dto.
+     * @param id the ID of the car to update.
+     * @param carDto DTO containing updated car data.
+     * @return Optional containing the updated car DTO, or empty if not found.
      */
     public Optional<CarDto> updateCar(Long id, CarDto carDto) {
         return carRepository.findById(id).map(car -> {
@@ -132,7 +144,7 @@ public class CarService {
     /**
      * Deletes a car by ID.
      *
-     * @param id Car ID.
+     * @param id the ID of the car to delete.
      */
     public void deleteCar(Long id) {
         carRepository.deleteById(id);

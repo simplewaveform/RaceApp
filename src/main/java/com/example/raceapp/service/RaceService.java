@@ -34,10 +34,27 @@ public class RaceService {
     }
 
     /**
+     * Maps a Race entity to a RaceDto.
+     *
+     * @param race the entity to convert.
+     * @return corresponding DTO.
+     */
+    private RaceDto mapToRaceDto(Race race) {
+        RaceDto dto = new RaceDto();
+        dto.setId(race.getId());
+        dto.setName(race.getName());
+        dto.setYear(race.getYear());
+        dto.setPilotIds(race.getPilots().stream()
+                .map(Pilot::getId)
+                .collect(Collectors.toSet()));
+        return dto;
+    }
+
+    /**
      * Creates a new race.
      *
-     * @param raceDto Dto with race data.
-     * @return Created race Dto.
+     * @param raceDto DTO containing race data.
+     * @return created race DTO.
      */
     public RaceDto createRace(RaceDto raceDto) {
         Race race = new Race();
@@ -54,30 +71,28 @@ public class RaceService {
     /**
      * Retrieves all races.
      *
-     * @return List of all races.
+     * @return list of all race DTOs.
      */
     public List<RaceDto> getAllRaces() {
-        return raceRepository.findAll().stream()
-                .map(this::mapToRaceDto)
-                .toList();
+        return raceRepository.findAll().stream().map(this::mapToRaceDto).toList();
     }
 
     /**
      * Retrieves a race by ID.
      *
-     * @param id Race ID.
-     * @return Optional containing race Dto.
+     * @param id the ID of the race to retrieve.
+     * @return Optional containing the race DTO, or empty if not found.
      */
     public Optional<RaceDto> getRaceById(Long id) {
         return raceRepository.findById(id).map(this::mapToRaceDto);
     }
 
     /**
-     * Updates a race.
+     * Updates an existing race.
      *
-     * @param id Race ID.
-     * @param raceDto Updated data.
-     * @return Optional containing updated race Dto.
+     * @param id the ID of the race to update.
+     * @param raceDto DTO containing updated race data.
+     * @return Optional containing the updated race DTO, or empty if not found.
      */
     public Optional<RaceDto> updateRace(Long id, RaceDto raceDto) {
         return raceRepository.findById(id).map(race -> {
@@ -85,8 +100,8 @@ public class RaceService {
             race.setYear(raceDto.getYear());
 
             Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(raceDto.getPilotIds()));
-            race.getPilots().retainAll(pilots);
-            race.getPilots().addAll(pilots);
+            race.getPilots().retainAll(pilots); // Сохранить существующих пилотов
+            race.getPilots().addAll(pilots);    // Добавить новых
 
             return mapToRaceDto(raceRepository.save(race));
         });
@@ -95,20 +110,9 @@ public class RaceService {
     /**
      * Deletes a race by ID.
      *
-     * @param id Race ID.
+     * @param id the ID of the race to delete.
      */
     public void deleteRace(Long id) {
         raceRepository.deleteById(id);
-    }
-
-    private RaceDto mapToRaceDto(Race race) {
-        RaceDto raceDto = new RaceDto();
-        raceDto.setId(race.getId());
-        raceDto.setName(race.getName());
-        raceDto.setYear(race.getYear());
-        raceDto.setPilotIds(race.getPilots().stream()
-                .map(Pilot::getId)
-                .collect(Collectors.toSet()));
-        return raceDto;
     }
 }

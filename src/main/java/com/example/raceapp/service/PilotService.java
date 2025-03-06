@@ -31,8 +31,8 @@ public class PilotService {
     /**
      * Maps a Pilot entity to a PilotDto.
      *
-     * @param pilot The entity to convert.
-     * @return Corresponding Dto.
+     * @param pilot the entity to convert.
+     * @return corresponding DTO.
      */
     private PilotDto mapToPilotDto(Pilot pilot) {
         PilotDto dto = new PilotDto();
@@ -46,8 +46,8 @@ public class PilotService {
     /**
      * Creates a new pilot.
      *
-     * @param pilotDto Dto containing pilot data.
-     * @return Created pilot Dto.
+     * @param pilotDto DTO containing pilot data.
+     * @return created pilot DTO.
      */
     public PilotDto createPilot(PilotDto pilotDto) {
         Pilot pilot = new Pilot();
@@ -60,21 +60,19 @@ public class PilotService {
     /**
      * Retrieves all pilots.
      *
-     * @return List of all pilots.
+     * @return list of all pilot DTOs.
      */
     public List<PilotDto> getAllPilots() {
-        return pilotRepository.findAll().stream()
-                .map(this::mapToPilotDto)
-                .toList();
+        return pilotRepository.findAll().stream().map(this::mapToPilotDto).toList();
     }
 
     /**
      * Searches pilots by optional filters.
      *
-     * @param name Pilot name filter.
-     * @param age Pilot age filter.
-     * @param experience Pilot experience filter.
-     * @return List of filtered pilots.
+     * @param name the name filter (optional).
+     * @param age the age filter (optional).
+     * @param experience the experience filter (optional).
+     * @return list of matching pilot DTOs.
      */
     public List<PilotDto> searchPilots(String name, Integer age, Integer experience) {
         Specification<Pilot> spec = (root, query, cb) -> {
@@ -90,16 +88,14 @@ public class PilotService {
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return pilotRepository.findAll(spec).stream()
-                .map(this::mapToPilotDto)
-                .toList();
+        return pilotRepository.findAll(spec).stream().map(this::mapToPilotDto).toList();
     }
 
     /**
      * Retrieves a pilot by ID.
      *
-     * @param id Pilot ID.
-     * @return Optional containing pilot Dto.
+     * @param id the ID of the pilot to retrieve.
+     * @return Optional containing the pilot DTO, or empty if not found.
      */
     public Optional<PilotDto> getPilotById(Long id) {
         return pilotRepository.findById(id).map(this::mapToPilotDto);
@@ -108,9 +104,9 @@ public class PilotService {
     /**
      * Updates an existing pilot.
      *
-     * @param id Pilot ID.
-     * @param pilotDto Updated pilot data.
-     * @return Optional containing updated pilot Dto.
+     * @param id the ID of the pilot to update.
+     * @param pilotDto DTO containing updated pilot data.
+     * @return Optional containing the updated pilot DTO, or empty if not found.
      */
     public Optional<PilotDto> updatePilot(Long id, PilotDto pilotDto) {
         return pilotRepository.findById(id).map(pilot -> {
@@ -124,7 +120,7 @@ public class PilotService {
     /**
      * Deletes a pilot by ID.
      *
-     * @param id Pilot ID.
+     * @param id the ID of the pilot to delete.
      */
     public void deletePilot(Long id) {
         pilotRepository.deleteById(id);

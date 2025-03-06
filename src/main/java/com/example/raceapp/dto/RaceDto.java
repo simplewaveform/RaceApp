@@ -1,12 +1,14 @@
 package com.example.raceapp.dto;
 
 import java.util.Set;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Dto for transferring race data between layers.
  */
-@Data
+@Getter
+@Setter
 public class RaceDto {
     private Long id;
     private String name;

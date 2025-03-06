@@ -1,11 +1,13 @@
 package com.example.raceapp.dto;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Dto for transferring car data between layers.
  */
-@Data
+@Getter
+@Setter
 public class CarDto {
     private Long id;
     private String brand;

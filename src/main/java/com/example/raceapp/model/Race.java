@@ -13,12 +13,14 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Represents a race event in the system.
  */
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "races")
 public class Race {
@@ -28,16 +30,15 @@ public class Race {
     private String name;
     private Integer year;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "race_pilot",
             joinColumns = @JoinColumn(name = "race_id"),
             inverseJoinColumns = @JoinColumn(name = "pilot_id")
     )
-    @JsonManagedReference("race-pilots")
     private Set<Pilot> pilots = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "race_car",
             joinColumns = @JoinColumn(name = "race_id"),
