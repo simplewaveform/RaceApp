@@ -3,11 +3,13 @@ package com.example.raceapp.controller;
 import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.service.PilotService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -86,6 +88,23 @@ public class PilotController {
         Optional<PilotDto> updatedPilot = pilotService.updatePilot(id, pilotDto);
         return updatedPilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
                                                                     .notFound().build());
+    }
+
+    /**
+     * Partially updates a pilot by ID.
+     *
+     * @param id      the ID of the pilot to update.
+     * @param updates map of fields to update.
+     * @return updated pilot DTO, or 404 if not found.
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<PilotDto> partialUpdatePilot(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
+        Optional<PilotDto> updatedPilot = pilotService.partialUpdatePilot(id, updates);
+        return updatedPilot
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**

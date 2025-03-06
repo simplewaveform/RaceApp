@@ -3,11 +3,13 @@ package com.example.raceapp.controller;
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.service.CarService;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -87,6 +89,23 @@ public class CarController {
         Optional<CarDto> updatedCar = carService.updateCar(id, carDto);
         return updatedCar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
                                                                   .notFound().build());
+    }
+
+    /**
+     * Partially updates a car by ID.
+     *
+     * @param id      the ID of the car to update.
+     * @param updates map of fields to update.
+     * @return updated car DTO, or 404 if not found.
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<CarDto> partialUpdateCar(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> updates) {
+        Optional<CarDto> updatedCar = carService.partialUpdateCar(id, updates);
+        return updatedCar
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**

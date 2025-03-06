@@ -6,6 +6,7 @@ import com.example.raceapp.repository.PilotRepository;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -113,6 +114,27 @@ public class PilotService {
             pilot.setName(pilotDto.getName());
             pilot.setAge(pilotDto.getAge());
             pilot.setExperience(pilotDto.getExperience());
+            return mapToPilotDto(pilotRepository.save(pilot));
+        });
+    }
+
+    /**
+     * Partially updates a pilot's fields.
+     *
+     * @param id      the ID of the pilot to update.
+     * @param updates map containing fields to update.
+     * @return optional of updated pilot DTO.
+     */
+    public Optional<PilotDto> partialUpdatePilot(Long id, Map<String, Object> updates) {
+        return pilotRepository.findById(id).map(pilot -> {
+            updates.forEach((key, value) -> {
+                switch (key) {
+                    case "name" -> pilot.setName((String) value);
+                    case "age" -> pilot.setAge((Integer) value);
+                    case "experience" -> pilot.setExperience((Integer) value);
+                    default -> throw new IllegalArgumentException("Invalid field: " + key);
+                }
+            });
             return mapToPilotDto(pilotRepository.save(pilot));
         });
     }

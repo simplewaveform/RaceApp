@@ -8,6 +8,7 @@ import com.example.raceapp.repository.PilotRepository;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -137,6 +138,33 @@ public class CarService {
                         .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
                 car.setOwner(pilot);
             }
+            return mapToCarDto(carRepository.save(car));
+        });
+    }
+
+    /**
+     * Partially updates a car's fields.
+     *
+     * @param id      the ID of the car to update.
+     * @param updates map containing fields to update.
+     * @return optional of updated car DTO.
+     */
+    public Optional<CarDto> partialUpdateCar(Long id, Map<String, Object> updates) {
+        return carRepository.findById(id).map(car -> {
+            updates.forEach((key, value) -> {
+                switch (key) {
+                    case "brand" -> car.setBrand((String) value);
+                    case "model" -> car.setModel((String) value);
+                    case "power" -> car.setPower((Integer) value);
+                    case "ownerId" -> {
+                        Long ownerId = ((Number) value).longValue();
+                        Pilot owner = pilotRepository.findById(ownerId)
+                                .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
+                        car.setOwner(owner);
+                    }
+                    default -> throw new IllegalArgumentException("Invalid field: " + key);
+                }
+            });
             return mapToCarDto(carRepository.save(car));
         });
     }
