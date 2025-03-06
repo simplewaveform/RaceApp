@@ -7,6 +7,7 @@ import com.example.raceapp.repository.PilotRepository;
 import com.example.raceapp.repository.RaceRepository;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -103,6 +104,31 @@ public class RaceService {
             race.getPilots().retainAll(pilots); // Сохранить существующих пилотов
             race.getPilots().addAll(pilots);    // Добавить новых
 
+            return mapToRaceDto(raceRepository.save(race));
+        });
+    }
+
+    /**
+     * Partially updates a race's fields.
+     *
+     * @param id      the ID of the race to update.
+     * @param updates map containing fields to update.
+     * @return optional of updated race DTO.
+     */
+    public Optional<RaceDto> partialUpdateRace(Long id, Map<String, Object> updates) {
+        return raceRepository.findById(id).map(race -> {
+            updates.forEach((key, value) -> {
+                switch (key) {
+                    case "name" -> race.setName((String) value);
+                    case "year" -> race.setYear((Integer) value);
+                    case "pilotIds" -> {
+                        Set<Long> pilotIds = (Set<Long>) value;
+                        Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(pilotIds));
+                        race.setPilots(pilots);
+                    }
+                    default -> throw new IllegalArgumentException("Invalid field: " + key);
+                }
+            });
             return mapToRaceDto(raceRepository.save(race));
         });
     }

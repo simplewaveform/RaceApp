@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CarService {
+    private static final String PILOT_NOT_FOUND_MSG = "Pilot not found";
     private final CarRepository carRepository;
     private final PilotRepository pilotRepository;
 
@@ -65,7 +66,7 @@ public class CarService {
         car.setPower(carDto.getPower());
         if (carDto.getOwnerId() != null) {
             Pilot pilot = pilotRepository.findById(carDto.getOwnerId())
-                    .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
+                    .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND_MSG));
             car.setOwner(pilot);
         }
         return car;
@@ -135,7 +136,7 @@ public class CarService {
             car.setPower(carDto.getPower());
             if (carDto.getOwnerId() != null) {
                 Pilot pilot = pilotRepository.findById(carDto.getOwnerId())
-                        .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
+                        .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND_MSG));
                 car.setOwner(pilot);
             }
             return mapToCarDto(carRepository.save(car));
@@ -158,8 +159,8 @@ public class CarService {
                     case "power" -> car.setPower((Integer) value);
                     case "ownerId" -> {
                         Long ownerId = ((Number) value).longValue();
-                        Pilot owner = pilotRepository.findById(ownerId)
-                                .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
+                        Pilot owner = pilotRepository.findById(ownerId).orElseThrow(() ->
+                                new IllegalArgumentException(PILOT_NOT_FOUND_MSG));
                         car.setOwner(owner);
                     }
                     default -> throw new IllegalArgumentException("Invalid field: " + key);
