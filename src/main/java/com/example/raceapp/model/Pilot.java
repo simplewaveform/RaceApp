@@ -13,10 +13,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Data;
 
 /**
  * Represents a pilot (driver) entity in the system.
  */
+@Data
 @Entity
 @Table(name = "pilots")
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -28,58 +30,10 @@ public class Pilot {
     private Integer age;
     private Integer experience;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY,
-                        orphanRemoval = true)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL,
+               fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Car> cars = new HashSet<>();
 
     @ManyToMany(mappedBy = "pilots", fetch = FetchType.LAZY)
     private Set<Race> races = new HashSet<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public Integer getExperience() {
-        return experience;
-    }
-
-    public void setExperience(Integer experience) {
-        this.experience = experience;
-    }
-
-    public Set<Car> getCars() {
-        return cars;
-    }
-
-    public void setCars(Set<Car> cars) {
-        this.cars = cars;
-    }
-
-    public Set<Race> getRaces() {
-        return races;
-    }
-
-    public void setRaces(Set<Race> races) {
-        this.races = races;
-    }
 }

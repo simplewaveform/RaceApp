@@ -13,10 +13,12 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Data;
 
 /**
  * Represents a race event in the system.
  */
+@Data
 @Entity
 @Table(name = "races")
 public class Race {
@@ -42,45 +44,4 @@ public class Race {
             inverseJoinColumns = @JoinColumn(name = "car_id")
     )
     private Set<Car> cars = new HashSet<>();
-
-    // Геттеры и сеттеры
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public Set<Pilot> getPilots() {
-        return pilots;
-    }
-
-    public void setPilots(Set<Pilot> pilots) {
-        this.pilots = pilots;
-    }
-
-    public Set<Car> getCars() {
-        return cars;
-    }
-
-    public void setCars(Set<Car> cars) {
-        this.cars = cars;
-    }
 }
