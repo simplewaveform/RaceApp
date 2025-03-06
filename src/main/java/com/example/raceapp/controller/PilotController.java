@@ -1,13 +1,21 @@
 package com.example.raceapp.controller;
 
-import com.example.raceapp.dto.PilotDTO;
+import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.service.PilotService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for managing pilots.
@@ -17,29 +25,36 @@ import java.util.Optional;
 public class PilotController {
     private final PilotService pilotService;
 
+    /**
+     * Constructs a PilotController with the provided PilotService.
+     *
+     * @param pilotService the service for managing pilot operations.
+     */
     public PilotController(PilotService pilotService) {
         this.pilotService = pilotService;
     }
 
     /**
      * Creates a new pilot.
-     * @param pilotDTO DTO containing pilot data.
-     * @return Created pilot DTO with HTTP 201.
+     *
+     * @param pilotDto Dto containing pilot data.
+     * @return Created pilot Dto with HTTP 201.
      */
     @PostMapping
-    public ResponseEntity<PilotDTO> createPilot(@RequestBody PilotDTO pilotDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(pilotService.createPilot(pilotDTO));
+    public ResponseEntity<PilotDto> createPilot(@RequestBody PilotDto pilotDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(pilotService.createPilot(pilotDto));
     }
 
     /**
      * Retrieves pilots by optional filters.
+     *
      * @param name Pilot name filter.
      * @param age Pilot age filter.
      * @param experience Pilot experience filter.
      * @return List of filtered pilots.
      */
     @GetMapping
-    public ResponseEntity<List<PilotDTO>> getPilots(
+    public ResponseEntity<List<PilotDto>> getPilots(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer age,
             @RequestParam(required = false) Integer experience) {
@@ -48,29 +63,34 @@ public class PilotController {
 
     /**
      * Retrieves a pilot by ID.
+     *
      * @param id Pilot ID.
-     * @return Pilot DTO or 404 if not found.
+     * @return Pilot Dto or 404 if not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<PilotDTO> getPilotById(@PathVariable Long id) {
-        Optional<PilotDTO> pilot = pilotService.getPilotById(id);
+    public ResponseEntity<PilotDto> getPilotById(@PathVariable Long id) {
+        Optional<PilotDto> pilot = pilotService.getPilotById(id);
         return pilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Updates an existing pilot.
+     *
      * @param id Pilot ID.
-     * @param pilotDTO Updated pilot data.
-     * @return Updated pilot DTO or 404 if not found.
+     * @param pilotDto Updated pilot data.
+     * @return Updated pilot Dto or 404 if not found.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<PilotDTO> updatePilot(@PathVariable Long id, @RequestBody PilotDTO pilotDTO) {
-        Optional<PilotDTO> updatedPilot = pilotService.updatePilot(id, pilotDTO);
-        return updatedPilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<PilotDto> updatePilot(@PathVariable Long id,
+                                                @RequestBody PilotDto pilotDto) {
+        Optional<PilotDto> updatedPilot = pilotService.updatePilot(id, pilotDto);
+        return updatedPilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
+                                                                    .notFound().build());
     }
 
     /**
      * Deletes a pilot by ID.
+     *
      * @param id Pilot ID.
      */
     @DeleteMapping("/{id}")

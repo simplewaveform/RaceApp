@@ -1,13 +1,20 @@
 package com.example.raceapp.controller;
 
-import com.example.raceapp.dto.RaceDTO;
+import com.example.raceapp.dto.RaceDto;
 import com.example.raceapp.service.RaceService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for managing races.
@@ -17,54 +24,65 @@ import java.util.Optional;
 public class RaceController {
     private final RaceService raceService;
 
+    /**
+     * Constructs a RaceController with the provided RaceService.
+     *
+     * @param raceService the service for managing race operations.
+     */
     public RaceController(RaceService raceService) {
         this.raceService = raceService;
     }
 
     /**
      * Creates a new race.
-     * @param raceDTO DTO containing race data.
-     * @return Created race DTO with HTTP 201.
+     *
+     * @param raceDto Dto containing race data.
+     * @return Created race Dto with HTTP 201.
      */
     @PostMapping
-    public ResponseEntity<RaceDTO> createRace(@RequestBody RaceDTO raceDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(raceService.createRace(raceDTO));
+    public ResponseEntity<RaceDto> createRace(@RequestBody RaceDto raceDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(raceService.createRace(raceDto));
     }
 
     /**
      * Retrieves all races.
+     *
      * @return List of all races.
      */
     @GetMapping
-    public ResponseEntity<List<RaceDTO>> getAllRaces() {
+    public ResponseEntity<List<RaceDto>> getAllRaces() {
         return ResponseEntity.ok(raceService.getAllRaces());
     }
 
     /**
      * Retrieves a race by ID.
+     *
      * @param id Race ID.
-     * @return Race DTO or 404 if not found.
+     * @return Race Dto or 404 if not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<RaceDTO> getRaceById(@PathVariable Long id) {
-        Optional<RaceDTO> race = raceService.getRaceById(id);
+    public ResponseEntity<RaceDto> getRaceById(@PathVariable Long id) {
+        Optional<RaceDto> race = raceService.getRaceById(id);
         return race.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Updates an existing race.
+     *
      * @param id Race ID.
-     * @param raceDTO Updated race data.
-     * @return Updated race DTO or 404 if not found.
+     * @param raceDto Updated race data.
+     * @return Updated race Dto or 404 if not found.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<RaceDTO> updateRace(@PathVariable Long id, @RequestBody RaceDTO raceDTO) {
-        Optional<RaceDTO> updatedRace = raceService.updateRace(id, raceDTO);
-        return updatedRace.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<RaceDto> updateRace(@PathVariable Long id, @RequestBody RaceDto raceDto) {
+        Optional<RaceDto> updatedRace = raceService.updateRace(id, raceDto);
+        return updatedRace.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
+                                                                   .notFound().build());
     }
 
     /**
      * Deletes a race by ID.
+     *
      * @param id Race ID.
      */
     @DeleteMapping("/{id}")
