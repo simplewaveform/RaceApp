@@ -101,8 +101,8 @@ public class RaceService {
             race.setYear(raceDto.getYear());
 
             Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(raceDto.getPilotIds()));
-            race.getPilots().retainAll(pilots); // Сохранить существующих пилотов
-            race.getPilots().addAll(pilots);    // Добавить новых
+            race.getPilots().clear();
+            race.getPilots().addAll(pilots);
 
             return mapToRaceDto(raceRepository.save(race));
         });
