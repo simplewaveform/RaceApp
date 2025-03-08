@@ -32,6 +32,6 @@ public class Pilot {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Car> cars = new HashSet<>();
 
-    @ManyToMany(mappedBy = "pilots", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "pilots")
     private Set<Race> races = new HashSet<>();
 }

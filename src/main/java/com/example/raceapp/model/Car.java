@@ -33,6 +33,6 @@ public class Car {
     @JoinColumn(name = "pilot_id")
     private Pilot owner;
 
-    @ManyToMany(mappedBy = "cars", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "cars")
     private Set<Race> races = new HashSet<>();
 }
