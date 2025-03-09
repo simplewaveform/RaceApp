@@ -122,7 +122,7 @@ public class RaceService {
                     case "name" -> race.setName((String) value);
                     case "year" -> race.setYear((Integer) value);
                     case "pilotIds" -> {
-                        Set<Long> pilotIds = (Set<Long>) value;
+                        List<Long> pilotIds = (List<Long>) value;
                         Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(pilotIds));
                         race.setPilots(pilots);
                     }
