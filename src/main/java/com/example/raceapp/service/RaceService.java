@@ -64,6 +64,10 @@ public class RaceService {
      * @return CarResponse containing car details and owner information
      */
     private CarResponse mapToCarResponse(Car car) {
+        return getCarResponse(car);
+    }
+
+    static CarResponse getCarResponse(Car car) {
         CarResponse response = new CarResponse();
         response.setId(car.getId());
         response.setBrand(car.getBrand());

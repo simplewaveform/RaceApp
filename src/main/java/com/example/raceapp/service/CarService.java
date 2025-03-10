@@ -19,6 +19,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.example.raceapp.service.RaceService.getCarResponse;
+
 /**
  * Service for managing car-related operations including creation, retrieval,
  * updating, and deletion of cars. Handles owner associations and mapping between
@@ -40,20 +42,7 @@ public class CarService {
      * @return CarResponse containing car details and owner information
      */
     private CarResponse mapToResponse(Car car) {
-        CarResponse response = new CarResponse();
-        response.setId(car.getId());
-        response.setBrand(car.getBrand());
-        response.setModel(car.getModel());
-        response.setPower(car.getPower());
-
-        if (car.getOwner() != null) {
-            PilotSimpleResponse owner = new PilotSimpleResponse();
-            owner.setId(car.getOwner().getId());
-            owner.setName(car.getOwner().getName());
-            owner.setExperience(car.getOwner().getExperience());
-            response.setOwner(owner);
-        }
-        return response;
+        return getCarResponse(car);
     }
 
     /**
