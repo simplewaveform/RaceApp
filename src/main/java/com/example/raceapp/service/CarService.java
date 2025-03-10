@@ -1,7 +1,5 @@
 package com.example.raceapp.service;
 
-import static com.example.raceapp.service.RaceService.getCarResponse;
-
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
 import com.example.raceapp.model.Car;
@@ -41,7 +39,7 @@ public class CarService {
      * @return CarResponse containing car details and owner information
      */
     private CarResponse mapToResponse(Car car) {
-        return getCarResponse(car);
+        return RaceService.getCarResponse(car);
     }
 
     /**
@@ -53,6 +51,10 @@ public class CarService {
      */
     public CarResponse createCar(CarDto request) {
         Car car = new Car();
+        return getCarResponse(request, car);
+    }
+
+    private CarResponse getCarResponse(CarDto request, Car car) {
         car.setBrand(request.getBrand());
         car.setModel(request.getModel());
         car.setPower(request.getPower());
@@ -65,17 +67,6 @@ public class CarService {
         }
 
         return mapToResponse(carRepository.save(car));
-    }
-
-    /**
-     * Retrieves all cars with their associated owners.
-     *
-     * @return List of CarResponse containing all cars
-     */
-    public List<CarResponse> getAllCars() {
-        return carRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .toList();
     }
 
     /**
@@ -129,20 +120,7 @@ public class CarService {
      * @throws IllegalArgumentException if owner ID is invalid
      */
     public Optional<CarResponse> updateCar(Long id, CarDto request) {
-        return carRepository.findById(id).map(car -> {
-            car.setBrand(request.getBrand());
-            car.setModel(request.getModel());
-            car.setPower(request.getPower());
-
-            if (request.getOwnerId() != null) {
-                Pilot owner = pilotRepository.findById(request.getOwnerId())
-                        .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND
-                                + request.getOwnerId()));
-                car.setOwner(owner);
-            }
-
-            return mapToResponse(carRepository.save(car));
-        });
+        return carRepository.findById(id).map(car -> getCarResponse(request, car));
     }
 
     /**
