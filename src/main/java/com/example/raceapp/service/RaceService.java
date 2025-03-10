@@ -1,22 +1,24 @@
 package com.example.raceapp.service;
 
-import com.example.raceapp.dto.*;
-import com.example.raceapp.model.Race;
-import com.example.raceapp.model.Pilot;
+import com.example.raceapp.dto.CarResponse;
+import com.example.raceapp.dto.PilotSimpleResponse;
+import com.example.raceapp.dto.RaceDto;
+import com.example.raceapp.dto.RaceResponse;
 import com.example.raceapp.model.Car;
+import com.example.raceapp.model.Pilot;
+import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.CarRepository;
-import com.example.raceapp.repository.RaceRepository;
 import com.example.raceapp.repository.PilotRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.example.raceapp.repository.RaceRepository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for managing race-related operations including creation, retrieval,

@@ -10,15 +10,14 @@ import com.example.raceapp.repository.CarRepository;
 import com.example.raceapp.repository.PilotRepository;
 import com.example.raceapp.repository.RaceRepository;
 import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for managing car-related operations including creation, retrieval,
@@ -72,7 +71,8 @@ public class CarService {
 
         if (request.getOwnerId() != null) {
             Pilot owner = pilotRepository.findById(request.getOwnerId())
-                    .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND + request.getOwnerId()));
+                    .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND
+                            + request.getOwnerId()));
             car.setOwner(owner);
         }
 
@@ -102,10 +102,18 @@ public class CarService {
     public List<CarResponse> searchCars(String brand, String model, Integer power, Long ownerId) {
         Specification<Car> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (brand != null) predicates.add(cb.equal(root.get("brand"), brand));
-            if (model != null) predicates.add(cb.equal(root.get("model"), model));
-            if (power != null) predicates.add(cb.equal(root.get("power"), power));
-            if (ownerId != null) predicates.add(cb.equal(root.get("owner").get("id"), ownerId));
+            if (brand != null) {
+                predicates.add(cb.equal(root.get("brand"), brand));
+            }
+            if (model != null) {
+                predicates.add(cb.equal(root.get("model"), model));
+            }
+            if (power != null) {
+                predicates.add(cb.equal(root.get("power"), power));
+            }
+            if (ownerId != null) {
+                predicates.add(cb.equal(root.get("owner").get("id"), ownerId));
+            }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         return carRepository.findAll(spec).stream()
@@ -140,7 +148,8 @@ public class CarService {
 
             if (request.getOwnerId() != null) {
                 Pilot owner = pilotRepository.findById(request.getOwnerId())
-                        .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND + request.getOwnerId()));
+                        .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND
+                                + request.getOwnerId()));
                 car.setOwner(owner);
             }
 
@@ -166,7 +175,8 @@ public class CarService {
                     case "ownerId" -> {
                         Long ownerId = ((Number) value).longValue();
                         Pilot owner = pilotRepository.findById(ownerId)
-                                .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND + ownerId));
+                                .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND
+                                        + ownerId));
                         car.setOwner(owner);
                     }
                     default -> throw new IllegalArgumentException("Invalid field: " + key);

@@ -86,7 +86,8 @@ public class CarController {
      * @return Updated car Dto or 404 if not found.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CarResponse> updateCar(@PathVariable Long id, @RequestBody CarDto carDto) {
+    public ResponseEntity<CarResponse> updateCar(@PathVariable Long id,
+                                                 @RequestBody CarDto carDto) {
         Optional<CarResponse> updatedCar = carService.updateCar(id, carDto);
         return updatedCar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
                                                                   .notFound().build());

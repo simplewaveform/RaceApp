@@ -1,8 +1,8 @@
 package com.example.raceapp.dto;
 
+import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Set;
 
 /**
  * Detailed DTO for race responses with full participant data.

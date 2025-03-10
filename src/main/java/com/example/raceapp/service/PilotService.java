@@ -1,24 +1,22 @@
 package com.example.raceapp.service;
 
+import com.example.raceapp.dto.CarSimpleResponse;
 import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.dto.PilotResponse;
-import com.example.raceapp.dto.CarSimpleResponse;
-import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Car;
+import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.PilotRepository;
-import com.example.raceapp.repository.CarRepository;
 import com.example.raceapp.repository.RaceRepository;
 import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for managing pilot-related operations including creation, retrieval,
@@ -100,9 +98,15 @@ public class PilotService {
     public List<PilotResponse> searchPilots(String name, Integer age, Integer experience) {
         Specification<Pilot> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (name != null) predicates.add(cb.equal(root.get("name"), name));
-            if (age != null) predicates.add(cb.equal(root.get("age"), age));
-            if (experience != null) predicates.add(cb.equal(root.get("experience"), experience));
+            if (name != null) {
+                predicates.add(cb.equal(root.get("name"), name));
+            }
+            if (age != null) {
+                predicates.add(cb.equal(root.get("age"), age));
+            }
+            if (experience != null) {
+                predicates.add(cb.equal(root.get("experience"), experience));
+            }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
         return pilotRepository.findAll(spec).stream()

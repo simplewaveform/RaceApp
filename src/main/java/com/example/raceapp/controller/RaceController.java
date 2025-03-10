@@ -77,7 +77,8 @@ public class RaceController {
      * @return Updated race Dto or 404 if not found.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<RaceResponse> updateRace(@PathVariable Long id, @RequestBody RaceDto raceDto) {
+    public ResponseEntity<RaceResponse> updateRace(@PathVariable Long id,
+                                                   @RequestBody RaceDto raceDto) {
         Optional<RaceResponse> updatedRace = raceService.updateRace(id, raceDto);
         return updatedRace.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
                                                                    .notFound().build());
