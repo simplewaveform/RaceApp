@@ -27,7 +27,7 @@ public class Pilot {
     private Integer age;
     private Integer experience;
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", orphanRemoval = true)
     private Set<Car> cars = new HashSet<>();
 
     @ManyToMany(mappedBy = "pilots")

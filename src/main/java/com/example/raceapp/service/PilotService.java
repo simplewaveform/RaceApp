@@ -169,7 +169,6 @@ public class PilotService {
                 raceRepository.save(race);
             }
             car.setOwner(null);
-            carRepository.save(car);
         }
 
         for (Race race : pilot.getRaces()) {
