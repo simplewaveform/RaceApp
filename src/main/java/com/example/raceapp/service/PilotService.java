@@ -6,7 +6,6 @@ import com.example.raceapp.dto.PilotResponse;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
-import com.example.raceapp.repository.CarRepository;
 import com.example.raceapp.repository.PilotRepository;
 import com.example.raceapp.repository.RaceRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PilotService {
     private final PilotRepository pilotRepository;
     private final RaceRepository raceRepository;
-    private final CarRepository carRepository;
 
     /**
      * Maps a Pilot entity to a PilotResponse DTO.
