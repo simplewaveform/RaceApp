@@ -28,7 +28,7 @@ public class Pilot {
     private Integer age;
     private Integer experience;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner")
     private Set<Car> cars = new HashSet<>();
 
     @ManyToMany(mappedBy = "pilots")

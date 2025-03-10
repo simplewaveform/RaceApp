@@ -142,6 +142,10 @@ public class RaceService {
             race.getPilots().clear();
             race.getPilots().addAll(pilots);
 
+            Set<Car> cars = new HashSet<>(carRepository.findAllById(request.getCarIds()));
+            race.getCars().clear();
+            race.getCars().addAll(cars);
+
             return mapToResponse(raceRepository.save(race));
         });
     }
@@ -161,13 +165,15 @@ public class RaceService {
                     case "name" -> race.setName((String) value);
                     case "year" -> race.setYear((Integer) value);
                     case "pilotIds" -> {
-                        Set<Long> pilotIds = (Set<Long>) value;
-                        Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(pilotIds));
+                        List<Long> pilotIds = (List<Long>) value;
+                        Set<Long> pilotIdSet = new HashSet<>(pilotIds);
+                        Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(pilotIdSet));
                         race.setPilots(pilots);
                     }
                     case "carIds" -> {
-                        Set<Long> carIds = new HashSet<>((List<Long>) value);
-                        Set<Car> cars = new HashSet<>(carRepository.findAllById(carIds));
+                        List<Long> carIds = (List<Long>) value;
+                        Set<Long> carIdSet = new HashSet<>(carIds);
+                        Set<Car> cars = new HashSet<>(carRepository.findAllById(carIdSet));
                         race.setCars(cars);
                     }
                     default -> throw new IllegalArgumentException("Invalid field: " + key);

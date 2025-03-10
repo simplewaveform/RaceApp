@@ -6,6 +6,7 @@ import com.example.raceapp.dto.PilotResponse;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
+import com.example.raceapp.repository.CarRepository;
 import com.example.raceapp.repository.PilotRepository;
 import com.example.raceapp.repository.RaceRepository;
 import jakarta.persistence.criteria.Predicate;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PilotService {
     private final PilotRepository pilotRepository;
     private final RaceRepository raceRepository;
+    private final CarRepository carRepository;
 
     /**
      * Maps a Pilot entity to a PilotResponse DTO.
@@ -160,6 +162,15 @@ public class PilotService {
     public void deletePilot(Long id) {
         Pilot pilot = pilotRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pilot not found with id: " + id));
+
+        for (Car car : pilot.getCars()) {
+            for (Race race : car.getRaces()) {
+                race.getCars().remove(car);
+                raceRepository.save(race);
+            }
+            car.setOwner(null);
+            carRepository.save(car);
+        }
 
         for (Race race : pilot.getRaces()) {
             race.getPilots().remove(pilot);

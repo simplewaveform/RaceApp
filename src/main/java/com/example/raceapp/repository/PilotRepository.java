@@ -8,28 +8,27 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
- * Repository for managing pilots.
+ * Repository for managing pilots with explicit EntityGraph configurations to load associations.
  */
-public interface PilotRepository extends
-        JpaRepository<Pilot, Long>,
-        JpaSpecificationExecutor<Pilot> { // Добавлено!
+public interface PilotRepository extends JpaRepository<Pilot, Long>,
+        JpaSpecificationExecutor<Pilot> {
 
     /**
-     * Retrieves a pilot by their ID with associated cars and races eagerly loaded via EntityGraph.
+     * Retrieves all pilots with their associated cars loaded eagerly.
      *
-     * @param id the ID of the pilot to retrieve
-     * @return an {@link Optional} containing the pilot with loaded associations if found,
-     *         or empty if no pilot exists with the given ID
-     */
-    @EntityGraph(attributePaths = {"cars", "races"})
-    Optional<Pilot> findById(Long id);
-
-    /**
-     * Retrieves all pilots with their associated cars eagerly loaded (via EntityGraph).
-     *
-     * @return a list of all pilots.
+     * @return a list of all pilots with cars.
      */
     @EntityGraph(attributePaths = {"cars"})
     @Override
     List<Pilot> findAll();
+
+    /**
+     * Retrieves a pilot by their ID with associated cars and races loaded eagerly.
+     *
+     * @param id the ID of the pilot to retrieve.
+     * @return an Optional containing the pilot if found, or empty otherwise.
+     */
+    @EntityGraph(attributePaths = {"cars", "races"})
+    @Override
+    Optional<Pilot> findById(Long id);
 }
