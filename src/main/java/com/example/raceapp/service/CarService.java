@@ -1,8 +1,9 @@
 package com.example.raceapp.service;
 
+import static com.example.raceapp.service.RaceService.getCarResponse;
+
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
-import com.example.raceapp.dto.PilotSimpleResponse;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
@@ -18,8 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.example.raceapp.service.RaceService.getCarResponse;
 
 /**
  * Service for managing car-related operations including creation, retrieval,
