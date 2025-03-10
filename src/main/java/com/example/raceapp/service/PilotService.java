@@ -77,17 +77,6 @@ public class PilotService {
     }
 
     /**
-     * Retrieves all pilots with their associated cars.
-     *
-     * @return List of PilotResponse containing all pilots
-     */
-    public List<PilotResponse> getAllPilots() {
-        return pilotRepository.findAll().stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    /**
      * Searches pilots based on optional filters.
      *
      * @param name the name filter (optional)
