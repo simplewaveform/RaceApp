@@ -14,4 +14,5 @@ public class RaceDto {
     private String name;
     private Integer year;
     private Set<Long> pilotIds;
+    private Set<Long> carIds;
 }

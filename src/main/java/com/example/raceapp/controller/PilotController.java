@@ -1,6 +1,7 @@
 package com.example.raceapp.controller;
 
 import com.example.raceapp.dto.PilotDto;
+import com.example.raceapp.dto.PilotResponse;
 import com.example.raceapp.service.PilotService;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class PilotController {
      * @return Created pilot Dto with HTTP 201.
      */
     @PostMapping
-    public ResponseEntity<PilotDto> createPilot(@RequestBody PilotDto pilotDto) {
+    public ResponseEntity<PilotResponse> createPilot(@RequestBody PilotDto pilotDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pilotService.createPilot(pilotDto));
     }
 
@@ -56,7 +57,7 @@ public class PilotController {
      * @return List of filtered pilots.
      */
     @GetMapping
-    public ResponseEntity<List<PilotDto>> getPilots(
+    public ResponseEntity<List<PilotResponse>> getPilots(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer age,
             @RequestParam(required = false) Integer experience) {
@@ -70,22 +71,22 @@ public class PilotController {
      * @return Pilot Dto or 404 if not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<PilotDto> getPilotById(@PathVariable Long id) {
-        Optional<PilotDto> pilot = pilotService.getPilotById(id);
+    public ResponseEntity<PilotResponse> getPilotById(@PathVariable Long id) {
+        Optional<PilotResponse> pilot = pilotService.getPilotById(id);
         return pilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Updates an existing pilot.
      *
-     * @param id Pilot ID.
+     * @param id       Pilot ID.
      * @param pilotDto Updated pilot data.
      * @return Updated pilot Dto or 404 if not found.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<PilotDto> updatePilot(@PathVariable Long id,
-                                                @RequestBody PilotDto pilotDto) {
-        Optional<PilotDto> updatedPilot = pilotService.updatePilot(id, pilotDto);
+    public ResponseEntity<PilotResponse> updatePilot(@PathVariable Long id,
+                                                     @RequestBody PilotDto pilotDto) {
+        Optional<PilotResponse> updatedPilot = pilotService.updatePilot(id, pilotDto);
         return updatedPilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
                                                                     .notFound().build());
     }
@@ -98,10 +99,10 @@ public class PilotController {
      * @return updated pilot DTO, or 404 if not found.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<PilotDto> partialUpdatePilot(
+    public ResponseEntity<PilotResponse> partialUpdatePilot(
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
-        Optional<PilotDto> updatedPilot = pilotService.partialUpdatePilot(id, updates);
+        Optional<PilotResponse> updatedPilot = pilotService.partialUpdatePilot(id, updates);
         return updatedPilot
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

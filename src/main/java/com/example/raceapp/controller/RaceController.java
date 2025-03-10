@@ -1,6 +1,7 @@
 package com.example.raceapp.controller;
 
 import com.example.raceapp.dto.RaceDto;
+import com.example.raceapp.dto.RaceResponse;
 import com.example.raceapp.service.RaceService;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class RaceController {
      * @return Created race Dto with HTTP 201.
      */
     @PostMapping
-    public ResponseEntity<RaceDto> createRace(@RequestBody RaceDto raceDto) {
+    public ResponseEntity<RaceResponse> createRace(@RequestBody RaceDto raceDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(raceService.createRace(raceDto));
     }
 
@@ -52,7 +53,7 @@ public class RaceController {
      * @return List of all races.
      */
     @GetMapping
-    public ResponseEntity<List<RaceDto>> getAllRaces() {
+    public ResponseEntity<List<RaceResponse>> getAllRaces() {
         return ResponseEntity.ok(raceService.getAllRaces());
     }
 
@@ -63,21 +64,21 @@ public class RaceController {
      * @return Race Dto or 404 if not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<RaceDto> getRaceById(@PathVariable Long id) {
-        Optional<RaceDto> race = raceService.getRaceById(id);
+    public ResponseEntity<RaceResponse> getRaceById(@PathVariable Long id) {
+        Optional<RaceResponse> race = raceService.getRaceById(id);
         return race.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Updates an existing race.
      *
-     * @param id Race ID.
+     * @param id      Race ID.
      * @param raceDto Updated race data.
      * @return Updated race Dto or 404 if not found.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<RaceDto> updateRace(@PathVariable Long id, @RequestBody RaceDto raceDto) {
-        Optional<RaceDto> updatedRace = raceService.updateRace(id, raceDto);
+    public ResponseEntity<RaceResponse> updateRace(@PathVariable Long id, @RequestBody RaceDto raceDto) {
+        Optional<RaceResponse> updatedRace = raceService.updateRace(id, raceDto);
         return updatedRace.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
                                                                    .notFound().build());
     }
@@ -90,10 +91,10 @@ public class RaceController {
      * @return updated race DTO, or 404 if not found.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<RaceDto> partialUpdateRace(
+    public ResponseEntity<RaceResponse> partialUpdateRace(
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
-        Optional<RaceDto> updatedRace = raceService.partialUpdateRace(id, updates);
+        Optional<RaceResponse> updatedRace = raceService.partialUpdateRace(id, updates);
         return updatedRace
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

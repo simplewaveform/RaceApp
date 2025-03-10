@@ -43,4 +43,5 @@ public class Race {
             inverseJoinColumns = @JoinColumn(name = "car_id")
     )
     private Set<Car> cars = new HashSet<>();
+
 }

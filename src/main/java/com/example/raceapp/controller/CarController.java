@@ -1,6 +1,7 @@
 package com.example.raceapp.controller;
 
 import com.example.raceapp.dto.CarDto;
+import com.example.raceapp.dto.CarResponse;
 import com.example.raceapp.service.CarService;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class CarController {
      * @return Created car Dto with HTTP 201.
      */
     @PostMapping
-    public ResponseEntity<CarDto> createCar(@RequestBody CarDto carDto) {
+    public ResponseEntity<CarResponse> createCar(@RequestBody CarDto carDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(carService.createCar(carDto));
     }
 
@@ -57,7 +58,7 @@ public class CarController {
      * @return List of filtered cars.
      */
     @GetMapping
-    public ResponseEntity<List<CarDto>> getCars(
+    public ResponseEntity<List<CarResponse>> getCars(
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String model,
             @RequestParam(required = false) Integer power,
@@ -72,21 +73,21 @@ public class CarController {
      * @return Car Dto or 404 if not found.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CarDto> getCarById(@PathVariable Long id) {
-        Optional<CarDto> car = carService.getCarById(id);
+    public ResponseEntity<CarResponse> getCarById(@PathVariable Long id) {
+        Optional<CarResponse> car = carService.getCarById(id);
         return car.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     /**
      * Updates an existing car.
      *
-     * @param id Car ID.
+     * @param id     Car ID.
      * @param carDto Updated car data.
      * @return Updated car Dto or 404 if not found.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<CarDto> updateCar(@PathVariable Long id, @RequestBody CarDto carDto) {
-        Optional<CarDto> updatedCar = carService.updateCar(id, carDto);
+    public ResponseEntity<CarResponse> updateCar(@PathVariable Long id, @RequestBody CarDto carDto) {
+        Optional<CarResponse> updatedCar = carService.updateCar(id, carDto);
         return updatedCar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
                                                                   .notFound().build());
     }
@@ -99,10 +100,10 @@ public class CarController {
      * @return updated car DTO, or 404 if not found.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<CarDto> partialUpdateCar(
+    public ResponseEntity<CarResponse> partialUpdateCar(
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
-        Optional<CarDto> updatedCar = carService.partialUpdateCar(id, updates);
+        Optional<CarResponse> updatedCar = carService.partialUpdateCar(id, updates);
         return updatedCar
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());

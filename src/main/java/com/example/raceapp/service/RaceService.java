@@ -1,144 +1,188 @@
 package com.example.raceapp.service;
 
-import com.example.raceapp.dto.RaceDto;
-import com.example.raceapp.model.Pilot;
+import com.example.raceapp.dto.*;
 import com.example.raceapp.model.Race;
-import com.example.raceapp.repository.PilotRepository;
+import com.example.raceapp.model.Pilot;
+import com.example.raceapp.model.Car;
+import com.example.raceapp.repository.CarRepository;
 import com.example.raceapp.repository.RaceRepository;
+import com.example.raceapp.repository.PilotRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service for managing races.
+ * Service for managing race-related operations including creation, retrieval,
+ * updating, and deletion of races. Handles participant associations and mapping
+ * between entities and DTOs.
  */
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class RaceService {
     private final RaceRepository raceRepository;
+    private final CarRepository carRepository;
     private final PilotRepository pilotRepository;
+    private final PilotService pilotService;
 
     /**
-     * Constructs a RaceService with the specified repositories.
+     * Maps a Race entity to a RaceResponse DTO.
      *
-     * @param raceRepository the repository for race data operations.
-     * @param pilotRepository the repository for pilot data operations.
+     * @param race the Race entity to convert
+     * @return RaceResponse containing race details and full participant data
      */
-    public RaceService(RaceRepository raceRepository, PilotRepository pilotRepository) {
-        this.raceRepository = raceRepository;
-        this.pilotRepository = pilotRepository;
-    }
+    private RaceResponse mapToResponse(Race race) {
+        RaceResponse response = new RaceResponse();
+        response.setId(race.getId());
+        response.setName(race.getName());
+        response.setYear(race.getYear());
 
-    /**
-     * Maps a Race entity to a RaceDto.
-     *
-     * @param race the entity to convert.
-     * @return corresponding DTO.
-     */
-    private RaceDto mapToRaceDto(Race race) {
-        RaceDto dto = new RaceDto();
-        dto.setId(race.getId());
-        dto.setName(race.getName());
-        dto.setYear(race.getYear());
-        dto.setPilotIds(race.getPilots().stream()
-                .map(Pilot::getId)
+        response.setPilots(race.getPilots().stream()
+                .map(pilotService::mapToResponse)
                 .collect(Collectors.toSet()));
-        return dto;
+
+        response.setCars(race.getCars().stream()
+                .map(this::mapToCarResponse)
+                .collect(Collectors.toSet()));
+
+        return response;
     }
 
     /**
-     * Creates a new race.
+     * Maps a Car entity to a CarResponse DTO.
      *
-     * @param raceDto DTO containing race data.
-     * @return created race DTO.
+     * @param car the Car entity to convert
+     * @return CarResponse containing car details and owner information
      */
-    public RaceDto createRace(RaceDto raceDto) {
-        Race race = new Race();
-        race.setName(raceDto.getName());
-        race.setYear(raceDto.getYear());
+    private CarResponse mapToCarResponse(Car car) {
+        CarResponse response = new CarResponse();
+        response.setId(car.getId());
+        response.setBrand(car.getBrand());
+        response.setModel(car.getModel());
+        response.setPower(car.getPower());
 
-        Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(raceDto.getPilotIds()));
+        if (car.getOwner() != null) {
+            PilotSimpleResponse owner = new PilotSimpleResponse();
+            owner.setId(car.getOwner().getId());
+            owner.setName(car.getOwner().getName());
+            owner.setExperience(car.getOwner().getExperience());
+            response.setOwner(owner);
+        }
+        return response;
+    }
+
+    /**
+     * Creates a new race from the provided request data.
+     *
+     * @param request the RaceRequest containing race details
+     * @return RaceResponse with the created race's details
+     */
+    public RaceResponse createRace(RaceDto request) {
+        Race race = new Race();
+        race.setName(request.getName());
+        race.setYear(request.getYear());
+
+        Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(request.getPilotIds()));
         race.setPilots(pilots);
 
-        Race savedRace = raceRepository.save(race);
-        return mapToRaceDto(savedRace);
+        Set<Car> cars = new HashSet<>(carRepository.findAllById(request.getCarIds()));
+        race.setCars(cars);
+
+        return mapToResponse(raceRepository.save(race));
     }
 
     /**
-     * Retrieves all races.
+     * Retrieves all races with their associated pilots and cars.
      *
-     * @return list of all race DTOs.
+     * @return List of RaceResponse containing all races
      */
-    public List<RaceDto> getAllRaces() {
-        return raceRepository.findAll().stream().map(this::mapToRaceDto).toList();
+    public List<RaceResponse> getAllRaces() {
+        return raceRepository.findAll().stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     /**
      * Retrieves a race by ID.
      *
-     * @param id the ID of the race to retrieve.
-     * @return Optional containing the race DTO, or empty if not found.
+     * @param id the ID of the race to retrieve
+     * @return Optional containing RaceResponse if found, empty otherwise
      */
-    public Optional<RaceDto> getRaceById(Long id) {
-        return raceRepository.findById(id).map(this::mapToRaceDto);
+    public Optional<RaceResponse> getRaceById(Long id) {
+        return raceRepository.findById(id)
+                .map(this::mapToResponse);
     }
 
     /**
-     * Updates an existing race.
+     * Updates an existing race with new data.
      *
-     * @param id the ID of the race to update.
-     * @param raceDto DTO containing updated race data.
-     * @return Optional containing the updated race DTO, or empty if not found.
+     * @param id the ID of the race to update
+     * @param request the RaceRequest containing updated data
+     * @return Optional containing updated RaceResponse if found, empty otherwise
      */
-    public Optional<RaceDto> updateRace(Long id, RaceDto raceDto) {
+    public Optional<RaceResponse> updateRace(Long id, RaceDto request) {
         return raceRepository.findById(id).map(race -> {
-            race.setName(raceDto.getName());
-            race.setYear(raceDto.getYear());
+            race.setName(request.getName());
+            race.setYear(request.getYear());
 
-            Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(raceDto.getPilotIds()));
+            Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(request.getPilotIds()));
             race.getPilots().clear();
             race.getPilots().addAll(pilots);
 
-            return mapToRaceDto(raceRepository.save(race));
+            return mapToResponse(raceRepository.save(race));
         });
     }
 
     /**
-     * Partially updates a race's fields.
+     * Partially updates specific fields of a race.
      *
-     * @param id      the ID of the race to update.
-     * @param updates map containing fields to update.
-     * @return optional of updated race DTO.
+     * @param id the ID of the race to update
+     * @param updates map containing fields to update
+     * @return Optional containing updated RaceResponse if found, empty otherwise
+     * @throws IllegalArgumentException if invalid field is provided
      */
-    public Optional<RaceDto> partialUpdateRace(Long id, Map<String, Object> updates) {
+    public Optional<RaceResponse> partialUpdateRace(Long id, Map<String, Object> updates) {
         return raceRepository.findById(id).map(race -> {
             updates.forEach((key, value) -> {
                 switch (key) {
                     case "name" -> race.setName((String) value);
                     case "year" -> race.setYear((Integer) value);
                     case "pilotIds" -> {
-                        List<Long> pilotIds = (List<Long>) value;
+                        Set<Long> pilotIds = (Set<Long>) value;
                         Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(pilotIds));
                         race.setPilots(pilots);
+                    }
+                    case "carIds" -> {
+                        Set<Long> carIds = new HashSet<>((List<Long>) value);
+                        Set<Car> cars = new HashSet<>(carRepository.findAllById(carIds));
+                        race.setCars(cars);
                     }
                     default -> throw new IllegalArgumentException("Invalid field: " + key);
                 }
             });
-            return mapToRaceDto(raceRepository.save(race));
+            return mapToResponse(raceRepository.save(race));
         });
     }
 
     /**
      * Deletes a race by ID.
      *
-     * @param id the ID of the race to delete.
+     * @param id the ID of the race to delete
      */
     public void deleteRace(Long id) {
-        raceRepository.deleteById(id);
+        Race race = raceRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Race not found with id: " + id));
+
+        race.getCars().clear();
+        race.getPilots().clear();
+
+        raceRepository.delete(race);
     }
 }
