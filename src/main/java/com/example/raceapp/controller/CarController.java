@@ -65,12 +65,15 @@ public class CarController {
      * @return List of filtered cars.
      */
     @GetMapping
-    public ResponseEntity<List<CarResponse>> getCars(
+    public ResponseEntity<Page<CarResponse>> getCars(
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) String model,
             @RequestParam(required = false) Integer power,
-            @RequestParam(required = false) Long ownerId) {
-        return ResponseEntity.ok(carService.searchCars(brand, model, power, ownerId));
+            @RequestParam(required = false) Long ownerId,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(carService.searchCarsWithPagination(brand, model,
+                power, ownerId, pageable));
     }
 
     /**

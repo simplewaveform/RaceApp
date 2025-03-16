@@ -62,11 +62,14 @@ public class PilotController {
      * @return a {@link ResponseEntity} containing a list of {@link PilotResponse} DTOs.
      */
     @GetMapping
-    public ResponseEntity<List<PilotResponse>> getPilots(
+    public ResponseEntity<Page<PilotResponse>> getPilots(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer age,
-            @RequestParam(required = false) Integer experience) {
-        return ResponseEntity.ok(pilotService.searchPilots(name, age, experience));
+            @RequestParam(required = false) Integer experience,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(pilotService.searchPilotsWithPagination(name,
+                age, experience, pageable));
     }
 
     /**

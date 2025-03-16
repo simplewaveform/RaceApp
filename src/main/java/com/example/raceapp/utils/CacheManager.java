@@ -103,5 +103,6 @@ public class CacheManager {
         int initialSize = cacheMap.size();
         cacheMap.keySet().removeIf(key -> key.startsWith(pattern));
         int removed = initialSize - cacheMap.size();
-        logger.log(Level.INFO, "🧹 [CACHE] Removed {0} entries", removed);    }
+        logger.log(Level.INFO, "🧹 [CACHE] Removed {0} entries", removed);
+    }
 }

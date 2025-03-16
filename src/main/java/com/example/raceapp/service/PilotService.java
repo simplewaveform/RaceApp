@@ -99,9 +99,21 @@ public class PilotService {
      * @param experience The pilot's experience.
      * @return A list of pilots matching the given criteria.
      */
-    public List<PilotResponse> searchPilots(String name, Integer age, Integer experience) {
-        String cacheKey = String.format("%sSEARCH_%s_%s_%s", CACHE_PREFIX, name, age, experience);
-        List<PilotResponse> cached = cache.get(cacheKey);
+    public Page<PilotResponse> searchPilotsWithPagination(
+            String name,
+            Integer age,
+            Integer experience,
+            Pageable pageable
+    ) {
+        String cacheKey = String.format(
+                "%sSEARCH_%s_%d_%d_PAGE_%d_SIZE_%d",
+                CACHE_PREFIX,
+                name, age, experience,
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
+
+        Page<PilotResponse> cached = cache.get(cacheKey);
         if (cached != null) {
             return cached;
         }
@@ -120,10 +132,8 @@ public class PilotService {
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        List<PilotResponse> result = pilotRepository.findAll(spec).stream()
-                .map(this::mapToResponse)
-                .toList();
-
+        Page<Pilot> pilots = pilotRepository.findAll(spec, pageable);
+        Page<PilotResponse> result = pilots.map(this::mapToResponse);
         cache.put(cacheKey, result);
         return result;
     }

@@ -99,9 +99,22 @@ public class CarService {
      * @param ownerId the owner ID to filter cars by (nullable).
      * @return a {@link List} of {@link CarResponse} DTOs matching the search criteria.
      */
-    public List<CarResponse> searchCars(String brand, String model, Integer power, Long ownerId) {
-        String cacheKey = CACHE_PREFIX + "SEARCH_" + brand + model + power + ownerId;
-        List<CarResponse> cached = cache.get(cacheKey);
+    public Page<CarResponse> searchCarsWithPagination(
+            String brand,
+            String model,
+            Integer power,
+            Long ownerId,
+            Pageable pageable
+    ) {
+        String cacheKey = String.format(
+                "%sSEARCH_%s_%s_%s_%s_PAGE_%d_SIZE_%d",
+                CACHE_PREFIX,
+                brand, model, power, ownerId,
+                pageable.getPageNumber(),
+                pageable.getPageSize()
+        );
+
+        Page<CarResponse> cached = cache.get(cacheKey);
         if (cached != null) {
             return cached;
         }
@@ -118,15 +131,13 @@ public class CarService {
                 predicates.add(cb.equal(root.get("power"), power));
             }
             if (ownerId != null) {
-                predicates.add(cb.equal(root.get("owner").get("id"), ownerId));
+                predicates.add(cb.equal(root.get("owner.id"), ownerId));
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        List<CarResponse> result = carRepository.findAll(spec).stream()
-                .map(this::mapToResponse)
-                .toList();
-
+        Page<Car> cars = carRepository.findAll(spec, pageable);
+        Page<CarResponse> result = cars.map(this::mapToResponse);
         cache.put(cacheKey, result);
         return result;
     }
