@@ -1,5 +1,6 @@
 package com.example.raceapp.dto;
 
+import java.util.Objects;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,4 +16,21 @@ public class RaceResponse {
     private Integer year;
     private Set<PilotResponse> pilots;
     private Set<CarResponse> cars;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        RaceResponse that = (RaceResponse) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
