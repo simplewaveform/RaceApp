@@ -2,7 +2,6 @@ package com.example.raceapp.service;
 
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
-import com.example.raceapp.dto.PilotResponse;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
@@ -23,9 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service for managing car-related operations including creation, retrieval,
- * updating, and deletion of cars. Handles owner associations and mapping between
- * entities and DTOs.
+ * Service class for managing car-related operations including creation, retrieval,
+ * updating, deletion, and querying of cars. Handles car-ownership associations and
+ * mapping between {@link Car} entities and {@link CarResponse} DTOs.
  */
 @Service
 @Transactional
@@ -38,20 +37,43 @@ public class CarService {
     private static final String CACHE_PREFIX = "CAR_";
     private static final String PILOT_NOT_FOUND = "Pilot not found with id: ";
 
+    /**
+     * Clears the cache for cars to ensure data consistency.
+     * This is used after creating, updating, or deleting a car.
+     */
     private void clearCarCache() {
         cache.evictByKeyPattern(CACHE_PREFIX);
     }
 
+    /**
+     * Maps a {@link Car} entity to a {@link CarResponse} DTO.
+     *
+     * @param car the {@link Car} entity to map.
+     * @return a {@link CarResponse} DTO representing the car.
+     */
     private CarResponse mapToResponse(Car car) {
         return RaceService.getCarResponse(car);
     }
 
+    /**
+     * Creates a new car based on the provided {@link CarDto}.
+     *
+     * @param request the {@link CarDto} containing the car details to be created.
+     * @return a {@link CarResponse} DTO representing the created car.
+     */
     public CarResponse createCar(CarDto request) {
         clearCarCache();
         Car car = new Car();
         return getCarResponse(request, car);
     }
 
+    /**
+     * Helper method to convert a {@link CarDto} to a {@link Car} entity and save it.
+     *
+     * @param request the {@link CarDto} containing car details.
+     * @param car the {@link Car} entity to update.
+     * @return a {@link CarResponse} DTO representing the saved car.
+     */
     private CarResponse getCarResponse(CarDto request, Car car) {
         car.setBrand(request.getBrand());
         car.setModel(request.getModel());
@@ -67,6 +89,16 @@ public class CarService {
         return mapToResponse(carRepository.save(car));
     }
 
+    /**
+     * Searches for cars based on the provided filters (brand, model, power, ownerId).
+     * Caches the result to avoid redundant queries.
+     *
+     * @param brand the brand of the car to search for (nullable).
+     * @param model the model of the car to search for (nullable).
+     * @param power the power of the car to search for (nullable).
+     * @param ownerId the owner ID to filter cars by (nullable).
+     * @return a {@link List} of {@link CarResponse} DTOs matching the search criteria.
+     */
     public List<CarResponse> searchCars(String brand, String model, Integer power, Long ownerId) {
         String cacheKey = CACHE_PREFIX + "SEARCH_" + brand + model + power + ownerId;
         List<CarResponse> cached = cache.get(cacheKey);
@@ -99,6 +131,15 @@ public class CarService {
         return result;
     }
 
+    /**
+     * Retrieves cars with a power greater than the specified minimum power.
+     * The result is paginated and cached.
+     *
+     * @param minPower the minimum power of the cars to retrieve.
+     * @param pageable the pagination parameters.
+     * @return a {@link Page} of {@link CarResponse} DTOs representing
+     *         the cars with power greater than the specified threshold.
+     */
     public Page<CarResponse> getCarsByPower(Integer minPower, Pageable pageable) {
         String cacheKey = String.format("%sPOWER_%d_PAGE_%d_SIZE_%d", CACHE_PREFIX, minPower,
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -114,15 +155,36 @@ public class CarService {
         return result;
     }
 
+    /**
+     * Retrieves a car by its ID.
+     *
+     * @param id the ID of the car to retrieve.
+     * @return an {@link Optional} containing the {@link CarResponse}
+     *         DTO if the car is found, or {@link Optional#empty()} if not found.
+     */
     public Optional<CarResponse> getCarById(Long id) {
         return carRepository.findById(id).map(this::mapToResponse);
     }
 
+    /**
+     * Updates a car with the details provided in the {@link CarDto}.
+     *
+     * @param id the ID of the car to update.
+     * @param request the {@link CarDto} containing the updated car details.
+     * @return an {@link Optional} containing the updated {@link CarResponse} DTO.
+     */
     public Optional<CarResponse> updateCar(Long id, CarDto request) {
         clearCarCache();
         return carRepository.findById(id).map(car -> getCarResponse(request, car));
     }
 
+    /**
+     * Partially updates a car with the provided fields and values.
+     *
+     * @param id the ID of the car to update.
+     * @param updates a map containing field names and their corresponding values to update.
+     * @return an {@link Optional} containing the updated {@link CarResponse} DTO.
+     */
     public Optional<CarResponse> partialUpdateCar(Long id, Map<String, Object> updates) {
         clearCarCache();
         return carRepository.findById(id).map(car -> {
@@ -145,6 +207,13 @@ public class CarService {
         });
     }
 
+    /**
+     * Deletes a car by its ID.
+     * This method removes the car from any associated races and from the owner's car list.
+     *
+     * @param id the ID of the car to delete.
+     * @throws IllegalArgumentException if the car with the given ID is not found.
+     */
     public void deleteCar(Long id) {
         clearCarCache();
         Car car = carRepository.findById(id)

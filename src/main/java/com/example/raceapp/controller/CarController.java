@@ -23,7 +23,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for managing cars.
+ * REST controller for managing car-related operations such as creation,
+ * retrieval, updating, and deletion.
+ *
+ * <p>Handles HTTP requests related to car data and provides JSON responses
+ * with relevant details.</p>
  */
 @RestController
 @RequestMapping("/cars")
@@ -31,7 +35,7 @@ public class CarController {
     private final CarService carService;
 
     /**
-     * Constructs a CarController with the provided CarService.
+     * Constructs a {@code CarController} with the provided {@code CarService}.
      *
      * @param carService the service for managing car operations.
      */
@@ -40,10 +44,10 @@ public class CarController {
     }
 
     /**
-     * Creates a new car.
+     * Creates a new car and returns the created car's data.
      *
-     * @param carDto Dto containing car data.
-     * @return Created car Dto with HTTP 201.
+     * @param carDto DTO containing car data.
+     * @return The created car's data with HTTP status 201 (Created).
      */
     @PostMapping
     public ResponseEntity<CarResponse> createCar(@RequestBody CarDto carDto) {
@@ -51,12 +55,13 @@ public class CarController {
     }
 
     /**
-     * Retrieves cars by optional filters.
+     * Retrieves a list of cars filtered by optional parameters such as
+     * brand, model, power, or owner ID.
      *
-     * @param brand Car brand filter.
-     * @param model Car model filter.
-     * @param power Car power filter.
-     * @param ownerId Car owner ID filter.
+     * @param brand   Optional filter for car brand.
+     * @param model   Optional filter for car model.
+     * @param power   Optional filter for car power.
+     * @param ownerId Optional filter for car owner ID.
      * @return List of filtered cars.
      */
     @GetMapping
@@ -69,10 +74,10 @@ public class CarController {
     }
 
     /**
-     * Retrieves a car by ID.
+     * Retrieves a car by its unique identifier.
      *
-     * @param id Car ID.
-     * @return Car Dto or 404 if not found.
+     * @param id The unique ID of the car.
+     * @return The car's data if found, or HTTP status 404 (Not Found) if not.
      */
     @GetMapping("/{id}")
     public ResponseEntity<CarResponse> getCarById(@PathVariable Long id) {
@@ -80,6 +85,13 @@ public class CarController {
         return car.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Retrieves a paginated list of cars filtered by their power value.
+     *
+     * @param power    The car's power value for filtering.
+     * @param pageable Pageable parameters for pagination.
+     * @return A paginated list of cars matching the specified power value.
+     */
     @GetMapping("/by-power")
     public ResponseEntity<Page<CarResponse>> getCarsByPower(
             @RequestParam Integer power,
@@ -88,26 +100,26 @@ public class CarController {
     }
 
     /**
-     * Updates an existing car.
+     * Updates an existing car's data by ID.
      *
-     * @param id     Car ID.
-     * @param carDto Updated car data.
-     * @return Updated car Dto or 404 if not found.
+     * @param id     The ID of the car to update.
+     * @param carDto DTO containing the updated car data.
+     * @return The updated car's data, or HTTP status 404 if the car is not found.
      */
     @PutMapping("/{id}")
     public ResponseEntity<CarResponse> updateCar(@PathVariable Long id,
                                                  @RequestBody CarDto carDto) {
         Optional<CarResponse> updatedCar = carService.updateCar(id, carDto);
         return updatedCar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
-                                                                  .notFound().build());
+                .notFound().build());
     }
 
     /**
-     * Partially updates a car by ID.
+     * Partially updates an existing car's data by ID.
      *
-     * @param id      the ID of the car to update.
-     * @param updates map of fields to update.
-     * @return updated car DTO, or 404 if not found.
+     * @param id      The ID of the car to update.
+     * @param updates Map containing the fields to update and their new values.
+     * @return The updated car's data, or HTTP status 404 if the car is not found.
      */
     @PatchMapping("/{id}")
     public ResponseEntity<CarResponse> partialUpdateCar(
@@ -120,9 +132,9 @@ public class CarController {
     }
 
     /**
-     * Deletes a car by ID.
+     * Deletes a car by its unique identifier.
      *
-     * @param id Car ID.
+     * @param id The ID of the car to delete.
      */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -39,10 +39,19 @@ public class RaceService {
     private final CacheManager cache;
     private static final String CACHE_PREFIX = "RACE_";
 
+    /**
+     * Clears the race-related cache.
+     */
     private void clearRaceCache() {
         cache.evictByKeyPattern(CACHE_PREFIX);
     }
 
+    /**
+     * Maps a {@link Race} entity to a {@link RaceResponse} DTO.
+     *
+     * @param race The race entity to map.
+     * @return A {@link RaceResponse} representing the mapped race.
+     */
     private RaceResponse mapToResponse(Race race) {
         RaceResponse response = new RaceResponse();
         response.setId(race.getId());
@@ -60,10 +69,22 @@ public class RaceService {
         return response;
     }
 
+    /**
+     * Maps a {@link Car} entity to a {@link CarResponse} DTO.
+     *
+     * @param car The car entity to map.
+     * @return A {@link CarResponse} representing the mapped car.
+     */
     private CarResponse mapToCarResponse(Car car) {
         return getCarResponse(car);
     }
 
+    /**
+     * Static utility method to map a {@link Car} entity to a {@link CarResponse}.
+     *
+     * @param car The car entity to map.
+     * @return A {@link CarResponse} representing the mapped car.
+     */
     static CarResponse getCarResponse(Car car) {
         CarResponse response = new CarResponse();
         response.setId(car.getId());
@@ -81,6 +102,12 @@ public class RaceService {
         return response;
     }
 
+    /**
+     * Creates a new race with associated pilots and cars.
+     *
+     * @param request DTO containing race details.
+     * @return The created race as a {@link RaceResponse}.
+     */
     public RaceResponse createRace(RaceDto request) {
         clearRaceCache();
         Race race = new Race();
@@ -96,6 +123,12 @@ public class RaceService {
         return mapToResponse(raceRepository.save(race));
     }
 
+    /**
+     * Retrieves a paginated list of all races.
+     *
+     * @param pageable Pagination details.
+     * @return A paginated list of {@link RaceResponse}.
+     */
     public Page<RaceResponse> getAllRaces(Pageable pageable) {
         String cacheKey = String.format("%sALL_RACES_PAGE_%d_SIZE_%d", CACHE_PREFIX,
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -111,6 +144,12 @@ public class RaceService {
         return result;
     }
 
+    /**
+     * Retrieves a race by its ID.
+     *
+     * @param id The ID of the race to retrieve.
+     * @return An {@link Optional} containing the race if found, or empty otherwise.
+     */
     public Optional<RaceResponse> getRaceById(Long id) {
         String cacheKey = CACHE_PREFIX + "RACE_ID_" + id;
         RaceResponse cached = cache.get(cacheKey);
@@ -125,6 +164,13 @@ public class RaceService {
         return result;
     }
 
+    /**
+     * Updates an existing race with new details.
+     *
+     * @param id The ID of the race to update.
+     * @param request DTO containing the updated race details.
+     * @return An {@link Optional} containing the updated race.
+     */
     public Optional<RaceResponse> updateRace(Long id, RaceDto request) {
         clearRaceCache();
         return raceRepository.findById(id).map(race -> {
@@ -143,6 +189,13 @@ public class RaceService {
         });
     }
 
+    /**
+     * Partially updates a race's details based on provided key-value pairs.
+     *
+     * @param id The ID of the race to update.
+     * @param updates A map of fields to update with their new values.
+     * @return An {@link Optional} containing the updated race.
+     */
     public Optional<RaceResponse> partialUpdateRace(Long id, Map<String, Object> updates) {
         clearRaceCache();
         return raceRepository.findById(id).map(race -> {
@@ -152,14 +205,12 @@ public class RaceService {
                     case "year" -> race.setYear((Integer) value);
                     case "pilotIds" -> {
                         List<Long> pilotIds = (List<Long>) value;
-                        Set<Long> pilotIdSet = new HashSet<>(pilotIds);
-                        Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(pilotIdSet));
+                        Set<Pilot> pilots = new HashSet<>(pilotRepository.findAllById(pilotIds));
                         race.setPilots(pilots);
                     }
                     case "carIds" -> {
                         List<Long> carIds = (List<Long>) value;
-                        Set<Long> carIdSet = new HashSet<>(carIds);
-                        Set<Car> cars = new HashSet<>(carRepository.findAllById(carIdSet));
+                        Set<Car> cars = new HashSet<>(carRepository.findAllById(carIds));
                         race.setCars(cars);
                     }
                     default -> throw new IllegalArgumentException("Invalid field: " + key);
@@ -169,6 +220,11 @@ public class RaceService {
         });
     }
 
+    /**
+     * Deletes a race by its ID.
+     *
+     * @param id The ID of the race to delete.
+     */
     public void deleteRace(Long id) {
         clearRaceCache();
         Race race = raceRepository.findById(id)

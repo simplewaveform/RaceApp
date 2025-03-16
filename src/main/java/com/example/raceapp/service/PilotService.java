@@ -22,8 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service for managing pilot-related operations including creation, retrieval,
- * updating, and deletion of pilots. Handles mapping between entities and DTOs.
+ * Service for managing pilot-related operations including creation,
+ * retrieval, updating, and deletion of pilots.
+ * Handles caching, data mapping, and database interactions.
  */
 @Service
 @Transactional
@@ -34,10 +35,19 @@ public class PilotService {
     private final CacheManager cache;
     private static final String CACHE_PREFIX = "PILOT_";
 
+    /**
+     * Invalidates all cache entries related to pilots.
+     */
     private void invalidateCache() {
         cache.evictByKeyPattern(CACHE_PREFIX);
     }
 
+    /**
+     * Maps a {@link Pilot} entity to a {@link PilotResponse} DTO.
+     *
+     * @param pilot The pilot entity to map.
+     * @return A {@link PilotResponse} representing the mapped pilot.
+     */
     PilotResponse mapToResponse(Pilot pilot) {
         PilotResponse response = new PilotResponse();
         response.setId(pilot.getId());
@@ -50,6 +60,12 @@ public class PilotService {
         return response;
     }
 
+    /**
+     * Maps a {@link Car} entity to a {@link CarSimpleResponse} DTO.
+     *
+     * @param car The car entity to map.
+     * @return A {@link CarSimpleResponse} representing the mapped car.
+     */
     private CarSimpleResponse mapToCarSimpleResponse(Car car) {
         CarSimpleResponse response = new CarSimpleResponse();
         response.setId(car.getId());
@@ -59,6 +75,12 @@ public class PilotService {
         return response;
     }
 
+    /**
+     * Creates a new pilot.
+     *
+     * @param request The DTO containing pilot details.
+     * @return The created pilot as a {@link PilotResponse}.
+     */
     public PilotResponse createPilot(PilotDto request) {
         invalidateCache();
 
@@ -69,6 +91,14 @@ public class PilotService {
         return mapToResponse(pilotRepository.save(pilot));
     }
 
+    /**
+     * Searches for pilots based on given criteria.
+     *
+     * @param name The pilot's name.
+     * @param age The pilot's age.
+     * @param experience The pilot's experience.
+     * @return A list of pilots matching the given criteria.
+     */
     public List<PilotResponse> searchPilots(String name, Integer age, Integer experience) {
         String cacheKey = String.format("%sSEARCH_%s_%s_%s", CACHE_PREFIX, name, age, experience);
         List<PilotResponse> cached = cache.get(cacheKey);
@@ -98,6 +128,13 @@ public class PilotService {
         return result;
     }
 
+    /**
+     * Retrieves a paginated list of pilots who own a car of the specified brand.
+     *
+     * @param brand The car's brand.
+     * @param pageable Pagination details.
+     * @return A paginated list of pilots.
+     */
     public Page<PilotResponse> getPilotsByCarBrand(String brand, Pageable pageable) {
         String cacheKey = String.format("%sBY_BRAND_%s_PAGE_%d_SIZE_%d", CACHE_PREFIX, brand,
                 pageable.getPageNumber(), pageable.getPageSize());
@@ -114,10 +151,23 @@ public class PilotService {
         return result;
     }
 
+    /**
+     * Retrieves a pilot by its ID.
+     *
+     * @param id The ID of the pilot.
+     * @return An {@link Optional} containing the pilot if found.
+     */
     public Optional<PilotResponse> getPilotById(Long id) {
         return pilotRepository.findById(id).map(this::mapToResponse);
     }
 
+    /**
+     * Updates a pilot's details.
+     *
+     * @param id The ID of the pilot to update.
+     * @param request The DTO containing updated pilot data.
+     * @return The updated pilot wrapped in an {@link Optional}.
+     */
     public Optional<PilotResponse> updatePilot(Long id, PilotDto request) {
         invalidateCache();
         return pilotRepository.findById(id).map(pilot -> {
@@ -128,6 +178,13 @@ public class PilotService {
         });
     }
 
+    /**
+     * Partially updates a pilot's details.
+     *
+     * @param id The ID of the pilot to update.
+     * @param updates A map of fields to update with their new values.
+     * @return The updated pilot wrapped in an {@link Optional}.
+     */
     public Optional<PilotResponse> partialUpdatePilot(Long id, Map<String, Object> updates) {
         invalidateCache();
         return pilotRepository.findById(id).map(pilot -> {
@@ -143,6 +200,11 @@ public class PilotService {
         });
     }
 
+    /**
+     * Deletes a pilot by their ID and updates related races and cars accordingly.
+     *
+     * @param id The ID of the pilot to delete.
+     */
     public void deletePilot(Long id) {
         invalidateCache();
 
