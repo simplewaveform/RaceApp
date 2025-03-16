@@ -6,6 +6,8 @@ import com.example.raceapp.service.CarService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -76,6 +78,13 @@ public class CarController {
     public ResponseEntity<CarResponse> getCarById(@PathVariable Long id) {
         Optional<CarResponse> car = carService.getCarById(id);
         return car.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/by-power")
+    public ResponseEntity<Page<CarResponse>> getCarsByPower(
+            @RequestParam Integer power,
+            Pageable pageable) {
+        return ResponseEntity.ok(carService.getCarsByPower(power, pageable));
     }
 
     /**

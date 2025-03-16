@@ -8,12 +8,15 @@ import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.PilotRepository;
 import com.example.raceapp.repository.RaceRepository;
+import com.example.raceapp.utils.CacheManager;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,13 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class PilotService {
     private final PilotRepository pilotRepository;
     private final RaceRepository raceRepository;
+    private final CacheManager cache;
+    private static final String CACHE_PREFIX = "PILOT_";
 
-    /**
-     * Maps a Pilot entity to a PilotResponse DTO.
-     *
-     * @param pilot the Pilot entity to convert
-     * @return PilotResponse containing pilot details and associated cars
-     */
+    private void invalidateCache() {
+        cache.evictByKeyPattern(CACHE_PREFIX);
+    }
+
     PilotResponse mapToResponse(Pilot pilot) {
         PilotResponse response = new PilotResponse();
         response.setId(pilot.getId());
@@ -47,12 +50,6 @@ public class PilotService {
         return response;
     }
 
-    /**
-     * Maps a Car entity to a CarSimpleResponse DTO.
-     *
-     * @param car the Car entity to convert
-     * @return CarSimpleResponse containing basic car details
-     */
     private CarSimpleResponse mapToCarSimpleResponse(Car car) {
         CarSimpleResponse response = new CarSimpleResponse();
         response.setId(car.getId());
@@ -62,13 +59,9 @@ public class PilotService {
         return response;
     }
 
-    /**
-     * Creates a new pilot from the provided request data.
-     *
-     * @param request the PilotRequest containing pilot details
-     * @return PilotResponse with the created pilot's details
-     */
     public PilotResponse createPilot(PilotDto request) {
+        invalidateCache();
+
         Pilot pilot = new Pilot();
         pilot.setName(request.getName());
         pilot.setAge(request.getAge());
@@ -76,15 +69,13 @@ public class PilotService {
         return mapToResponse(pilotRepository.save(pilot));
     }
 
-    /**
-     * Searches pilots based on optional filters.
-     *
-     * @param name the name filter (optional)
-     * @param age the age filter (optional)
-     * @param experience the experience filter (optional)
-     * @return List of PilotResponse matching the criteria
-     */
     public List<PilotResponse> searchPilots(String name, Integer age, Integer experience) {
+        String cacheKey = String.format("%sSEARCH_%s_%s_%s", CACHE_PREFIX, name, age, experience);
+        List<PilotResponse> cached = cache.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
         Specification<Pilot> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (name != null) {
@@ -98,30 +89,37 @@ public class PilotService {
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return pilotRepository.findAll(spec).stream()
+
+        List<PilotResponse> result = pilotRepository.findAll(spec).stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        cache.put(cacheKey, result);
+        return result;
     }
 
-    /**
-     * Retrieves a pilot by ID.
-     *
-     * @param id the ID of the pilot to retrieve
-     * @return Optional containing PilotResponse if found, empty otherwise
-     */
-    public Optional<PilotResponse> getPilotById(Long id) {
-        return pilotRepository.findById(id)
+    public Page<PilotResponse> getPilotsByCarBrand(String brand, Pageable pageable) {
+        String cacheKey = String.format("%sBY_BRAND_%s_PAGE_%d_SIZE_%d", CACHE_PREFIX, brand,
+                pageable.getPageNumber(), pageable.getPageSize());
+        Page<PilotResponse> cached = cache.get(cacheKey);
+
+        if (cached != null) {
+            return cached;
+        }
+
+        Page<PilotResponse> result = pilotRepository.findPilotsByCarBrand(brand, pageable)
                 .map(this::mapToResponse);
+
+        cache.put(cacheKey, result);
+        return result;
     }
 
-    /**
-     * Updates an existing pilot with new data.
-     *
-     * @param id the ID of the pilot to update
-     * @param request the PilotRequest containing updated data
-     * @return Optional containing updated PilotResponse if found, empty otherwise
-     */
+    public Optional<PilotResponse> getPilotById(Long id) {
+        return pilotRepository.findById(id).map(this::mapToResponse);
+    }
+
     public Optional<PilotResponse> updatePilot(Long id, PilotDto request) {
+        invalidateCache();
         return pilotRepository.findById(id).map(pilot -> {
             pilot.setName(request.getName());
             pilot.setAge(request.getAge());
@@ -130,15 +128,8 @@ public class PilotService {
         });
     }
 
-    /**
-     * Partially updates specific fields of a pilot.
-     *
-     * @param id the ID of the pilot to update
-     * @param updates map containing fields to update
-     * @return Optional containing updated PilotResponse if found, empty otherwise
-     * @throws IllegalArgumentException if invalid field is provided
-     */
     public Optional<PilotResponse> partialUpdatePilot(Long id, Map<String, Object> updates) {
+        invalidateCache();
         return pilotRepository.findById(id).map(pilot -> {
             updates.forEach((key, value) -> {
                 switch (key) {
@@ -152,12 +143,9 @@ public class PilotService {
         });
     }
 
-    /**
-     * Deletes a pilot by ID.
-     *
-     * @param id the ID of the pilot to delete
-     */
     public void deletePilot(Long id) {
+        invalidateCache();
+
         Pilot pilot = pilotRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pilot not found with id: " + id));
 
@@ -176,5 +164,4 @@ public class PilotService {
 
         pilotRepository.delete(pilot);
     }
-
 }

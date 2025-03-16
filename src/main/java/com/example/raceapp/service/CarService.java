@@ -2,18 +2,22 @@ package com.example.raceapp.service;
 
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
+import com.example.raceapp.dto.PilotResponse;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.CarRepository;
 import com.example.raceapp.repository.PilotRepository;
 import com.example.raceapp.repository.RaceRepository;
+import com.example.raceapp.utils.CacheManager;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,26 +34,20 @@ public class CarService {
     private final CarRepository carRepository;
     private final RaceRepository raceRepository;
     private final PilotRepository pilotRepository;
+    private final CacheManager cache;
+    private static final String CACHE_PREFIX = "CAR_";
     private static final String PILOT_NOT_FOUND = "Pilot not found with id: ";
 
-    /**
-     * Maps a Car entity to a CarResponse DTO.
-     *
-     * @param car the Car entity to convert
-     * @return CarResponse containing car details and owner information
-     */
+    private void clearCarCache() {
+        cache.evictByKeyPattern(CACHE_PREFIX);
+    }
+
     private CarResponse mapToResponse(Car car) {
         return RaceService.getCarResponse(car);
     }
 
-    /**
-     * Creates a new car from the provided request data.
-     *
-     * @param request the CarRequest containing car details
-     * @return CarResponse with the created car's details
-     * @throws IllegalArgumentException if owner ID is invalid
-     */
     public CarResponse createCar(CarDto request) {
+        clearCarCache();
         Car car = new Car();
         return getCarResponse(request, car);
     }
@@ -69,16 +67,13 @@ public class CarService {
         return mapToResponse(carRepository.save(car));
     }
 
-    /**
-     * Searches cars based on optional filters.
-     *
-     * @param brand the brand filter (optional)
-     * @param model the model filter (optional)
-     * @param power the power filter (optional)
-     * @param ownerId the owner ID filter (optional)
-     * @return List of CarResponse matching the criteria
-     */
     public List<CarResponse> searchCars(String brand, String model, Integer power, Long ownerId) {
+        String cacheKey = CACHE_PREFIX + "SEARCH_" + brand + model + power + ownerId;
+        List<CarResponse> cached = cache.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
         Specification<Car> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             if (brand != null) {
@@ -95,43 +90,41 @@ public class CarService {
             }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        return carRepository.findAll(spec).stream()
+
+        List<CarResponse> result = carRepository.findAll(spec).stream()
                 .map(this::mapToResponse)
                 .toList();
+
+        cache.put(cacheKey, result);
+        return result;
     }
 
-    /**
-     * Retrieves a car by ID.
-     *
-     * @param id the ID of the car to retrieve
-     * @return Optional containing CarResponse if found, empty otherwise
-     */
-    public Optional<CarResponse> getCarById(Long id) {
-        return carRepository.findById(id)
+    public Page<CarResponse> getCarsByPower(Integer minPower, Pageable pageable) {
+        String cacheKey = String.format("%sPOWER_%d_PAGE_%d_SIZE_%d", CACHE_PREFIX, minPower,
+                pageable.getPageNumber(), pageable.getPageSize());
+        Page<CarResponse> cached = cache.get(cacheKey);
+        if (cached != null) {
+            return cached;
+        }
+
+        Page<CarResponse> result = carRepository.findCarsByPowerNative(minPower, pageable)
                 .map(this::mapToResponse);
+
+        cache.put(cacheKey, result);
+        return result;
     }
 
-    /**
-     * Updates an existing car with new data.
-     *
-     * @param id the ID of the car to update
-     * @param request the CarRequest containing updated data
-     * @return Optional containing updated CarResponse if found, empty otherwise
-     * @throws IllegalArgumentException if owner ID is invalid
-     */
+    public Optional<CarResponse> getCarById(Long id) {
+        return carRepository.findById(id).map(this::mapToResponse);
+    }
+
     public Optional<CarResponse> updateCar(Long id, CarDto request) {
+        clearCarCache();
         return carRepository.findById(id).map(car -> getCarResponse(request, car));
     }
 
-    /**
-     * Partially updates specific fields of a car.
-     *
-     * @param id the ID of the car to update
-     * @param updates map containing fields to update
-     * @return Optional containing updated CarResponse if found, empty otherwise
-     * @throws IllegalArgumentException if invalid field is provided
-     */
     public Optional<CarResponse> partialUpdateCar(Long id, Map<String, Object> updates) {
+        clearCarCache();
         return carRepository.findById(id).map(car -> {
             updates.forEach((key, value) -> {
                 switch (key) {
@@ -152,12 +145,8 @@ public class CarService {
         });
     }
 
-    /**
-     * Deletes a car by ID.
-     *
-     * @param id the ID of the car to delete
-     */
     public void deleteCar(Long id) {
+        clearCarCache();
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found with id: " + id));
 
@@ -173,6 +162,4 @@ public class CarService {
 
         carRepository.delete(car);
     }
-
-
 }

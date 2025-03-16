@@ -3,10 +3,14 @@ package com.example.raceapp.repository;
 import com.example.raceapp.model.Car;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * Repository for managing cars with explicit EntityGraph configurations to load owner associations.
@@ -41,5 +45,13 @@ public interface CarRepository extends JpaRepository<Car, Long>, JpaSpecificatio
     @EntityGraph(attributePaths = {"owner"})
     @Override
     Optional<Car> findById(Long id);
+
+    @EntityGraph(attributePaths = {"owner"})
+    @Query("SELECT c FROM Car c WHERE c.owner.id = :ownerId")
+    Page<Car> findByOwner(@Param("ownerId") Long ownerId, Pageable pageable);
+
+    @Query(value = "SELECT * FROM cars WHERE power > :minPower", nativeQuery = true)
+    Page<Car> findCarsByPowerNative(@Param("minPower") Integer power, Pageable pageable);
+
 
 }

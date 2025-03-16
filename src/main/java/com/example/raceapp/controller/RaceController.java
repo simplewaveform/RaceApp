@@ -3,9 +3,10 @@ package com.example.raceapp.controller;
 import com.example.raceapp.dto.RaceDto;
 import com.example.raceapp.dto.RaceResponse;
 import com.example.raceapp.service.RaceService;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,8 +54,8 @@ public class RaceController {
      * @return List of all races.
      */
     @GetMapping
-    public ResponseEntity<List<RaceResponse>> getAllRaces() {
-        return ResponseEntity.ok(raceService.getAllRaces());
+    public ResponseEntity<Page<RaceResponse>> getAllRaces(Pageable pageable) {
+        return ResponseEntity.ok(raceService.getAllRaces(pageable));
     }
 
     /**
