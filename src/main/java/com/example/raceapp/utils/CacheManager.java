@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CacheManager {
-
     private static final Logger logger = Logger.getLogger(CacheManager.class.getName());
     private final ConcurrentHashMap<String, Object> cacheMap = new ConcurrentHashMap<>();
 
@@ -26,7 +25,8 @@ public class CacheManager {
      */
     public void put(String key, Object value) {
         cacheMap.put(key, value);
-        logger.info("✅ [CACHE PUT] Key: " + key);
+        // Avoid logging sensitive or user-controlled data directly.
+        logger.info("✅ [CACHE PUT] Key added to cache.");
     }
 
     /**
@@ -40,9 +40,10 @@ public class CacheManager {
     public <T> T get(String key) {
         T value = (T) cacheMap.get(key);
         if (value != null) {
-            logger.info("📌 [CACHE HIT] Key: " + key);
+            // Avoid logging the key and only log the result without revealing sensitive data.
+            logger.info("📌 [CACHE HIT] Cache contains a value for the given key.");
         } else {
-            logger.info("❌ [CACHE MISS] Key: " + key);
+            logger.info("❌ [CACHE MISS] No value found for the given key.");
         }
         return value;
     }
@@ -56,6 +57,6 @@ public class CacheManager {
      */
     public void evictByKeyPattern(String pattern) {
         cacheMap.keySet().removeIf(key -> key.startsWith(pattern));
-        logger.info("🧹 [CACHE EVICT] Pattern: " + pattern);
+        logger.info("🧹 [CACHE EVICT] Cache entries removed for the given pattern.");
     }
 }
