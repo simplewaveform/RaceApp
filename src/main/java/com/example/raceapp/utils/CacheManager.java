@@ -1,6 +1,7 @@
 package com.example.raceapp.utils;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.springframework.stereotype.Component;
 
@@ -102,6 +103,5 @@ public class CacheManager {
         int initialSize = cacheMap.size();
         cacheMap.keySet().removeIf(key -> key.startsWith(pattern));
         int removed = initialSize - cacheMap.size();
-        logger.info("🧹 [CACHE] Removed " + removed + " entries");
-    }
+        logger.log(Level.INFO, "🧹 [CACHE] Removed {0} entries", removed);    }
 }
