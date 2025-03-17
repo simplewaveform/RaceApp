@@ -54,12 +54,12 @@ public interface PilotRepository extends JpaRepository<Pilot, Long>,
      * @param pageable Pagination information.
      * @return A paginated list of pilots with cars of the specified brand.
      */
-    @Query(value = "SELECT DISTINCT p.* FROM pilots p " +
-            "JOIN cars c ON p.id = c.pilot_id " +
-            "WHERE c.brand = :brand",
-            countQuery = "SELECT COUNT(DISTINCT p.id) FROM pilots p " +
-                    "JOIN cars c ON p.id = c.pilot_id " +
-                    "WHERE c.brand = :brand",
+    @Query(value = "SELECT DISTINCT p.* FROM pilots p "
+            + "JOIN cars c ON p.id = c.pilot_id "
+            + "WHERE c.brand = :brand",
+            countQuery = "SELECT COUNT(DISTINCT p.id) FROM pilots p "
+                    + "JOIN cars c ON p.id = c.pilot_id "
+                    + "WHERE c.brand = :brand",
             nativeQuery = true)
     Page<Pilot> findPilotsByCarBrandNative(@Param("brand") String brand, Pageable pageable);
 
