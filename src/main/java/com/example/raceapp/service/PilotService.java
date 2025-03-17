@@ -32,13 +32,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class PilotService {
     private final PilotRepository pilotRepository;
     private final RaceRepository raceRepository;
+    private final CarService carService;
     private final CacheManager cache;
     private static final String CACHE_PREFIX = "PILOT_";
 
     /**
      * Invalidates all cache entries related to pilots.
      */
-    private void invalidateCache() {
+    void invalidateCache() {
         cache.evictByKeyPattern(CACHE_PREFIX);
     }
 
@@ -179,6 +180,7 @@ public class PilotService {
      * @return The updated pilot wrapped in an {@link Optional}.
      */
     public Optional<PilotResponse> updatePilot(Long id, PilotDto request) {
+        carService.clearCarCache();
         invalidateCache();
         return pilotRepository.findById(id).map(pilot -> {
             pilot.setName(request.getName());
@@ -196,6 +198,7 @@ public class PilotService {
      * @return The updated pilot wrapped in an {@link Optional}.
      */
     public Optional<PilotResponse> partialUpdatePilot(Long id, Map<String, Object> updates) {
+        carService.clearCarCache();
         invalidateCache();
         return pilotRepository.findById(id).map(pilot -> {
             updates.forEach((key, value) -> {
@@ -217,6 +220,7 @@ public class PilotService {
      */
     public void deletePilot(Long id) {
         invalidateCache();
+        carService.clearCarCache();
 
         Pilot pilot = pilotRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Pilot not found with id: " + id));

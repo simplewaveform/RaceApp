@@ -1,5 +1,8 @@
 package com.example.raceapp.utils;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,7 +19,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheManager {
     private static final Logger logger = Logger.getLogger(CacheManager.class.getName());
-    private final ConcurrentHashMap<String, CacheEntry> cacheMap = new ConcurrentHashMap<>();
+    private static final int MAX_CACHE_SIZE = 3;
+
+    private final Map<String, CacheEntry> cacheMap = Collections.synchronizedMap(
+            new LinkedHashMap<>(MAX_CACHE_SIZE, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, CacheEntry> eldest) {
+                    return size() > MAX_CACHE_SIZE;
+                }
+            }
+    );
     private static final long DEFAULT_TTL = 3600_000; // 1 hour
 
     /**

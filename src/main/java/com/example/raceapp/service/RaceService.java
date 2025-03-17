@@ -36,6 +36,7 @@ public class RaceService {
     private final CarRepository carRepository;
     private final PilotRepository pilotRepository;
     private final PilotService pilotService;
+    private final CarService carService;
     private final CacheManager cache;
     private static final String CACHE_PREFIX = "RACE_";
 
@@ -185,6 +186,9 @@ public class RaceService {
             race.getCars().clear();
             race.getCars().addAll(cars);
 
+            pilotService.invalidateCache();
+            carService.clearCarCache();
+
             return mapToResponse(raceRepository.save(race));
         });
     }
@@ -197,6 +201,8 @@ public class RaceService {
      * @return An {@link Optional} containing the updated race.
      */
     public Optional<RaceResponse> partialUpdateRace(Long id, Map<String, Object> updates) {
+        pilotService.invalidateCache();
+        carService.clearCarCache();
         clearRaceCache();
         return raceRepository.findById(id).map(race -> {
             updates.forEach((key, value) -> {
@@ -215,6 +221,7 @@ public class RaceService {
                     }
                     default -> throw new IllegalArgumentException("Invalid field: " + key);
                 }
+
             });
             return mapToResponse(raceRepository.save(race));
         });
@@ -232,6 +239,9 @@ public class RaceService {
 
         race.getCars().clear();
         race.getPilots().clear();
+
+        pilotService.invalidateCache();
+        carService.clearCarCache();
 
         raceRepository.delete(race);
     }

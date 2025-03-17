@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -41,7 +42,7 @@ public class CarService {
      * Clears the cache for cars to ensure data consistency.
      * This is used after creating, updating, or deleting a car.
      */
-    private void clearCarCache() {
+    void clearCarCache() {
         cache.evictByKeyPattern(CACHE_PREFIX);
     }
 
@@ -186,6 +187,7 @@ public class CarService {
      */
     public Optional<CarResponse> updateCar(Long id, CarDto request) {
         clearCarCache();
+        cache.evictByKeyPattern("PILOT_");
         return carRepository.findById(id).map(car -> getCarResponse(request, car));
     }
 
@@ -197,6 +199,8 @@ public class CarService {
      * @return an {@link Optional} containing the updated {@link CarResponse} DTO.
      */
     public Optional<CarResponse> partialUpdateCar(Long id, Map<String, Object> updates) {
+
+        cache.evictByKeyPattern("PILOT_");
         clearCarCache();
         return carRepository.findById(id).map(car -> {
             updates.forEach((key, value) -> {
@@ -226,6 +230,8 @@ public class CarService {
      * @throws IllegalArgumentException if the car with the given ID is not found.
      */
     public void deleteCar(Long id) {
+
+        cache.evictByKeyPattern("PILOT_");
         clearCarCache();
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found with id: " + id));
