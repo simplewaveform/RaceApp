@@ -59,18 +59,17 @@ public interface CarRepository extends JpaRepository<Car, Long>, JpaSpecificatio
 
     /**
      * Retrieves a paginated list of {@link Car} entities
-     * where the owner ID matches the provided {@code ownerId}.
-     * The "owner" association is eagerly loaded for each car in the result.
-     * This method uses a custom JPQL query to filter the cars based on the owner's ID.
+     * with a power greater than the specified {@code minPower}.
+     * This method uses JPQL instead of native SQL.
      *
-     * @param ownerId the ID of the owner whose cars should be retrieved.
+     * @param power the minimum power threshold for the cars to be retrieved.
      * @param pageable a {@link Pageable} object to apply pagination to the result.
-     * @return a {@link Page} of {@link Car} entities that belong to the
-     *         specified owner, with their associated owner eagerly loaded.
+     * @return a {@link Page} of {@link Car} entities that
+     *         have power greater than the specified minimum power.
      */
-    @EntityGraph(attributePaths = {"owner"})
-    @Query("SELECT c FROM Car c WHERE c.owner.id = :ownerId")
-    Page<Car> findByOwner(@Param("ownerId") Long ownerId, Pageable pageable);
+    @Query("SELECT c FROM Car c WHERE c.power > :minPower")
+    Page<Car> findCarsByPower(@Param("minPower") Integer power, Pageable pageable);
+
 
     /**
      * Retrieves a paginated list of {@link Car} entities

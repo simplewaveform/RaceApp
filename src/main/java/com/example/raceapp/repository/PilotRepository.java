@@ -48,14 +48,21 @@ public interface PilotRepository extends JpaRepository<Pilot, Long>,
     Page<Pilot> findPilotsByCarBrand(@Param("brand") String brand, Pageable pageable);
 
     /**
-     * Finds pilots who have more than the specified years of experience
-     * and possess at least one car.
+     * Finds pilots who own a car of a specified brand using a native SQL query.
      *
-     * @param experience Minimum required years of experience.
+     * @param brand The brand of the car.
      * @param pageable Pagination information.
-     * @return A paginated list of experienced pilots with cars.
+     * @return A paginated list of pilots with cars of the specified brand.
      */
-    @Query("SELECT p FROM Pilot p WHERE p.experience > :experience AND SIZE(p.cars) > 0")
-    Page<Pilot> findExperiencedPilotsWithCars(@Param("experience") int experience,
-                                              Pageable pageable);
+    @Query(value = "SELECT DISTINCT p.* FROM pilots p " +
+            "JOIN cars c ON p.id = c.pilot_id " +
+            "WHERE c.brand = :brand",
+            countQuery = "SELECT COUNT(DISTINCT p.id) FROM pilots p " +
+                    "JOIN cars c ON p.id = c.pilot_id " +
+                    "WHERE c.brand = :brand",
+            nativeQuery = true)
+    Page<Pilot> findPilotsByCarBrandNative(@Param("brand") String brand, Pageable pageable);
+
 }
+
+

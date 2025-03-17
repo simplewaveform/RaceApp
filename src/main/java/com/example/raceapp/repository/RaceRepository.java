@@ -48,7 +48,22 @@ public interface RaceRepository extends JpaRepository<Race, Long> {
      * @return A paginated list of races that fall within the specified year range.
      */
     @Query(value = "SELECT * FROM races WHERE year BETWEEN :start AND :end", nativeQuery = true)
+    Page<Race> findRacesByYearRangeNative(@Param("start") int start,
+                                    @Param("end") int end,
+                                    Pageable pageable);
+
+    /**
+     * Retrieves races that occurred within the specified year range.
+     * Uses JPQL instead of native SQL.
+     *
+     * @param start The starting year (inclusive).
+     * @param end The ending year (inclusive).
+     * @param pageable Pagination details for efficient data handling.
+     * @return A paginated list of races that fall within the specified year range.
+     */
+    @Query("SELECT r FROM Race r WHERE r.year BETWEEN :start AND :end")
     Page<Race> findRacesByYearRange(@Param("start") int start,
                                     @Param("end") int end,
                                     Pageable pageable);
+
 }
