@@ -35,6 +35,7 @@ public class CarService {
     private final RaceRepository raceRepository;
     private final PilotRepository pilotRepository;
     private final CacheManager cache;
+    private static final String CACHE_PREFIX_PILOT = "PILOT_";
     private static final String CACHE_PREFIX = "CAR_";
     private static final String PILOT_NOT_FOUND = "Pilot not found with id: ";
 
@@ -187,7 +188,7 @@ public class CarService {
      */
     public Optional<CarResponse> updateCar(Long id, CarDto request) {
         clearCarCache();
-        cache.evictByKeyPattern("PILOT_");
+        cache.evictByKeyPattern("CACHE_PREFIX_PILOT");
         return carRepository.findById(id).map(car -> getCarResponse(request, car));
     }
 
@@ -200,7 +201,7 @@ public class CarService {
      */
     public Optional<CarResponse> partialUpdateCar(Long id, Map<String, Object> updates) {
 
-        cache.evictByKeyPattern("PILOT_");
+        cache.evictByKeyPattern("CACHE_PREFIX_PILOT");
         clearCarCache();
         return carRepository.findById(id).map(car -> {
             updates.forEach((key, value) -> {
@@ -231,7 +232,7 @@ public class CarService {
      */
     public void deleteCar(Long id) {
 
-        cache.evictByKeyPattern("PILOT_");
+        cache.evictByKeyPattern("CACHE_PREFIX_PILOT");
         clearCarCache();
         Car car = carRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Car not found with id: " + id));
