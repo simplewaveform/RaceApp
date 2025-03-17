@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheManager {
     private static final Logger logger = Logger.getLogger(CacheManager.class.getName());
-    private static final int MAX_CACHE_SIZE = 3;
+    private static final int MAX_CACHE_SIZE = 2;
 
     private final Map<String, CacheEntry> cacheMap = Collections.synchronizedMap(
             new LinkedHashMap<>(MAX_CACHE_SIZE, 0.75f, true) {
