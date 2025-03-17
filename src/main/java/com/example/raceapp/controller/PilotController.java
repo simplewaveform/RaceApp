@@ -85,7 +85,7 @@ public class PilotController {
     }
 
     /**
-     * Retrieves pilots associated with a specific car brand.
+     * Retrieves pilots associated with a specific car brand using a native SQL query.
      * Supports pagination for large result sets.
      *
      * @param brand the brand of the car to filter pilots by.
@@ -96,7 +96,7 @@ public class PilotController {
     public ResponseEntity<Page<PilotResponse>> getByCarBrand(
             @RequestParam String brand,
             Pageable pageable) {
-        return ResponseEntity.ok(pilotService.getPilotsByCarBrand(brand, pageable));
+        return ResponseEntity.ok(pilotService.getPilotsByCarBrandNative(brand, pageable));
     }
 
     /**

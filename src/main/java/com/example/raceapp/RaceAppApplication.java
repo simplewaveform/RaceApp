@@ -2,11 +2,13 @@ package com.example.raceapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
 /**
  * The main class to run the Spring Boot application for the RaceApp.
  */
+@EnableCaching
 @EnableSpringDataWebSupport
 @SpringBootApplication
 public class RaceAppApplication {

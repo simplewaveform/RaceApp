@@ -4,18 +4,20 @@ import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
-import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.CarRepository;
 import com.example.raceapp.repository.PilotRepository;
 import com.example.raceapp.repository.RaceRepository;
-import com.example.raceapp.utils.CacheManager;
 import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,84 +25,56 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service class for managing car-related operations including creation, retrieval,
- * updating, deletion, and querying of cars. Handles car-ownership associations and
- * mapping between {@link Car} entities and {@link CarResponse} DTOs.
+ * Service for managing car-related operations.
  */
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CarService {
     private final CarRepository carRepository;
-    private final RaceRepository raceRepository;
     private final PilotRepository pilotRepository;
-    private final CacheManager cache;
-    private static final String CACHE_PREFIX_PILOT = "PILOT_";
-    private static final String CACHE_PREFIX = "CAR_";
-    private static final String PILOT_NOT_FOUND = "Pilot not found with id: ";
+    private final RaceRepository raceRepository;
 
-    /**
-     * Clears the cache for cars to ensure data consistency.
-     * This is used after creating, updating, or deleting a car.
-     */
-    void clearCarCache() {
-        cache.evictByKeyPattern(CACHE_PREFIX);
+    CarResponse mapToResponse(Car car) {
+        CarResponse response = new CarResponse();
+        response.setId(car.getId());
+        response.setBrand(car.getBrand());
+        response.setModel(car.getModel());
+        response.setPower(car.getPower());
+        if (car.getOwner() != null) {
+            response.setOwner(RaceService.mapToPilotSimpleResponse(car.getOwner()));
+        }
+        return response;
     }
 
-    /**
-     * Maps a {@link Car} entity to a {@link CarResponse} DTO.
-     *
-     * @param car the {@link Car} entity to map.
-     * @return a {@link CarResponse} DTO representing the car.
-     */
-    private CarResponse mapToResponse(Car car) {
-        return RaceService.getCarResponse(car);
-    }
-
-    /**
-     * Creates a new car based on the provided {@link CarDto}.
-     *
-     * @param request the {@link CarDto} containing the car details to be created.
-     * @return a {@link CarResponse} DTO representing the created car.
-     */
+    @Caching(evict = {
+        @CacheEvict(value = "cars", allEntries = true),
+        @CacheEvict(value = "pilots", allEntries = true)
+    })
     public CarResponse createCar(CarDto request) {
-        clearCarCache();
         Car car = new Car();
         return getCarResponse(request, car);
     }
 
-    /**
-     * Helper method to convert a {@link CarDto} to a {@link Car} entity and save it.
-     *
-     * @param request the {@link CarDto} containing car details.
-     * @param car the {@link Car} entity to update.
-     * @return a {@link CarResponse} DTO representing the saved car.
-     */
     private CarResponse getCarResponse(CarDto request, Car car) {
         car.setBrand(request.getBrand());
         car.setModel(request.getModel());
         car.setPower(request.getPower());
-
         if (request.getOwnerId() != null) {
             Pilot owner = pilotRepository.findById(request.getOwnerId())
-                    .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND
-                            + request.getOwnerId()));
+                    .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
             car.setOwner(owner);
         }
-
         return mapToResponse(carRepository.save(car));
     }
 
-    /**
-     * Searches for cars based on the provided filters (brand, model, power, ownerId).
-     * Caches the result to avoid redundant queries.
-     *
-     * @param brand the brand of the car to search for (nullable).
-     * @param model the model of the car to search for (nullable).
-     * @param power the power of the car to search for (nullable).
-     * @param ownerId the owner ID to filter cars by (nullable).
-     * @return a {@link List} of {@link CarResponse} DTOs matching the search criteria.
-     */
+    @Cacheable(value = "cars", key = "{#minPower, #pageable.pageNumber, #pageable.pageSize}")
+    public Page<CarResponse> getCarsByPower(Integer minPower, Pageable pageable) {
+        return carRepository.findCarsByPowerNative(minPower, pageable)
+                .map(this::mapToResponse);
+    }
+
+    @Cacheable(value = "cars", key = "{#brand, #model, #power, #ownerId, #pageable.pageNumber, #pageable.pageSize}")
     public Page<CarResponse> searchCarsWithPagination(
             String brand,
             String model,
@@ -108,101 +82,43 @@ public class CarService {
             Long ownerId,
             Pageable pageable
     ) {
-        String cacheKey = String.format(
-                "%sSEARCH_%s_%s_%s_%s_PAGE_%d_SIZE_%d",
-                CACHE_PREFIX,
-                brand, model, power, ownerId,
-                pageable.getPageNumber(),
-                pageable.getPageSize()
-        );
-
-        Page<CarResponse> cached = cache.get(cacheKey);
-        if (cached != null) {
-            return cached;
-        }
-
         Specification<Car> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (brand != null) {
-                predicates.add(cb.equal(root.get("brand"), brand));
-            }
-            if (model != null) {
-                predicates.add(cb.equal(root.get("model"), model));
-            }
-            if (power != null) {
-                predicates.add(cb.equal(root.get("power"), power));
-            }
-            if (ownerId != null) {
-                predicates.add(cb.equal(root.get("owner.id"), ownerId));
-            }
+            if (brand != null) predicates.add(cb.equal(root.get("brand"), brand));
+            if (model != null) predicates.add(cb.equal(root.get("model"), model));
+            if (power != null) predicates.add(cb.equal(root.get("power"), power));
+            if (ownerId != null) predicates.add(cb.equal(root.get("owner").get("id"), ownerId));
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
-        Page<Car> cars = carRepository.findAll(spec, pageable);
-        Page<CarResponse> result = cars.map(this::mapToResponse);
-        cache.put(cacheKey, result);
-        return result;
+        return carRepository.findAll(spec, pageable).map(this::mapToResponse);
     }
 
     /**
-     * Retrieves cars with a power greater than the specified minimum power.
-     * The result is paginated and cached.
-     *
-     * @param minPower the minimum power of the cars to retrieve.
-     * @param pageable the pagination parameters.
-     * @return a {@link Page} of {@link CarResponse} DTOs representing
-     *         the cars with power greater than the specified threshold.
+     * Retrieves cars by their IDs.
      */
-    public Page<CarResponse> getCarsByPower(Integer minPower, Pageable pageable) {
-        String cacheKey = String.format("%sPOWER_%d_PAGE_%d_SIZE_%d", CACHE_PREFIX, minPower,
-                pageable.getPageNumber(), pageable.getPageSize());
-        Page<CarResponse> cached = cache.get(cacheKey);
-        if (cached != null) {
-            return cached;
-        }
-
-        Page<CarResponse> result = carRepository.findCarsByPowerNative(minPower, pageable)
-                .map(this::mapToResponse);
-
-        cache.put(cacheKey, result);
-        return result;
+    public Set<Car> getCarsByIds(Set<Long> ids) {
+        return new HashSet<>(carRepository.findAllById(ids));
     }
 
-    /**
-     * Retrieves a car by its ID.
-     *
-     * @param id the ID of the car to retrieve.
-     * @return an {@link Optional} containing the {@link CarResponse}
-     *         DTO if the car is found, or {@link Optional#empty()} if not found.
-     */
+    @Cacheable(value = "cars", key = "#id")
     public Optional<CarResponse> getCarById(Long id) {
         return carRepository.findById(id).map(this::mapToResponse);
     }
 
-    /**
-     * Updates a car with the details provided in the {@link CarDto}.
-     *
-     * @param id the ID of the car to update.
-     * @param request the {@link CarDto} containing the updated car details.
-     * @return an {@link Optional} containing the updated {@link CarResponse} DTO.
-     */
+    @Caching(evict = {
+            @CacheEvict(value = "cars", allEntries = true),
+            @CacheEvict(value = "pilots", allEntries = true)
+    })
     public Optional<CarResponse> updateCar(Long id, CarDto request) {
-        clearCarCache();
-        cache.evictByKeyPattern("CACHE_PREFIX_PILOT");
         return carRepository.findById(id).map(car -> getCarResponse(request, car));
     }
 
-    /**
-     * Partially updates a car with the provided fields and values.
-     *
-     * @param id the ID of the car to update.
-     * @param updates a map containing field names and their corresponding values to update.
-     * @return an {@link Optional} containing the updated {@link CarResponse} DTO.
-     */
+    @Caching(evict = {
+            @CacheEvict(value = "cars", allEntries = true),
+            @CacheEvict(value = "pilots", allEntries = true)
+    })
     public Optional<CarResponse> partialUpdateCar(Long id, Map<String, Object> updates) {
-
-        cache.evictByKeyPattern("CACHE_PREFIX_PILOT");
-        clearCarCache();
         return carRepository.findById(id).map(car -> {
             updates.forEach((key, value) -> {
                 switch (key) {
@@ -210,10 +126,8 @@ public class CarService {
                     case "model" -> car.setModel((String) value);
                     case "power" -> car.setPower((Integer) value);
                     case "ownerId" -> {
-                        Long ownerId = ((Number) value).longValue();
-                        Pilot owner = pilotRepository.findById(ownerId)
-                                .orElseThrow(() -> new IllegalArgumentException(PILOT_NOT_FOUND
-                                        + ownerId));
+                        Pilot owner = pilotRepository.findById(((Number) value).longValue())
+                                .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
                         car.setOwner(owner);
                     }
                     default -> throw new IllegalArgumentException("Invalid field: " + key);
@@ -223,24 +137,19 @@ public class CarService {
         });
     }
 
-    /**
-     * Deletes a car by its ID.
-     * This method removes the car from any associated races and from the owner's car list.
-     *
-     * @param id the ID of the car to delete.
-     * @throws IllegalArgumentException if the car with the given ID is not found.
-     */
+    @Caching(evict = {
+            @CacheEvict(value = "cars", allEntries = true),
+            @CacheEvict(value = "pilots", allEntries = true),
+            @CacheEvict(value = "races", allEntries = true)
+    })
     public void deleteCar(Long id) {
-
-        cache.evictByKeyPattern("CACHE_PREFIX_PILOT");
-        clearCarCache();
         Car car = carRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Car not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
 
-        for (Race race : car.getRaces()) {
+        car.getRaces().forEach(race -> {
             race.getCars().remove(car);
             raceRepository.save(race);
-        }
+        });
 
         if (car.getOwner() != null) {
             car.getOwner().getCars().remove(car);
