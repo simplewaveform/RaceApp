@@ -5,11 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
+import static org.springframework.data.web.config.EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO;
+
 /**
  * The main class to run the Spring Boot application for the RaceApp.
  */
 @EnableCaching
-@EnableSpringDataWebSupport
+@EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO)
 @SpringBootApplication
 public class RaceAppApplication {
 

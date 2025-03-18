@@ -29,4 +29,5 @@ public class LogController {
             throw new CustomException(HttpStatus.NOT_FOUND, "Log file not found");
         }
     }
+
 }
