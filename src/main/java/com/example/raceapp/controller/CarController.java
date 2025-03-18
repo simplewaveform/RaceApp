@@ -3,141 +3,137 @@ package com.example.raceapp.controller;
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
 import com.example.raceapp.service.CarService;
-import java.util.Map;
-import java.util.Optional;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-/**
- * REST controller for managing car-related operations such as creation,
- * retrieval, updating, and deletion.
- *
- * <p>Handles HTTP requests related to car data and provides JSON responses
- * with relevant details.</p>
- */
+import java.util.Map;
+import java.util.Optional;
+
+@Tag(name = "Cars", description = "API for managing cars")
 @RestController
 @RequestMapping("/cars")
 public class CarController {
     private final CarService carService;
 
-    /**
-     * Constructs a {@code CarController} with the provided {@code CarService}.
-     *
-     * @param carService the service for managing car operations.
-     */
     public CarController(CarService carService) {
         this.carService = carService;
     }
 
-    /**
-     * Creates a new car and returns the created car's data.
-     *
-     * @param carDto DTO containing car data.
-     * @return The created car's data with HTTP status 201 (Created).
-     */
+    @Operation(
+            summary = "Create a car",
+            description = "Creates a new car with specified parameters",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Car created",
+                            content = @Content(schema = @Schema(implementation = CarResponse.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid input"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @PostMapping
-    public ResponseEntity<CarResponse> createCar(@RequestBody CarDto carDto) {
+    public ResponseEntity<CarResponse> createCar(@Valid @RequestBody CarDto carDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(carService.createCar(carDto));
     }
 
-    /**
-     * Retrieves a list of cars filtered by optional parameters such as
-     * brand, model, power, or owner ID.
-     *
-     * @param brand   Optional filter for car brand.
-     * @param model   Optional filter for car model.
-     * @param power   Optional filter for car power.
-     * @param ownerId Optional filter for car owner ID.
-     * @return List of filtered cars.
-     */
+    @Operation(
+            summary = "Get cars with filters",
+            description = "Returns paginated list of cars with optional filters",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Cars retrieved",
+                            content = @Content(schema = @Schema(implementation = Page.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @GetMapping
     public ResponseEntity<Page<CarResponse>> getCars(
+            @Parameter(description = "Filter by brand", example = "Toyota")
             @RequestParam(required = false) String brand,
+            @Parameter(description = "Filter by model", example = "Camry")
             @RequestParam(required = false) String model,
+            @Parameter(description = "Filter by power", example = "200")
             @RequestParam(required = false) Integer power,
+            @Parameter(description = "Filter by owner ID", example = "1")
             @RequestParam(required = false) Long ownerId,
-            Pageable pageable
-    ) {
-        return ResponseEntity.ok(carService.searchCarsWithPagination(brand, model,
-                power, ownerId, pageable));
+            Pageable pageable) {
+        return ResponseEntity.ok(carService.searchCarsWithPagination(brand, model, power, ownerId, pageable));
     }
 
-    /**
-     * Retrieves a car by its unique identifier.
-     *
-     * @param id The unique ID of the car.
-     * @return The car's data if found, or HTTP status 404 (Not Found) if not.
-     */
+    @Operation(
+            summary = "Get car by ID",
+            description = "Returns a single car with full details",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Car found",
+                            content = @Content(schema = @Schema(implementation = CarResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Car not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @GetMapping("/{id}")
-    public ResponseEntity<CarResponse> getCarById(@PathVariable Long id) {
+    public ResponseEntity<CarResponse> getCarById(
+            @Parameter(description = "ID of car to return", required = true, example = "1")
+            @PathVariable Long id) {
         Optional<CarResponse> car = carService.getCarById(id);
         return car.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Retrieves a paginated list of cars filtered by their power value.
-     *
-     * @param power    The car's power value for filtering.
-     * @param pageable Pageable parameters for pagination.
-     * @return A paginated list of cars matching the specified power value.
-     */
-    @GetMapping("/by-power")
-    public ResponseEntity<Page<CarResponse>> getCarsByPower(
-            @RequestParam Integer power,
-            Pageable pageable) {
-        return ResponseEntity.ok(carService.getCarsByPower(power, pageable));
-    }
-
-    /**
-     * Updates an existing car's data by ID.
-     *
-     * @param id     The ID of the car to update.
-     * @param carDto DTO containing the updated car data.
-     * @return The updated car's data, or HTTP status 404 if the car is not found.
-     */
+    @Operation(
+            summary = "Update car by ID",
+            description = "Fully updates an existing car",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Car updated",
+                            content = @Content(schema = @Schema(implementation = CarResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Car not found"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @PutMapping("/{id}")
-    public ResponseEntity<CarResponse> updateCar(@PathVariable Long id,
-                                                 @RequestBody CarDto carDto) {
+    public ResponseEntity<CarResponse> updateCar(
+            @Parameter(description = "ID of car to update", required = true, example = "1")
+            @PathVariable Long id,
+            @Valid @RequestBody CarDto carDto) {
         Optional<CarResponse> updatedCar = carService.updateCar(id, carDto);
-        return updatedCar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity
-                .notFound().build());
+        return updatedCar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Partially updates an existing car's data by ID.
-     *
-     * @param id      The ID of the car to update.
-     * @param updates Map containing the fields to update and their new values.
-     * @return The updated car's data, or HTTP status 404 if the car is not found.
-     */
+    @Operation(
+            summary = "Partially update car by ID",
+            description = "Updates specific fields of an existing car",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Car partially updated",
+                            content = @Content(schema = @Schema(implementation = CarResponse.class))),
+                    @ApiResponse(responseCode = "404", description = "Car not found"),
+                    @ApiResponse(responseCode = "400", description = "Invalid input"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @PatchMapping("/{id}")
     public ResponseEntity<CarResponse> partialUpdateCar(
+            @Parameter(description = "ID of car to update", required = true, example = "1")
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
         Optional<CarResponse> updatedCar = carService.partialUpdateCar(id, updates);
-        return updatedCar
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return updatedCar.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    /**
-     * Deletes a car by its unique identifier.
-     *
-     * @param id The ID of the car to delete.
-     */
+    @Operation(
+            summary = "Delete car by ID",
+            description = "Permanently removes a car from the system",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Car deleted"),
+                    @ApiResponse(responseCode = "404", description = "Car not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCar(@PathVariable Long id) {
