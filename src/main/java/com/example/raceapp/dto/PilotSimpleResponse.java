@@ -1,33 +1,22 @@
 package com.example.raceapp.dto;
 
-import java.util.Objects;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Simplified DTO for pilot references in other responses.
  */
+@Schema(description = "Simplified Pilot Response")
 @Getter
 @Setter
 public class PilotSimpleResponse {
+    @Schema(description = "Pilot ID", example = "1")
     private Long id;
+
+    @Schema(description = "Pilot's name", example = "John Doe")
     private String name;
+
+    @Schema(description = "Pilot's experience in years", example = "5")
     private Integer experience;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        PilotSimpleResponse that = (PilotSimpleResponse) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

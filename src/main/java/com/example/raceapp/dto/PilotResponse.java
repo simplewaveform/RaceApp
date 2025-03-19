@@ -1,36 +1,29 @@
 package com.example.raceapp.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Detailed DTO for pilot responses with associated cars.
  */
+@Schema(description = "Detailed Pilot Response")
 @Getter
 @Setter
 public class PilotResponse {
+    @Schema(description = "Pilot ID", example = "1")
     private Long id;
+
+    @Schema(description = "Pilot's name", example = "John Doe")
     private String name;
+
+    @Schema(description = "Pilot's age", example = "30")
     private Integer age;
+
+    @Schema(description = "Pilot's experience in years", example = "5")
     private Integer experience;
+
+    @Schema(description = "List of associated cars")
     private List<CarSimpleResponse> cars;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        PilotResponse that = (PilotResponse) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
