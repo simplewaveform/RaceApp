@@ -67,8 +67,23 @@ public class PilotController {
                 @ApiResponse(responseCode = "201", description = "Pilot created",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Invalid input \"message\":"
+                                                    + "\"Age must be a positive number\" }"
+                                    )
+                            )
+                    ),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Internal server error\","
+                                                    + "\"message\":"
+                                                    + "\"An unexpected error occurred\" }"
+                                    )
+                            )
+                    )
             }
     )
     @PostMapping
@@ -92,7 +107,16 @@ public class PilotController {
             responses = {
                 @ApiResponse(responseCode = "200", description = "Pilots retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\":"
+                                                    + "\"Internal server error\","
+                                                    + "\"message\":"
+                                                    + "\"An unexpected error occurred\" }"
+                                    )
+                            )
+                    )
             }
     )
     @GetMapping
@@ -134,8 +158,23 @@ public class PilotController {
                 @ApiResponse(responseCode = "200", description = "Pilot found",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Pilot not found"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Pilot not found",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Pilot not found\","
+                                                    + "\"message\": \"Pilot with ID 1 not found\" }"
+                                    )
+                            )
+                    ),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Internal server error\","
+                                                    + "\"message\":"
+                                                    + "\"An unexpected error occurred\" }"
+                                    )
+                            )
+                    )
             }
     )
     @GetMapping("/{id}")
@@ -160,9 +199,31 @@ public class PilotController {
                 @ApiResponse(responseCode = "200", description = "Pilot updated",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Pilot not found"),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Pilot not found",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Pilot not found\","
+                                                    + "\"message\": \"Pilot with ID 1 not found\" }"
+                                    )
+                            )
+                    ),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Invalid input\","
+                                                    + "\"message\": \"Invalid fields provided\" }"
+                                    )
+                            )
+                    ),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Internal server error\","
+                                                    + "\"message\":"
+                                                    + "\"An unexpected error occurred\" }"
+                                    )
+                            )
+                    )
             }
     )
     @PutMapping("/{id}")
@@ -196,14 +257,30 @@ public class PilotController {
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
                 @ApiResponse(responseCode = "400", description = "Invalid input",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Invalid input\" }"))),
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Invalid input\","
+                                                    + "\"message\": \"Invalid field(s) provided\" }"
+                                    )
+                            )
+                    ),
                 @ApiResponse(responseCode = "404", description = "Pilot not found",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Pilot not found\" }"))),
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Pilot not found\","
+                                                    + "\"message\": \"Pilot with ID 1 not found\" }"
+                                    )
+                            )
+                    ),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Internal server error\","
+                                                    + "\"message\":"
+                                                    + "\"An unexpected error occurred\" }"
+                                    )
+                            )
+                    )
             }
     )
     @PatchMapping("/{id}")
@@ -221,13 +298,27 @@ public class PilotController {
      * @param id the ID of the pilot to delete
      */
     @Operation(
-            summary = "Delete pilot by ID",
-            description = "Permanently removes a pilot from the system "
-                    + "identified by the pilot's ID.",
+            summary = "Delete a pilot by ID",
+            description = "Deletes a pilot identified by the ID.",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Pilot deleted"),
-                @ApiResponse(responseCode = "404", description = "Pilot not found"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Pilot not found",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Pilot not found\","
+                                                    + "\"message\": \"Pilot with ID 1 not found\" }"
+                                    )
+                            )
+                    ),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(
+                                    schema = @Schema(
+                                            example = "{ \"error\": \"Internal server error\","
+                                                    + "\"message\":"
+                                                    + "\"An unexpected error occurred\" }"
+                                    )
+                            )
+                    )
             }
     )
     @DeleteMapping("/{id}")
