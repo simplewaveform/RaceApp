@@ -19,7 +19,8 @@ import org.springframework.context.annotation.Configuration;
 public class SwaggerConfig {
 
     public static final String CONTENT_TYPE = "application/json";
-    public static final String COMPONENTS_SCHEMAS_ERROR_RESPONSE = "#/components/schemas/ErrorResponse";
+    public static final String COMPONENTS_SCHEMAS_ERROR_RESPONSE =
+            "#/components/schemas/ErrorResponse";
 
     /**
      * Bean for Swagger API documentation.
