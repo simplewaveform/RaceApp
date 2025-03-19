@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,7 +29,6 @@ public class LogController {
 
     @Value("${logging.file.path:logs/}")
     private String logDir;
-
     private static final int LINES_PER_PAGE = 100;
 
     /**
@@ -47,7 +45,7 @@ public class LogController {
                 @ApiResponse(responseCode = "200", description = "Log content retrieved"),
                 @ApiResponse(responseCode = "404", description = "Log file not found"),
                 @ApiResponse(responseCode = "400", description = "Invalid date or pagination "
-                        + "parameters"),
+                            + "parameters"),
                 @ApiResponse(responseCode = "500", description = "Error reading log file")
             }
     )
@@ -57,16 +55,14 @@ public class LogController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @Parameter(description = "Page number (0-based)")
             @RequestParam(defaultValue = "0") int page) {
-
         validateDate(date);
         Path logPath = Paths.get(logDir + "application-" + date + ".log");
         validateLogFile(logPath, date);
-
         try (Stream<String> lines = Files.lines(logPath)) {
             List<String> logLines = lines
                     .skip((long) page * LINES_PER_PAGE)
                     .limit(LINES_PER_PAGE)
-                    .collect(Collectors.toList());
+                    .toList();  // Replaced collect(Collectors.toList()) with toList()
 
             return ResponseEntity.ok(logLines);
         } catch (IOException e) {

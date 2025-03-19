@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    private static final String ERROR_KEY = "error";
 
     /**
      * Handles MethodArgumentNotValidException thrown during validation failures
@@ -75,7 +76,7 @@ public class GlobalExceptionHandler {
         String message = "Data integrity violation: " + Objects.requireNonNullElse(
                 ex.getRootCause(), ex).getMessage();
         log.error(message, ex);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", message));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(ERROR_KEY, message));
     }
 
     /**
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Map<String, String>> handleCustomException(CustomException ex) {
         log.error("Custom exception: {}", ex.getMessage());
-        return ResponseEntity.status(ex.getStatus()).body(Map.of("error", ex.getMessage()));
+        return ResponseEntity.status(ex.getStatus()).body(Map.of(ERROR_KEY, ex.getMessage()));
     }
 
     /**
@@ -99,7 +100,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleEntityNotFound(EntityNotFoundException ex) {
         log.warn("Entity not found: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(ERROR_KEY, ex.getMessage()));
     }
 
     /**
@@ -112,7 +113,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(
             IllegalArgumentException ex) {
         log.warn("Illegal argument: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(ERROR_KEY,
+                ex.getMessage()));
     }
 
     /**
@@ -124,7 +126,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
         log.error("Internal server error: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error",
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(ERROR_KEY,
                 "Internal server error"));
     }
 }
