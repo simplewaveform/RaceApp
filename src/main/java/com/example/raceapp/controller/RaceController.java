@@ -38,19 +38,19 @@ public class RaceController {
     private final RaceService raceService;
 
     /**
-     * Constructor to initialize the controller with the race service.
+     * Constructor for RaceController.
      *
-     * @param raceService the service to manage races
+     * @param raceService Service layer to handle race-related operations.
      */
     public RaceController(RaceService raceService) {
         this.raceService = raceService;
     }
 
     /**
-     * Creates a new race with specified parameters.
+     * Creates a new race with the specified parameters.
      *
-     * @param raceDto the data transfer object containing race details
-     * @return ResponseEntity with the response after creating the race
+     * @param raceDto the data transfer object containing race information
+     * @return the created race with its ID
      */
     @Operation(
             summary = "Create a race",
@@ -58,16 +58,21 @@ public class RaceController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Race data",
                     content = @Content(
-                            schema = @Schema(example = "{ \"name\": \"Grand Prix\", \"location\":"
-                                    + "\"Monaco\", \"date\": \"2025-06-01\" }")
+                            schema = @Schema(example = "{ \"name\": \"Grand Prix\","
+                                    + "\"location\": \"Monaco\", \"date\": \"2025-06-01\" }")
                     )
             ),
             responses = {
                 @ApiResponse(responseCode = "201", description = "Race created",
-                            content = @Content(schema = @Schema(implementation =
-                                    RaceResponse.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                            content = @Content(schema = @Schema(implementation = RaceResponse.class,
+                                    example = "{ \"id\": 1, \"name\": \"Grand Prix\", \"location\":"
+                                            + "\"Monaco\", \"date\": \"2025-06-01\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid data\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @PostMapping
@@ -76,10 +81,10 @@ public class RaceController {
     }
 
     /**
-     * Retrieves all races with pagination.
+     * Retrieves all races with pagination support.
      *
-     * @param pageable pagination parameters
-     * @return ResponseEntity containing a paginated list of all races
+     * @param pageable the pagination parameters
+     * @return a paginated list of races
      */
     @Operation(
             summary = "Get all races",
@@ -87,7 +92,9 @@ public class RaceController {
             responses = {
                 @ApiResponse(responseCode = "200", description = "Races retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @GetMapping
@@ -96,20 +103,25 @@ public class RaceController {
     }
 
     /**
-     * Retrieves a race by its ID.
+     * Retrieves a single race by its ID.
      *
      * @param id the ID of the race to retrieve
-     * @return ResponseEntity with the race details if found, otherwise not found
+     * @return the race with the specified ID
      */
     @Operation(
             summary = "Get race by ID",
             description = "Returns a single race with full details",
             responses = {
                 @ApiResponse(responseCode = "200", description = "Race found",
-                            content = @Content(schema = @Schema(implementation =
-                                    RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Race not found"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                            content = @Content(schema = @Schema(implementation = RaceResponse.class,
+                                    example = "{ \"id\": 1, \"name\": \"Grand Prix\", \"location\":"
+                                            + "\"Monaco\", \"date\": \"2025-06-01\" }"))),
+                @ApiResponse(responseCode = "404", description = "Race not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @GetMapping("/{id}")
@@ -121,22 +133,30 @@ public class RaceController {
     }
 
     /**
-     * Fully updates a race by its ID.
+     * Fully updates an existing race by its ID.
      *
      * @param id the ID of the race to update
-     * @param raceDto the data transfer object containing updated race details
-     * @return ResponseEntity with the updated race details
+     * @param raceDto the data transfer object containing updated race information
+     * @return the updated race
      */
     @Operation(
             summary = "Update race by ID",
             description = "Fully updates an existing race",
             responses = {
                 @ApiResponse(responseCode = "200", description = "Race updated",
-                            content = @Content(schema = @Schema(implementation =
-                                    RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Race not found"),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                            content = @Content(schema = @Schema(implementation = RaceResponse.class,
+                                    example = "{ \"id\": 1, \"name\": \"Grand Prix Updated\","
+                                            + "\"location\": \"Monaco Updated\","
+                                            + "\"date\":\"2025-06-01\" }"))),
+                @ApiResponse(responseCode = "404", description = "Race not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid data\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @PutMapping("/{id}")
@@ -150,22 +170,31 @@ public class RaceController {
     }
 
     /**
-     * Partially updates a race by its ID.
+     * Partially updates an existing race by its ID.
      *
-     * @param id the ID of the race to update
-     * @param updates the map of fields to update
-     * @return ResponseEntity with the partially updated race details
+     * @param id the ID of the race to partially update
+     * @param updates the map of fields to be updated
+     * @return the updated race
      */
     @Operation(
             summary = "Partially update race by ID",
             description = "Updates specific fields of an existing race",
             responses = {
                 @ApiResponse(responseCode = "200", description = "Race partially updated",
-                            content = @Content(schema = @Schema(implementation =
-                                    RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Race not found"),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                            content = @Content(schema = @Schema(implementation = RaceResponse.class,
+                                    example = "{ \"id\": 1, \"name\":"
+                                            + "\"Grand Prix Partially Updated\","
+                                            + "\"location\": \"Monaco\", \"date\":"
+                                            + "\"2025-06-01\" }"))),
+                @ApiResponse(responseCode = "404", description = "Race not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid data\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @PatchMapping("/{id}")
@@ -188,8 +217,12 @@ public class RaceController {
             description = "Permanently removes a race from the system",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Race deleted"),
-                @ApiResponse(responseCode = "404", description = "Race not found"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Race not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @DeleteMapping("/{id}")
