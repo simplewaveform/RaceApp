@@ -2,9 +2,7 @@ package com.example.raceapp.controller;
 
 import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.dto.PilotResponse;
-import com.example.raceapp.exception.BadRequestException;
 import com.example.raceapp.exception.NotFoundException;
-import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.service.PilotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -63,8 +59,12 @@ public class PilotController {
                 @ApiResponse(responseCode = "201", description = "Pilot created",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\": "
+                                    + "\"Invalid input data\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Unexpected error occurred\" }")))
             }
     )
     @PostMapping
@@ -84,11 +84,13 @@ public class PilotController {
     @Operation(
             summary = "Get pilots with optional filters",
             description = "Returns a paginated list of pilots with optional filters"
-                    + "such as name, age, and experience.",
+                    + " such as name, age, and experience.",
             responses = {
                 @ApiResponse(responseCode = "200", description = "Pilots retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Unexpected error occurred\" }")))
             }
     )
     @GetMapping
@@ -117,7 +119,9 @@ public class PilotController {
             responses = {
                 @ApiResponse(responseCode = "200", description = "Pilots retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid brand parameter")
+                @ApiResponse(responseCode = "400", description = "Invalid brand parameter",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid brand parameter\" }")))
             }
     )
     @GetMapping("/by-car-brand")
@@ -139,13 +143,13 @@ public class PilotController {
                 @ApiResponse(responseCode = "200", description = "Pilot found",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND)
+                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND,
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Pilot not found\" }")))
             }
     )
     @GetMapping("/{id}")
-    public PilotResponse getPilotById(
-            @Parameter(description = "ID of pilot to return", required = true, example = "1")
-            @PathVariable Long id) {
+    public PilotResponse getPilotById(@PathVariable Long id) {
         return pilotService.getPilotById(id)
                 .orElseThrow(() -> new NotFoundException(PILOT_NOT_FOUND));
     }
@@ -164,53 +168,18 @@ public class PilotController {
                 @ApiResponse(responseCode = "200", description = "Pilot updated",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND),
-                @ApiResponse(responseCode = "400", description = "Invalid input")
+                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND,
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Pilot not found\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid input data\" }")))
             }
     )
     @PutMapping("/{id}")
-    public PilotResponse updatePilot(
-            @Parameter(description = "ID of pilot to update", required = true, example = "1")
-            @PathVariable Long id,
-            @Valid @RequestBody PilotDto pilotDto) {
+    public PilotResponse updatePilot(@PathVariable Long id, @Valid @RequestBody PilotDto pilotDto) {
         return pilotService.updatePilot(id, pilotDto)
                 .orElseThrow(() -> new NotFoundException(PILOT_NOT_FOUND));
-    }
-
-    /**
-     * Partially updates an existing pilot.
-     *
-     * @param id      the ID of the pilot to update
-     * @param updates a map containing the fields to update
-     * @return ResponseEntity containing the partially updated pilot's data, or a 404 if not found
-     */
-    @Operation(
-            summary = "Partially update a pilot by ID",
-            description = "Updates specific fields of an existing pilot identified by the ID.",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Fields to update",
-                    content = @Content(
-                            schema = @Schema(example = "{ \"name\": \"John Doe\", \"age\": 30 }")
-                    )
-            ),
-            responses = {
-                @ApiResponse(responseCode = "200", description = "Pilot partially updated",
-                            content = @Content(schema = @Schema(implementation =
-                                    PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND),
-                @ApiResponse(responseCode = "400", description = "Invalid input")
-            }
-    )
-    @PatchMapping("/{id}")
-    public PilotResponse partialUpdatePilot(
-            @PathVariable Long id,
-            @RequestBody Map<String, Object> updates) {
-        try {
-            return pilotService.partialUpdatePilot(id, updates)
-                    .orElseThrow(() -> new NotFoundException(PILOT_NOT_FOUND));
-        } catch (IllegalArgumentException | ValidationException e) {
-            throw new ValidationException(Map.of("error", e.getMessage()));
-        }
     }
 
     /**
@@ -223,7 +192,9 @@ public class PilotController {
             description = "Deletes a pilot identified by the ID.",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Pilot deleted"),
-                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND)
+                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND,
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Pilot not found\" }")))
             }
     )
     @DeleteMapping("/{id}")

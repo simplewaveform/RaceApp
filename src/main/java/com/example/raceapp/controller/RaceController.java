@@ -62,8 +62,12 @@ public class RaceController {
                 @ApiResponse(responseCode = "201", description = "Race created",
                             content = @Content(schema = @Schema(implementation =
                                     RaceResponse.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid input data\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Unexpected error occurred\" }")))
             }
     )
     @PostMapping
@@ -83,7 +87,9 @@ public class RaceController {
             responses = {
                 @ApiResponse(responseCode = "200", description = "Races retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Unexpected error occurred\" }")))
             }
     )
     @GetMapping
@@ -104,7 +110,9 @@ public class RaceController {
                 @ApiResponse(responseCode = "200", description = "Race found",
                             content = @Content(schema = @Schema(implementation =
                                     RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND)
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND,
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }")))
             }
     )
     @GetMapping("/{id}")
@@ -129,8 +137,12 @@ public class RaceController {
                 @ApiResponse(responseCode = "200", description = "Race updated",
                             content = @Content(schema = @Schema(implementation =
                                     RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND),
-                @ApiResponse(responseCode = "400", description = "Invalid input")
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND,
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid input data\" }")))
             }
     )
     @PutMapping("/{id}")
@@ -156,8 +168,12 @@ public class RaceController {
                 @ApiResponse(responseCode = "200", description = "Race partially updated",
                             content = @Content(schema = @Schema(implementation =
                                     RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND),
-                @ApiResponse(responseCode = "400", description = "Invalid input")
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND,
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid input data\" }")))
             }
     )
     @PatchMapping("/{id}")
@@ -183,7 +199,9 @@ public class RaceController {
             description = "Permanently removes a race from the system",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Race deleted"),
-                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND)
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND,
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Race not found\" }")))
             }
     )
     @DeleteMapping("/{id}")

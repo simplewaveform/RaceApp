@@ -2,7 +2,6 @@ package com.example.raceapp.controller;
 
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
-import com.example.raceapp.exception.BadRequestException;
 import com.example.raceapp.exception.NotFoundException;
 import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.service.CarService;

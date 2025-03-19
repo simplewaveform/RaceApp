@@ -1,42 +1,77 @@
 package com.example.raceapp.config;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.servers.Server;
+import java.util.List;
+import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration class for Swagger API documentation.
- * This class sets up the OpenAPI configuration for the Race Application API.
+ * Configuration for Swagger API documentation.
  */
 @Configuration
-@OpenAPIDefinition(
-        info = @Info(
-                title = "Race App API",
-                version = "1.0",
-                description = "API documentation for Race Application"
-        )
-)
 public class SwaggerConfig {
 
     /**
-     * Configures and returns an OpenAPI instance for the Race App API.
-     *
-     * @return an OpenAPI instance configured with title, version,
-     *          description, and contact information.
+     * Bean for Swagger API documentation.
      */
     @Bean
-    public OpenAPI raceAppApi() {
+    public OpenAPI customOpenApi() {
         return new OpenAPI()
-                .info(new io.swagger.v3.oas.models.info.Info()
-                        .title("Race App API")
-                        .version("1.0")
-                        .description("API documentation for Race Application")
-                        .contact(new Contact()
-                                .name("Your Name")
-                                .email("your.email@example.com"))
-                );
+                .components(new Components().schemas(Map.of(
+                        "ErrorResponse", new Schema<>()
+                                .description("Standard error response")
+                                .addProperty("error", new Schema<String>()
+                                        .description("Error message")
+                                        .type("string")
+                                )
+                )))
+                .info(new Info()
+                        .title("RaceApp API")
+                        .description("API documentation for RaceApp")
+                        .version("1.0.0")
+                )
+                .servers(List.of(new Server().url("/")));
+    }
+
+    /**
+     * Bean for common api responses.
+     *
+     * @return api responses.
+     */
+    @Bean
+    public ApiResponses commonApiResponses() {
+        ApiResponses responses = new ApiResponses();
+
+        responses.addApiResponse("400", new ApiResponse()
+                .description("Bad Request")
+                .content(new io.swagger.v3.oas.models.media.Content()
+                        .addMediaType("application/json",
+                                new io.swagger.v3.oas.models.media.MediaType()
+                                        .schema(new Schema<>()
+                                                .$ref("#/components/schemas/ErrorResponse")))));
+
+        responses.addApiResponse("404", new ApiResponse()
+                .description("Resource Not Found")
+                .content(new io.swagger.v3.oas.models.media.Content()
+                        .addMediaType("application/json",
+                                new io.swagger.v3.oas.models.media.MediaType()
+                                        .schema(new Schema<>()
+                                                .$ref("#/components/schemas/ErrorResponse")))));
+
+        responses.addApiResponse("500", new ApiResponse()
+                .description("Internal Server Error")
+                .content(new io.swagger.v3.oas.models.media.Content()
+                        .addMediaType("application/json",
+                                new io.swagger.v3.oas.models.media.MediaType()
+                                        .schema(new Schema<>()
+                                                .$ref("#/components/schemas/ErrorResponse")))));
+        return responses;
     }
 }
