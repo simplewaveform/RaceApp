@@ -10,33 +10,65 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.Map;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-import java.util.Optional;
-
+/**
+ * Controller for managing pilot entities.
+ * Provides CRUD operations for pilots in the system.
+ */
 @Tag(name = "Pilots", description = "API for managing pilots")
 @RestController
 @RequestMapping("/pilots")
 public class PilotController {
     private final PilotService pilotService;
 
+    /**
+     * Basic constructor.
+     *
+     * @param pilotService pilotService class.
+     */
     public PilotController(PilotService pilotService) {
         this.pilotService = pilotService;
     }
 
+    /**
+     * Creates a new pilot.
+     *
+     * @param pilotDto the pilot data to create a new pilot
+     * @return ResponseEntity containing the created pilot's data
+     */
     @Operation(
-            summary = "Create a pilot",
-            description = "Creates a new pilot with specified parameters",
+            summary = "Create a new pilot",
+            description = "Creates a new pilot with the specified parameters.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Pilot data",
+                    content = @Content(
+                            schema = @Schema(example = "{ \"name\": \"John Doe\","
+                                    + "\"age\": 30, \"experience\": 5 }")
+                    )
+            ),
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Pilot created",
-                            content = @Content(schema = @Schema(implementation = PilotResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid input"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "201", description = "Pilot created",
+                            content = @Content(schema = @Schema(implementation =
+                                    PilotResponse.class))),
+                @ApiResponse(responseCode = "400", description = "Invalid input"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )
     @PostMapping
@@ -44,13 +76,23 @@ public class PilotController {
         return ResponseEntity.status(HttpStatus.CREATED).body(pilotService.createPilot(pilotDto));
     }
 
+    /**
+     * Retrieves a paginated list of pilots with optional filters.
+     *
+     * @param name       optional filter by pilot name
+     * @param age        optional filter by pilot age
+     * @param experience optional filter by pilot experience
+     * @param pageable   pagination details
+     * @return ResponseEntity containing the list of pilots with pagination
+     */
     @Operation(
-            summary = "Get pilots with filters",
-            description = "Returns paginated list of pilots with optional filters",
+            summary = "Get pilots with optional filters",
+            description = "Returns a paginated list of pilots with optional filters"
+                    + "such as name, age, and experience.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Pilots retrieved",
+                @ApiResponse(responseCode = "200", description = "Pilots retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )
     @GetMapping
@@ -62,17 +104,38 @@ public class PilotController {
             @Parameter(description = "Filter by experience", example = "5")
             @RequestParam(required = false) Integer experience,
             Pageable pageable) {
-        return ResponseEntity.ok(pilotService.searchPilotsWithPagination(name, age, experience, pageable));
+        return ResponseEntity.ok(pilotService.searchPilotsWithPagination(name, age,
+                experience, pageable));
     }
 
+    /**
+     * Retrieves pilots filtered by car brand.
+     *
+     * @param brand    the car brand to filter pilots by
+     * @param pageable pagination details
+     * @return ResponseEntity containing the filtered list of pilots
+     */
+    @GetMapping("/by-car-brand")
+    public ResponseEntity<Page<PilotResponse>> getPilotsByCarBrand(
+            @RequestParam String brand, Pageable pageable) {
+        return ResponseEntity.ok(pilotService.getPilotsByCarBrandNative(brand, pageable));
+    }
+
+    /**
+     * Retrieves a single pilot by their ID.
+     *
+     * @param id the ID of the pilot to retrieve
+     * @return ResponseEntity containing the pilot's details, or a 404 if not found
+     */
     @Operation(
-            summary = "Get pilot by ID",
-            description = "Returns a single pilot with full details",
+            summary = "Get a pilot by ID",
+            description = "Returns a single pilot's details identified by the pilot's ID.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Pilot found",
-                            content = @Content(schema = @Schema(implementation = PilotResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Pilot not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "200", description = "Pilot found",
+                            content = @Content(schema = @Schema(implementation =
+                                    PilotResponse.class))),
+                @ApiResponse(responseCode = "404", description = "Pilot not found"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )
     @GetMapping("/{id}")
@@ -83,15 +146,23 @@ public class PilotController {
         return pilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Fully updates an existing pilot.
+     *
+     * @param id        the ID of the pilot to update
+     * @param pilotDto  the updated pilot data
+     * @return ResponseEntity containing the updated pilot's data, or a 404 if not found
+     */
     @Operation(
             summary = "Update pilot by ID",
-            description = "Fully updates an existing pilot",
+            description = "Fully updates the details of an existing pilot identified by the ID.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Pilot updated",
-                            content = @Content(schema = @Schema(implementation = PilotResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Pilot not found"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "200", description = "Pilot updated",
+                            content = @Content(schema = @Schema(implementation =
+                                    PilotResponse.class))),
+                @ApiResponse(responseCode = "404", description = "Pilot not found"),
+                @ApiResponse(responseCode = "400", description = "Invalid input"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )
     @PutMapping("/{id}")
@@ -100,36 +171,63 @@ public class PilotController {
             @PathVariable Long id,
             @Valid @RequestBody PilotDto pilotDto) {
         Optional<PilotResponse> updatedPilot = pilotService.updatePilot(id, pilotDto);
-        return updatedPilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return updatedPilot.map(ResponseEntity::ok).orElseGet(() ->
+                ResponseEntity.notFound().build());
     }
 
+    /**
+     * Partially updates an existing pilot.
+     *
+     * @param id      the ID of the pilot to update
+     * @param updates a map containing the fields to update
+     * @return ResponseEntity containing the partially updated pilot's data, or a 404 if not found
+     */
     @Operation(
-            summary = "Partially update pilot by ID",
-            description = "Updates specific fields of an existing pilot",
+            summary = "Partially update a pilot by ID",
+            description = "Updates specific fields of an existing pilot identified by the ID.",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Fields to update",
+                    content = @Content(
+                            schema = @Schema(example = "{ \"name\": \"John Doe\", \"age\": 30 }")
+                    )
+            ),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Pilot partially updated",
-                            content = @Content(schema = @Schema(implementation = PilotResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Pilot not found"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "200", description = "Pilot partially updated",
+                            content = @Content(schema = @Schema(implementation =
+                                    PilotResponse.class))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid input\" }"))),
+                @ApiResponse(responseCode = "404", description = "Pilot not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Pilot not found\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @PatchMapping("/{id}")
     public ResponseEntity<PilotResponse> partialUpdatePilot(
-            @Parameter(description = "ID of pilot to update", required = true, example = "1")
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
         Optional<PilotResponse> updatedPilot = pilotService.partialUpdatePilot(id, updates);
-        return updatedPilot.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return updatedPilot.map(ResponseEntity::ok).orElseGet(() ->
+                ResponseEntity.notFound().build());
     }
 
+    /**
+     * Deletes a pilot by their ID.
+     *
+     * @param id the ID of the pilot to delete
+     */
     @Operation(
             summary = "Delete pilot by ID",
-            description = "Permanently removes a pilot from the system",
+            description = "Permanently removes a pilot from the system "
+                    + "identified by the pilot's ID.",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Pilot deleted"),
-                    @ApiResponse(responseCode = "404", description = "Pilot not found"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "204", description = "Pilot deleted"),
+                @ApiResponse(responseCode = "404", description = "Pilot not found"),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
             }
     )
     @DeleteMapping("/{id}")

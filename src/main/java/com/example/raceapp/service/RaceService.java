@@ -20,16 +20,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Service for managing race-related operations.
+ * Service for managing race-related operations including creation,
+ * retrieval, updating, and deletion of races.
  */
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class RaceService {
+
     private final RaceRepository raceRepository;
     private final PilotService pilotService;
     private final CarService carService;
 
+    /**
+     * Maps a {@link Pilot} entity to a {@link PilotSimpleResponse} DTO.
+     *
+     * @param pilot the pilot entity
+     * @return the mapped PilotSimpleResponse
+     */
     static PilotSimpleResponse mapToPilotSimpleResponse(Pilot pilot) {
         PilotSimpleResponse response = new PilotSimpleResponse();
         response.setId(pilot.getId());
@@ -38,6 +46,12 @@ public class RaceService {
         return response;
     }
 
+    /**
+     * Maps a {@link Race} entity to a {@link RaceResponse} DTO.
+     *
+     * @param race the race entity
+     * @return the mapped RaceResponse DTO
+     */
     private RaceResponse mapToResponse(Race race) {
         RaceResponse response = new RaceResponse();
         response.setId(race.getId());
@@ -52,10 +66,16 @@ public class RaceService {
         return response;
     }
 
+    /**
+     * Creates a new race from the provided {@link RaceDto} request.
+     *
+     * @param request the RaceDto containing race data
+     * @return the created RaceResponse DTO
+     */
     @Caching(evict = {
-            @CacheEvict(value = "races", allEntries = true),
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true)
+        @CacheEvict(value = "races", allEntries = true),
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
     })
     public RaceResponse createRace(RaceDto request) {
         Race race = new Race();
@@ -66,20 +86,39 @@ public class RaceService {
         return mapToResponse(raceRepository.save(race));
     }
 
+    /**
+     * Retrieves all races with pagination.
+     *
+     * @param pageable the pagination information
+     * @return a page of RaceResponse DTOs
+     */
     @Cacheable(value = "races", key = "#pageable.pageNumber + '-' + #pageable.pageSize")
     public Page<RaceResponse> getAllRaces(Pageable pageable) {
         return raceRepository.findAll(pageable).map(this::mapToResponse);
     }
 
+    /**
+     * Retrieves a race by its ID.
+     *
+     * @param id the race ID
+     * @return an Optional containing the RaceResponse DTO if found
+     */
     @Cacheable(value = "races", key = "#id")
     public Optional<RaceResponse> getRaceById(Long id) {
         return raceRepository.findById(id).map(this::mapToResponse);
     }
 
+    /**
+     * Updates an existing race identified by its ID using the provided {@link RaceDto} request.
+     *
+     * @param id the race ID
+     * @param request the RaceDto containing updated race data
+     * @return an Optional containing the updated RaceResponse DTO if the race was found
+     */
     @Caching(evict = {
-            @CacheEvict(value = "races", allEntries = true),
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true)
+        @CacheEvict(value = "races", allEntries = true),
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
     })
     public Optional<RaceResponse> updateRace(Long id, RaceDto request) {
         return raceRepository.findById(id).map(race -> {
@@ -91,10 +130,17 @@ public class RaceService {
         });
     }
 
+    /**
+     * Partially updates a race identified by its ID using a map of updates.
+     *
+     * @param id the race ID
+     * @param updates a map of fields to be updated and their new values
+     * @return an Optional containing the updated RaceResponse DTO if the race was found
+     */
     @Caching(evict = {
-            @CacheEvict(value = "races", allEntries = true),
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true)
+        @CacheEvict(value = "races", allEntries = true),
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
     })
     public Optional<RaceResponse> partialUpdateRace(Long id, Map<String, Object> updates) {
         return raceRepository.findById(id).map(race -> {
@@ -102,7 +148,8 @@ public class RaceService {
                 switch (key) {
                     case "name" -> race.setName((String) value);
                     case "year" -> race.setYear((Integer) value);
-                    case "pilotIds" -> race.setPilots(pilotService.getPilotsByIds((Set<Long>) value));
+                    case "pilotIds" -> race.setPilots(pilotService.getPilotsByIds((Set<Long>)
+                            value));
                     case "carIds" -> race.setCars(carService.getCarsByIds((Set<Long>) value));
                     default -> throw new IllegalArgumentException("Invalid field: " + key);
                 }
@@ -111,10 +158,16 @@ public class RaceService {
         });
     }
 
+    /**
+     * Deletes a race identified by its ID.
+     *
+     * @param id the race ID
+     * @throws IllegalArgumentException if the race with the specified ID is not found
+     */
     @Caching(evict = {
-            @CacheEvict(value = "races", allEntries = true),
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true)
+        @CacheEvict(value = "races", allEntries = true),
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
     })
     public void deleteRace(Long id) {
         Race race = raceRepository.findById(id)

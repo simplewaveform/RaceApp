@@ -37,6 +37,9 @@ public class PilotService {
 
     /**
      * Maps a {@link Pilot} entity to a {@link PilotResponse} DTO.
+     *
+     * @param pilot the pilot entity to map
+     * @return a {@link PilotResponse} containing the mapped pilot details
      */
     PilotResponse mapToResponse(Pilot pilot) {
         PilotResponse response = new PilotResponse();
@@ -50,6 +53,12 @@ public class PilotService {
         return response;
     }
 
+    /**
+     * Maps a {@link Car} entity to a {@link CarSimpleResponse} DTO.
+     *
+     * @param car the car entity to map
+     * @return a {@link CarSimpleResponse} containing the mapped car details
+     */
     private CarSimpleResponse mapToCarSimpleResponse(Car car) {
         CarSimpleResponse response = new CarSimpleResponse();
         response.setId(car.getId());
@@ -59,9 +68,15 @@ public class PilotService {
         return response;
     }
 
+    /**
+     * Creates a new pilot from the provided {@link PilotDto}.
+     *
+     * @param request the DTO containing the new pilot's details
+     * @return the created pilot's response as a {@link PilotResponse}
+     */
     @Caching(evict = {
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true)
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
     })
     public PilotResponse createPilot(PilotDto request) {
         Pilot pilot = new Pilot();
@@ -71,30 +86,61 @@ public class PilotService {
         return mapToResponse(pilotRepository.save(pilot));
     }
 
+    /**
+     * Retrieves a paginated list of pilots who own cars of a specific brand.
+     *
+     * @param brand    the car brand to filter by
+     * @param pageable the pagination details
+     * @return a paginated list of {@link PilotResponse} objects
+     */
     @Cacheable(value = "pilots", key = "{#brand, #pageable.pageNumber, #pageable.pageSize}")
     public Page<PilotResponse> getPilotsByCarBrandNative(String brand, Pageable pageable) {
         return pilotRepository.findPilotsByCarBrandNative(brand, pageable)
                 .map(this::mapToResponse);
     }
 
-    @Cacheable(value = "pilots", key = "{#name, #age, #experience, #pageable.pageNumber, #pageable.pageSize}")
+    /**
+     * Searches for pilots based on provided filters (name, age, experience)
+     * with pagination support.
+     *
+     * @param name       the name to search by
+     * @param age        the age to search by
+     * @param experience the experience level to search by
+     * @param pageable   the pagination details
+     * @return a paginated list of {@link PilotResponse} objects that match the search criteria
+     */
+    @Cacheable(value = "pilots", key = "{#name, #age, #experience, "
+            + "#pageable.pageNumber, #pageable.pageSize}")
     public Page<PilotResponse> searchPilotsWithPagination(
             String name,
             Integer age,
             Integer experience,
             Pageable pageable
     ) {
-        Specification<Pilot> spec = (root, _, cb) -> {
+        Specification<Pilot> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if (name != null) predicates.add(cb.equal(root.get("name"), name));
-            if (age != null) predicates.add(cb.equal(root.get("age"), age));
-            if (experience != null) predicates.add(cb.equal(root.get("experience"), experience));
+            if (name != null) {
+                predicates.add(cb.equal(root.get("name"), name));
+            }
+            if (age != null) {
+                predicates.add(cb.equal(root.get("age"), age));
+            }
+            if (experience != null) {
+                predicates.add(cb.equal(root.get("experience"), experience));
+            }
             return cb.and(predicates.toArray(new Predicate[0]));
         };
 
         return pilotRepository.findAll(spec, pageable).map(this::mapToResponse);
     }
 
+    /**
+     * Retrieves a pilot by their ID.
+     *
+     * @param id the ID of the pilot to retrieve
+     * @return an {@link Optional} containing the {@link PilotResponse}
+     *          if found, or empty if not found
+     */
     @Cacheable(value = "pilots", key = "#id")
     public Optional<PilotResponse> getPilotById(Long id) {
         return pilotRepository.findById(id).map(this::mapToResponse);
@@ -102,14 +148,24 @@ public class PilotService {
 
     /**
      * Retrieves pilots by their IDs.
+     *
+     * @param ids a set of pilot IDs
+     * @return a set of {@link Pilot} entities
      */
     public Set<Pilot> getPilotsByIds(Set<Long> ids) {
         return new HashSet<>(pilotRepository.findAllById(ids));
     }
 
+    /**
+     * Updates an existing pilot with the details from the provided {@link PilotDto}.
+     *
+     * @param id      the ID of the pilot to update
+     * @param request the DTO containing the updated details
+     * @return an {@link Optional} containing the updated {@link PilotResponse} if successful
+     */
     @Caching(evict = {
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true)
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
     })
     public Optional<PilotResponse> updatePilot(Long id, PilotDto request) {
         return pilotRepository.findById(id).map(pilot -> {
@@ -120,9 +176,16 @@ public class PilotService {
         });
     }
 
+    /**
+     * Partially updates a pilot with the fields provided in the {@link Map} of updates.
+     *
+     * @param id      the ID of the pilot to update
+     * @param updates a map of fields to update with their new values
+     * @return an {@link Optional} containing the updated {@link PilotResponse} if successful
+     */
     @Caching(evict = {
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true)
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
     })
     public Optional<PilotResponse> partialUpdatePilot(Long id, Map<String, Object> updates) {
         return pilotRepository.findById(id).map(pilot -> {
@@ -138,10 +201,15 @@ public class PilotService {
         });
     }
 
+    /**
+     * Deletes a pilot by their ID and removes them from any associated cars and races.
+     *
+     * @param id the ID of the pilot to delete
+     */
     @Caching(evict = {
-            @CacheEvict(value = "pilots", allEntries = true),
-            @CacheEvict(value = "cars", allEntries = true),
-            @CacheEvict(value = "races", allEntries = true)
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true),
+        @CacheEvict(value = "races", allEntries = true)
     })
     public void deletePilot(Long id) {
         Pilot pilot = pilotRepository.findById(id)
