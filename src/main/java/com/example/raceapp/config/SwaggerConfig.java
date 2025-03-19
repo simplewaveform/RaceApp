@@ -18,6 +18,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
 
+    public static final String CONTENT_TYPE = "application/json";
+    public static final String COMPONENTS_SCHEMAS_ERROR_RESPONSE = "#/components/schemas/ErrorResponse";
+
     /**
      * Bean for Swagger API documentation.
      */
@@ -52,26 +55,26 @@ public class SwaggerConfig {
         responses.addApiResponse("400", new ApiResponse()
                 .description("Bad Request")
                 .content(new io.swagger.v3.oas.models.media.Content()
-                        .addMediaType("application/json",
+                        .addMediaType(CONTENT_TYPE,
                                 new io.swagger.v3.oas.models.media.MediaType()
                                         .schema(new Schema<>()
-                                                .$ref("#/components/schemas/ErrorResponse")))));
+                                                .$ref(COMPONENTS_SCHEMAS_ERROR_RESPONSE)))));
 
         responses.addApiResponse("404", new ApiResponse()
                 .description("Resource Not Found")
                 .content(new io.swagger.v3.oas.models.media.Content()
-                        .addMediaType("application/json",
+                        .addMediaType(CONTENT_TYPE,
                                 new io.swagger.v3.oas.models.media.MediaType()
                                         .schema(new Schema<>()
-                                                .$ref("#/components/schemas/ErrorResponse")))));
+                                                .$ref(COMPONENTS_SCHEMAS_ERROR_RESPONSE)))));
 
         responses.addApiResponse("500", new ApiResponse()
                 .description("Internal Server Error")
                 .content(new io.swagger.v3.oas.models.media.Content()
-                        .addMediaType("application/json",
+                        .addMediaType(CONTENT_TYPE,
                                 new io.swagger.v3.oas.models.media.MediaType()
                                         .schema(new Schema<>()
-                                                .$ref("#/components/schemas/ErrorResponse")))));
+                                                .$ref(COMPONENTS_SCHEMAS_ERROR_RESPONSE)))));
         return responses;
     }
 }
