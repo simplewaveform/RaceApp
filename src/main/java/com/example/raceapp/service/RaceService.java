@@ -3,12 +3,12 @@ package com.example.raceapp.service;
 import com.example.raceapp.dto.PilotSimpleResponse;
 import com.example.raceapp.dto.RaceDto;
 import com.example.raceapp.dto.RaceResponse;
-import com.example.raceapp.exception.BadRequestException;
 import com.example.raceapp.exception.NotFoundException;
 import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.RaceRepository;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -151,12 +151,29 @@ public class RaceService {
                 switch (key) {
                     case "name" -> race.setName((String) value);
                     case "year" -> race.setYear((Integer) value);
-                    case "pilotIds" -> race.setPilots(pilotService
-                            .getPilotsByIds((Set<Long>) value));
-                    case "carIds" -> race.setCars(carService.getCarsByIds((Set<Long>) value));
-                    default -> throw new ValidationException(Map.of(key, "Invalid field: "
-                            + key));
-
+                    case "pilotIds" -> {
+                        if (value instanceof Collection<?> pilotIdsCollection) {
+                            Set<Long> pilotIds = pilotIdsCollection.stream()
+                                    .map(idObj -> ((Number) idObj).longValue())
+                                    .collect(Collectors.toSet());
+                            race.setPilots(pilotService.getPilotsByIds(pilotIds));
+                        } else {
+                            throw new ValidationException(Map.of("pilotIds", "Invalid format."
+                                    + "Expected an array of pilot IDs."));
+                        }
+                    }
+                    case "carIds" -> {
+                        if (value instanceof Collection<?> carIdsCollection) {
+                            Set<Long> carIds = carIdsCollection.stream()
+                                    .map(idObj -> ((Number) idObj).longValue())
+                                    .collect(Collectors.toSet());
+                            race.setCars(carService.getCarsByIds(carIds));
+                        } else {
+                            throw new ValidationException(Map.of("carIds", "Invalid format."
+                                    + "Expected an array of car IDs."));
+                        }
+                    }
+                    default -> throw new ValidationException(Map.of(key, "Invalid field: " + key));
                 }
             });
             return mapToResponse(raceRepository.save(race));
