@@ -2,6 +2,8 @@ package com.example.raceapp.service;
 
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
+import com.example.raceapp.exception.NotFoundException;
+import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.repository.CarRepository;
@@ -82,7 +84,7 @@ public class CarService {
         car.setPower(request.getPower());
         if (request.getOwnerId() != null) {
             Pilot owner = pilotRepository.findById(request.getOwnerId())
-                    .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
+                    .orElseThrow(() -> new NotFoundException("Pilot not found"));
             car.setOwner(owner);
         }
         return mapToResponse(carRepository.save(car));
@@ -196,10 +198,11 @@ public class CarService {
                     case "power" -> car.setPower((Integer) value);
                     case "ownerId" -> {
                         Pilot owner = pilotRepository.findById(((Number) value).longValue())
-                                .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
+                                .orElseThrow(() -> new NotFoundException("Pilot not found"));
                         car.setOwner(owner);
                     }
-                    default -> throw new IllegalArgumentException("Invalid field: " + key);
+                    default -> throw new ValidationException(Map.of(key, "Invalid field: "
+                            + key));
                 }
             });
             return mapToResponse(carRepository.save(car));
@@ -218,7 +221,7 @@ public class CarService {
     })
     public void deleteCar(Long id) {
         Car car = carRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Car not found"));
+                .orElseThrow(() -> new NotFoundException("Car not found"));
 
         car.getRaces().forEach(race -> {
             race.getCars().remove(car);

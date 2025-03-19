@@ -3,6 +3,9 @@ package com.example.raceapp.service;
 import com.example.raceapp.dto.PilotSimpleResponse;
 import com.example.raceapp.dto.RaceDto;
 import com.example.raceapp.dto.RaceResponse;
+import com.example.raceapp.exception.BadRequestException;
+import com.example.raceapp.exception.NotFoundException;
+import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.RaceRepository;
@@ -148,10 +151,12 @@ public class RaceService {
                 switch (key) {
                     case "name" -> race.setName((String) value);
                     case "year" -> race.setYear((Integer) value);
-                    case "pilotIds" -> race.setPilots(pilotService.getPilotsByIds((Set<Long>)
-                            value));
+                    case "pilotIds" -> race.setPilots(pilotService
+                            .getPilotsByIds((Set<Long>) value));
                     case "carIds" -> race.setCars(carService.getCarsByIds((Set<Long>) value));
-                    default -> throw new IllegalArgumentException("Invalid field: " + key);
+                    default -> throw new ValidationException(Map.of(key, "Invalid field: "
+                            + key));
+
                 }
             });
             return mapToResponse(raceRepository.save(race));
@@ -171,7 +176,7 @@ public class RaceService {
     })
     public void deleteRace(Long id) {
         Race race = raceRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Race not found"));
+                .orElseThrow(() -> new NotFoundException("Race not found"));
         race.getPilots().clear();
         race.getCars().clear();
         raceRepository.delete(race);

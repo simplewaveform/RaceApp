@@ -1,6 +1,8 @@
 package com.example.raceapp.service;
 
-import com.example.raceapp.exception.CustomException;
+import com.example.raceapp.exception.BadRequestException;
+import com.example.raceapp.exception.InternalServerException;
+import com.example.raceapp.exception.NotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,7 +14,6 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -30,10 +31,11 @@ public class LogService {
      *
      * @param date The date for which to retrieve the logs in the format "dd.MM.yyyy".
      * @return A Resource containing the log entries for the specified date.
-     * @throws CustomException with HttpStatus.NOT_FOUND if no logs are found for the given date.
-     * @throws CustomException with HttpStatus.INTERNAL_SERVER_ERROR if there is an error
+     * @throws NotFoundException with HttpStatus.NOT_FOUND if no logs are found for the given date.
+     * @throws InternalServerException with HttpStatus.INTERNAL_SERVER_ERROR if there is an error
      *         reading the log file.
-     * @throws CustomException with HttpStatus.BAD_REQUEST if the provided date format is invalid.
+     * @throws BadRequestException with HttpStatus.BAD_REQUEST if the provided date
+     *         format is invalid.
      */
     public Resource getLogFileForDate(String date) {
         LocalDate targetDate = parseDate(date);
@@ -44,8 +46,7 @@ public class LogService {
                     .toList();
 
             if (filteredLines.isEmpty()) {
-                throw new CustomException(HttpStatus.NOT_FOUND,
-                        "No logs found for date: " + date);
+                throw new NotFoundException("No logs found for date: " + date);
             }
 
             return new ByteArrayResource(
@@ -53,8 +54,7 @@ public class LogService {
             );
 
         } catch (IOException e) {
-            throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Error reading log file: " + e.getMessage());
+            throw new InternalServerException("Error reading log file: " + e.getMessage());
         }
     }
 
@@ -63,14 +63,14 @@ public class LogService {
      *
      * @param date The date string to be parsed in the format "dd.MM.yyyy".
      * @return A LocalDate object representing the parsed date.
-     * @throws CustomException with HttpStatus.BAD_REQUEST if the provided date format is invalid.
+     * @throws BadRequestException with HttpStatus.BAD_REQUEST if the provided date
+     *         format is invalid.
      */
     public LocalDate parseDate(String date) {
         try {
             return LocalDate.parse(date, DATE_FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new CustomException(HttpStatus.BAD_REQUEST,
-                    "Invalid date format. Use dd.MM.yyyy");
+            throw new BadRequestException("Invalid date format. Use dd.MM.yyyy");
         }
     }
 }

@@ -3,6 +3,9 @@ package com.example.raceapp.service;
 import com.example.raceapp.dto.CarSimpleResponse;
 import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.dto.PilotResponse;
+import com.example.raceapp.exception.BadRequestException;
+import com.example.raceapp.exception.NotFoundException;
+import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.repository.PilotRepository;
@@ -194,7 +197,9 @@ public class PilotService {
                     case "name" -> pilot.setName((String) value);
                     case "age" -> pilot.setAge((Integer) value);
                     case "experience" -> pilot.setExperience((Integer) value);
-                    default -> throw new IllegalArgumentException("Invalid field: " + key);
+                    default -> throw new ValidationException(Map.of(key, "Invalid field: "
+                            + key));
+
                 }
             });
             return mapToResponse(pilotRepository.save(pilot));
@@ -213,7 +218,7 @@ public class PilotService {
     })
     public void deletePilot(Long id) {
         Pilot pilot = pilotRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Pilot not found"));
+                .orElseThrow(() -> new NotFoundException("Pilot not found"));
 
         pilot.getCars().forEach(car -> {
             car.setOwner(null);

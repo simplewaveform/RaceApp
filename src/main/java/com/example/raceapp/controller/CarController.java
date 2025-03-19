@@ -2,6 +2,9 @@ package com.example.raceapp.controller;
 
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
+import com.example.raceapp.exception.BadRequestException;
+import com.example.raceapp.exception.NotFoundException;
+import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.service.CarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.Map;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,17 +38,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Cars", description = "API for managing cars")
 @RestController
 @RequestMapping("/cars")
+@RequiredArgsConstructor
 public class CarController {
     private final CarService carService;
-
-    /**
-     * Constructor for CarController.
-     *
-     * @param carService Service layer to handle car-related operations.
-     */
-    public CarController(CarService carService) {
-        this.carService = carService;
-    }
 
     /**
      * Creates a new car.
@@ -64,16 +59,18 @@ public class CarController {
                     )
             ),
             responses = {
-                @ApiResponse(responseCode = "201", description = "Car created",
+                @ApiResponse(responseCode = "201", description =
+                        "Car created",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid input, check"
-                        + "the car data provided.",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Invalid input\" }"))),
-                @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                @ApiResponse(responseCode = "400", description =
+                        "Invalid input, check the car data provided.",
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Invalid input\" }"))),
+                @ApiResponse(responseCode = "500", description =
+                        "Internal server error",
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Internal server error\" }")))
             }
     )
     @PostMapping
@@ -90,8 +87,8 @@ public class CarController {
      */
     @Operation(
             summary = "Get cars by minimum power",
-            description = "Returns a paginated list of cars with power greater "
-                    + "than the specified value",
+            description = "Returns a paginated list of cars with power"
+                    + "greater than the specified value",
             parameters = {
                 @Parameter(name = "minPower", description = "Minimum power of the car",
                             required = true, example = "200")
@@ -100,16 +97,17 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Cars retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
                 @ApiResponse(responseCode = "400", description = "Invalid input for minPower",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Invalid power input\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Invalid power input\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Internal server error\" }")))
             }
     )
     @GetMapping("/by-power")
     public ResponseEntity<Page<CarResponse>> getCarsByPower(
-            @RequestParam Integer minPower, Pageable pageable) {
+            @RequestParam Integer minPower,
+            Pageable pageable) {
         return ResponseEntity.ok(carService.getCarsByPower(minPower, pageable));
     }
 
@@ -130,11 +128,11 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Cars retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
                 @ApiResponse(responseCode = "400", description = "Invalid input parameters",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Invalid filter input\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Invalid filter input\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Internal server error\" }")))
             }
     )
     @GetMapping
@@ -148,15 +146,15 @@ public class CarController {
             @Parameter(description = "Filter by owner ID", example = "1")
             @RequestParam(required = false) Long ownerId,
             Pageable pageable) {
-        return ResponseEntity.ok(carService.searchCarsWithPagination(brand, model, power,
-                ownerId, pageable));
+        return ResponseEntity.ok(carService.searchCarsWithPagination(brand,
+                model, power, ownerId, pageable));
     }
 
     /**
      * Returns a single car by its ID.
      *
      * @param id The ID of the car to return.
-     * @return ResponseEntity with car details or a 404 if not found.
+     * @return Car details.
      */
     @Operation(
             summary = "Get car by ID",
@@ -166,19 +164,19 @@ public class CarController {
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
                 @ApiResponse(responseCode = "404", description = "Car not found",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Car not found\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Internal server error\" }")))
             }
     )
     @GetMapping("/{id}")
-    public ResponseEntity<CarResponse> getCarById(
+    public CarResponse getCarById(
             @Parameter(description = "ID of car to return", required = true, example = "1")
             @PathVariable Long id) {
-        Optional<CarResponse> car = carService.getCarById(id);
-        return car.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return carService.getCarById(id)
+                .orElseThrow(() -> new NotFoundException("Car not found"));
     }
 
     /**
@@ -186,7 +184,7 @@ public class CarController {
      *
      * @param id The ID of the car to update.
      * @param carDto The car data to update.
-     * @return ResponseEntity with updated car details or a 404 if not found.
+     * @return Updated car details.
      */
     @Operation(
             summary = "Update car by ID",
@@ -196,24 +194,23 @@ public class CarController {
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
                 @ApiResponse(responseCode = "404", description = "Car not found",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Car not found\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "400", description = "Invalid input",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Invalid input\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Invalid input\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Internal server error\" }")))
             }
     )
     @PutMapping("/{id}")
-    public ResponseEntity<CarResponse> updateCar(
+    public CarResponse updateCar(
             @Parameter(description = "ID of car to update", required = true, example = "1")
             @PathVariable Long id,
             @Valid @RequestBody CarDto carDto) {
-        Optional<CarResponse> updatedCar = carService.updateCar(id, carDto);
-        return updatedCar.map(ResponseEntity::ok).orElseGet(() ->
-                ResponseEntity.notFound().build());
+        return carService.updateCar(id, carDto)
+                .orElseThrow(() -> new NotFoundException("Car not found"));
     }
 
     /**
@@ -221,7 +218,7 @@ public class CarController {
      *
      * @param id The ID of the car to update.
      * @param updates A map of fields to update.
-     * @return ResponseEntity with updated car details or a 404 if not found.
+     * @return Updated car details.
      */
     @Operation(
             summary = "Partially update car by ID",
@@ -229,7 +226,7 @@ public class CarController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Fields to update",
                     content = @Content(
-                            schema = @Schema(example = "{ \"brand\": \"Toyota\", "
+                            schema = @Schema(example = "{ \"brand\": \"Toyota\","
                                     + "\"model\": \"Corolla\", \"power\": 150 }")
                     )
             ),
@@ -238,24 +235,27 @@ public class CarController {
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
                 @ApiResponse(responseCode = "404", description = "Car not found",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Car not found\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "400", description = "Invalid input for partial update",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Invalid partial update input\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Invalid partial update input\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Internal server error\" }")))
             }
     )
     @PatchMapping("/{id}")
-    public ResponseEntity<CarResponse> partialUpdateCar(
+    public CarResponse partialUpdateCar(
             @Parameter(description = "ID of car to update", required = true, example = "1")
             @PathVariable Long id,
             @RequestBody Map<String, Object> updates) {
-        Optional<CarResponse> updatedCar = carService.partialUpdateCar(id, updates);
-        return updatedCar.map(ResponseEntity::ok).orElseGet(() ->
-                ResponseEntity.notFound().build());
+        try {
+            return carService.partialUpdateCar(id, updates)
+                    .orElseThrow(() -> new NotFoundException("Car not found"));
+        } catch (IllegalArgumentException | ValidationException e) {
+            throw new ValidationException(Map.of("error", e.getMessage()));
+        }
     }
 
     /**
@@ -269,11 +269,11 @@ public class CarController {
             responses = {
                 @ApiResponse(responseCode = "204", description = "Car deleted"),
                 @ApiResponse(responseCode = "404", description = "Car not found",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Car not found\" }"))),
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Internal server error\" }")))
+                            content = @Content(schema = @Schema(example =
+                                    "{ \"error\": \"Internal server error\" }")))
             }
     )
     @DeleteMapping("/{id}")
