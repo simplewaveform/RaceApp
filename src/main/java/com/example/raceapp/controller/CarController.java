@@ -67,8 +67,13 @@ public class CarController {
                 @ApiResponse(responseCode = "201", description = "Car created",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "400", description = "Invalid input, check"
+                        + "the car data provided.",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid input\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @PostMapping
@@ -94,8 +99,12 @@ public class CarController {
             responses = {
                 @ApiResponse(responseCode = "200", description = "Cars retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "400", description = "Invalid input for minPower",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid power input\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @GetMapping("/by-power")
@@ -120,7 +129,12 @@ public class CarController {
             responses = {
                 @ApiResponse(responseCode = "200", description = "Cars retrieved",
                             content = @Content(schema = @Schema(implementation = Page.class))),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "400", description = "Invalid input parameters",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid filter input\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @GetMapping
@@ -151,8 +165,12 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Car found",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Car not found"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Car not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Car not found\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @GetMapping("/{id}")
@@ -177,9 +195,15 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Car updated",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Car not found"),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Car not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Car not found\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid input\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @PutMapping("/{id}")
@@ -213,9 +237,15 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Car partially updated",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Car not found"),
-                @ApiResponse(responseCode = "400", description = "Invalid input"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Car not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Car not found\" }"))),
+                @ApiResponse(responseCode = "400", description = "Invalid input for partial update",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Invalid partial update input\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @PatchMapping("/{id}")
@@ -238,8 +268,12 @@ public class CarController {
             description = "Permanently removes a car from the system",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Car deleted"),
-                @ApiResponse(responseCode = "404", description = "Car not found"),
-                @ApiResponse(responseCode = "500", description = "Internal server error")
+                @ApiResponse(responseCode = "404", description = "Car not found",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Car not found\" }"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Internal server error\" }")))
             }
     )
     @DeleteMapping("/{id}")
