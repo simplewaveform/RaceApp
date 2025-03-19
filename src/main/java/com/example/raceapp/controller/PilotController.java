@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/pilots")
 @RequiredArgsConstructor
 public class PilotController {
+    public static final String PILOT_NOT_FOUND = "Pilot not found";
     private final PilotService pilotService;
 
     /**
@@ -138,7 +139,7 @@ public class PilotController {
                 @ApiResponse(responseCode = "200", description = "Pilot found",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Pilot not found")
+                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND)
             }
     )
     @GetMapping("/{id}")
@@ -146,7 +147,7 @@ public class PilotController {
             @Parameter(description = "ID of pilot to return", required = true, example = "1")
             @PathVariable Long id) {
         return pilotService.getPilotById(id)
-                .orElseThrow(() -> new NotFoundException("Pilot not found"));
+                .orElseThrow(() -> new NotFoundException(PILOT_NOT_FOUND));
     }
 
     /**
@@ -163,7 +164,7 @@ public class PilotController {
                 @ApiResponse(responseCode = "200", description = "Pilot updated",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Pilot not found"),
+                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND),
                 @ApiResponse(responseCode = "400", description = "Invalid input")
             }
     )
@@ -173,7 +174,7 @@ public class PilotController {
             @PathVariable Long id,
             @Valid @RequestBody PilotDto pilotDto) {
         return pilotService.updatePilot(id, pilotDto)
-                .orElseThrow(() -> new NotFoundException("Pilot not found"));
+                .orElseThrow(() -> new NotFoundException(PILOT_NOT_FOUND));
     }
 
     /**
@@ -196,7 +197,7 @@ public class PilotController {
                 @ApiResponse(responseCode = "200", description = "Pilot partially updated",
                             content = @Content(schema = @Schema(implementation =
                                     PilotResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Pilot not found"),
+                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND),
                 @ApiResponse(responseCode = "400", description = "Invalid input")
             }
     )
@@ -206,7 +207,7 @@ public class PilotController {
             @RequestBody Map<String, Object> updates) {
         try {
             return pilotService.partialUpdatePilot(id, updates)
-                    .orElseThrow(() -> new NotFoundException("Pilot not found"));
+                    .orElseThrow(() -> new NotFoundException(PILOT_NOT_FOUND));
         } catch (IllegalArgumentException | ValidationException e) {
             throw new ValidationException(Map.of("error", e.getMessage()));
         }
@@ -222,7 +223,7 @@ public class PilotController {
             description = "Deletes a pilot identified by the ID.",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Pilot deleted"),
-                @ApiResponse(responseCode = "404", description = "Pilot not found")
+                @ApiResponse(responseCode = "404", description = PILOT_NOT_FOUND)
             }
     )
     @DeleteMapping("/{id}")

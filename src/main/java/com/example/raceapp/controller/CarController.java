@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/cars")
 @RequiredArgsConstructor
 public class CarController {
+    public static final String CAR_NOT_FOUND = "Car not found";
     private final CarService carService;
 
     /**
@@ -163,7 +164,7 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Car found",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Car not found",
+                @ApiResponse(responseCode = "404", description = CAR_NOT_FOUND,
                             content = @Content(schema = @Schema(example =
                                     "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -176,7 +177,7 @@ public class CarController {
             @Parameter(description = "ID of car to return", required = true, example = "1")
             @PathVariable Long id) {
         return carService.getCarById(id)
-                .orElseThrow(() -> new NotFoundException("Car not found"));
+                .orElseThrow(() -> new NotFoundException(CAR_NOT_FOUND));
     }
 
     /**
@@ -193,7 +194,7 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Car updated",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Car not found",
+                @ApiResponse(responseCode = "404", description = CAR_NOT_FOUND,
                             content = @Content(schema = @Schema(example =
                                     "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "400", description = "Invalid input",
@@ -210,7 +211,7 @@ public class CarController {
             @PathVariable Long id,
             @Valid @RequestBody CarDto carDto) {
         return carService.updateCar(id, carDto)
-                .orElseThrow(() -> new NotFoundException("Car not found"));
+                .orElseThrow(() -> new NotFoundException(CAR_NOT_FOUND));
     }
 
     /**
@@ -234,7 +235,7 @@ public class CarController {
                 @ApiResponse(responseCode = "200", description = "Car partially updated",
                             content = @Content(schema = @Schema(implementation =
                                     CarResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Car not found",
+                @ApiResponse(responseCode = "404", description = CAR_NOT_FOUND,
                             content = @Content(schema = @Schema(example =
                                     "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "400", description = "Invalid input for partial update",
@@ -252,7 +253,7 @@ public class CarController {
             @RequestBody Map<String, Object> updates) {
         try {
             return carService.partialUpdateCar(id, updates)
-                    .orElseThrow(() -> new NotFoundException("Car not found"));
+                    .orElseThrow(() -> new NotFoundException(CAR_NOT_FOUND));
         } catch (IllegalArgumentException | ValidationException e) {
             throw new ValidationException(Map.of("error", e.getMessage()));
         }
@@ -268,7 +269,7 @@ public class CarController {
             description = "Permanently removes a car from the system",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Car deleted"),
-                @ApiResponse(responseCode = "404", description = "Car not found",
+                @ApiResponse(responseCode = "404", description = CAR_NOT_FOUND,
                             content = @Content(schema = @Schema(example =
                                     "{ \"error\": \"Car not found\" }"))),
                 @ApiResponse(responseCode = "500", description = "Internal server error",

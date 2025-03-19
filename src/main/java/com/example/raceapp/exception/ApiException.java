@@ -26,7 +26,7 @@ public abstract class ApiException extends RuntimeException {
      * @param status     HTTP status code.
      * @param errorCode  System-specific error code.
      */
-    public ApiException(String message, HttpStatus status, String errorCode) {
+    protected ApiException(String message, HttpStatus status, String errorCode) {
         super(message);
         this.status = status;
         this.errorCode = errorCode;

@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/races")
 @RequiredArgsConstructor
 public class RaceController {
+    public static final String RACE_NOT_FOUND = "Race not found";
     private final RaceService raceService;
 
     /**
@@ -103,7 +104,7 @@ public class RaceController {
                 @ApiResponse(responseCode = "200", description = "Race found",
                             content = @Content(schema = @Schema(implementation =
                                     RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Race not found")
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND)
             }
     )
     @GetMapping("/{id}")
@@ -111,7 +112,7 @@ public class RaceController {
             @Parameter(description = "ID of the race to return", required = true, example = "1")
             @PathVariable Long id) {
         return raceService.getRaceById(id)
-                .orElseThrow(() -> new NotFoundException("Race not found"));
+                .orElseThrow(() -> new NotFoundException(RACE_NOT_FOUND));
     }
 
     /**
@@ -128,7 +129,7 @@ public class RaceController {
                 @ApiResponse(responseCode = "200", description = "Race updated",
                             content = @Content(schema = @Schema(implementation =
                                     RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Race not found"),
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND),
                 @ApiResponse(responseCode = "400", description = "Invalid input")
             }
     )
@@ -138,7 +139,7 @@ public class RaceController {
             @PathVariable Long id,
             @Valid @RequestBody RaceDto raceDto) {
         return raceService.updateRace(id, raceDto)
-                .orElseThrow(() -> new NotFoundException("Race not found"));
+                .orElseThrow(() -> new NotFoundException(RACE_NOT_FOUND));
     }
 
     /**
@@ -155,7 +156,7 @@ public class RaceController {
                 @ApiResponse(responseCode = "200", description = "Race partially updated",
                             content = @Content(schema = @Schema(implementation =
                                     RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = "Race not found"),
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND),
                 @ApiResponse(responseCode = "400", description = "Invalid input")
             }
     )
@@ -166,7 +167,7 @@ public class RaceController {
             @RequestBody Map<String, Object> updates) {
         try {
             return raceService.partialUpdateRace(id, updates)
-                    .orElseThrow(() -> new NotFoundException("Race not found"));
+                    .orElseThrow(() -> new NotFoundException(RACE_NOT_FOUND));
         } catch (IllegalArgumentException | ValidationException e) {
             throw new ValidationException(Map.of("error", e.getMessage()));
         }
@@ -182,7 +183,7 @@ public class RaceController {
             description = "Permanently removes a race from the system",
             responses = {
                 @ApiResponse(responseCode = "204", description = "Race deleted"),
-                @ApiResponse(responseCode = "404", description = "Race not found")
+                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND)
             }
     )
     @DeleteMapping("/{id}")
