@@ -15,7 +15,7 @@ public class RaceResponse {
     @Schema(description = "Race ID", example = "1")
     private Long id;
 
-    @Schema(description = "Race name", example = "Grand Prix 2025")
+    @Schema(description = "Race name", example = "Grand Prix Miami")
     private String name;
 
     @Schema(description = "Year of the race", example = "2025")

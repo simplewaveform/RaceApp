@@ -11,15 +11,15 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CarSimpleResponse {
-    @Schema(description = "Car ID", example = "10")
+    @Schema(description = "Car ID", example = "3")
     private Long id;
 
-    @Schema(description = "Car brand", example = "Toyota")
+    @Schema(description = "Car brand", example = "Red Bull")
     private String brand;
 
-    @Schema(description = "Car model", example = "Corolla")
+    @Schema(description = "Car model", example = "RB25")
     private String model;
 
-    @Schema(description = "Engine power in horsepower", example = "200")
+    @Schema(description = "Engine power in horsepower", example = "980")
     private Integer power;
 }

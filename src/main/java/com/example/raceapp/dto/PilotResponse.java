@@ -12,10 +12,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PilotResponse {
-    @Schema(description = "Pilot ID", example = "1")
+    @Schema(description = "Pilot ID", example = "3")
     private Long id;
 
-    @Schema(description = "Pilot's name", example = "John Doe")
+    @Schema(description = "Pilot's name", example = "Max Verstappen")
     private String name;
 
     @Schema(description = "Pilot's age", example = "30")

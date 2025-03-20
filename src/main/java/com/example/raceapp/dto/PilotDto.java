@@ -15,7 +15,7 @@ import lombok.Setter;
 @Schema(description = "Data Transfer Object for pilot creation and updates")
 public class PilotDto {
 
-    @Schema(description = "Pilot's name", example = "John Doe")
+    @Schema(description = "Pilot's name", example = "Max Verstappen")
     @NotBlank(message = "Name is required")
     private String name;
 

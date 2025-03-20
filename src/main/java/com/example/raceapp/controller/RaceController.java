@@ -2,7 +2,6 @@ package com.example.raceapp.controller;
 
 import com.example.raceapp.dto.RaceDto;
 import com.example.raceapp.dto.RaceResponse;
-import com.example.raceapp.exception.BadRequestException;
 import com.example.raceapp.exception.NotFoundException;
 import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.service.RaceService;
@@ -54,8 +53,8 @@ public class RaceController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Race data",
                     content = @Content(
-                            schema = @Schema(example = "{ \"name\": \"Grand Prix\","
-                                    + "\"year\": 2025, \"pilotIds\": [1,2], \"carIds\": [10,20] }")
+                            schema = @Schema(example = "{ \"name\": \"Grand Prix Miami\","
+                                    + "\"year\": 2025, \"pilotIds\": [1,3], \"carIds\": [1,3] }")
                     )
             ),
             responses = {
@@ -164,6 +163,12 @@ public class RaceController {
     @Operation(
             summary = "Partially update race by ID",
             description = "Updates specific fields of an existing race",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Fields to update",
+                    content = @Content(
+                            schema = @Schema(example = "{\n\"pilotIds\": [1, 3]\n}")
+                    )
+            ),
             responses = {
                 @ApiResponse(responseCode = "200", description = "Race partially updated",
                             content = @Content(schema = @Schema(implementation =

@@ -54,8 +54,8 @@ public class CarController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Car data",
                     content = @Content(
-                            schema = @Schema(example = "{ \"brand\": \"Toyota\", \"model\": "
-                                    + "\"Corolla\", \"power\": 150, \"ownerId\": 1 }")
+                            schema = @Schema(example = "{ \"brand\": \"Red Bull\", \"model\": "
+                                    + "\"RB25\", \"power\": 980, \"ownerId\": 3 }")
                     )
             ),
             responses = {
@@ -137,13 +137,13 @@ public class CarController {
     )
     @GetMapping
     public ResponseEntity<Page<CarResponse>> getCars(
-            @Parameter(description = "Filter by brand", example = "Toyota")
+            @Parameter(description = "Filter by brand", example = "Red Bull")
             @RequestParam(required = false) String brand,
-            @Parameter(description = "Filter by model", example = "Camry")
+            @Parameter(description = "Filter by model", example = "RB25")
             @RequestParam(required = false) String model,
-            @Parameter(description = "Filter by power", example = "200")
+            @Parameter(description = "Filter by power", example = "980")
             @RequestParam(required = false) Integer power,
-            @Parameter(description = "Filter by owner ID", example = "1")
+            @Parameter(description = "Filter by owner ID", example = "3")
             @RequestParam(required = false) Long ownerId,
             Pageable pageable) {
         return ResponseEntity.ok(carService.searchCarsWithPagination(brand,
@@ -226,8 +226,7 @@ public class CarController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Fields to update",
                     content = @Content(
-                            schema = @Schema(example = "{ \"brand\": \"Toyota\","
-                                    + "\"model\": \"Corolla\", \"power\": 150 }")
+                            schema = @Schema(example = "{\"power\": 1000 }")
                     )
             ),
             responses = {

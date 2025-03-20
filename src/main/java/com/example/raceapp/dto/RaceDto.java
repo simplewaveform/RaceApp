@@ -16,7 +16,7 @@ import lombok.Setter;
 @Schema(description = "Data Transfer Object for race creation and updates")
 public class RaceDto {
 
-    @Schema(description = "Race name", example = "Grand Prix 2025")
+    @Schema(description = "Race name", example = "Grand Prix Miami")
     @NotBlank(message = "Name is required")
     private String name;
 
@@ -28,7 +28,7 @@ public class RaceDto {
     @NotEmpty(message = "Pilot IDs cannot be empty")
     private Set<Long> pilotIds;
 
-    @Schema(description = "Set of car IDs participating in the race", example = "[10, 20, 30]")
+    @Schema(description = "Set of car IDs participating in the race", example = "[1, 2, 3]")
     @NotEmpty(message = "Car IDs cannot be empty")
     private Set<Long> carIds;
 }

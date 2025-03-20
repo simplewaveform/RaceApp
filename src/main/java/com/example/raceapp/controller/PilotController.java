@@ -51,7 +51,7 @@ public class PilotController {
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     description = "Pilot data",
                     content = @Content(
-                            schema = @Schema(example = "{ \"name\": \"John Doe\","
+                            schema = @Schema(example = "{ \"name\": \"Max Verstappen\","
                                     + "\"age\": 30, \"experience\": 5 }")
                     )
             ),
@@ -95,7 +95,7 @@ public class PilotController {
     )
     @GetMapping
     public ResponseEntity<Page<PilotResponse>> getPilots(
-            @Parameter(description = "Filter by name", example = "John")
+            @Parameter(description = "Filter by name", example = "Max Verstappen")
             @RequestParam(required = false) String name,
             @Parameter(description = "Filter by age", example = "30")
             @RequestParam(required = false) Integer age,
