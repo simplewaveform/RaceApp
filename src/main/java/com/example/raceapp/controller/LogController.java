@@ -2,6 +2,7 @@ package com.example.raceapp.controller;
 
 import com.example.raceapp.exception.BadRequestException;
 import com.example.raceapp.exception.InternalServerException;
+import com.example.raceapp.exception.NotFoundException;
 import com.example.raceapp.service.LogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,10 +67,10 @@ public class LogController {
                             + fileName + "\"")
                     .body(resource);
 
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException(Map.of("error", e.getMessage()).toString());
+        } catch (BadRequestException | NotFoundException e) {
+            throw e;
         } catch (RuntimeException e) {
-            throw new InternalServerException("Error processing log file: " + e.getMessage());
+            throw new InternalServerException("Unexpected error: " + e.getMessage());
         }
     }
 }

@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -70,6 +71,22 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
         log.error("Unhandled exception: {}", ex.getMessage(), ex);
         ApiException apiEx = new InternalServerException("Internal server error");
+        return buildResponse(apiEx);
+    }
+
+    /**
+     * Handles {@link HttpMessageNotReadableException} which occurs when the request
+     * body cannot be converted to a target object.
+     * This typically happens due to invalid JSON format or missing required fields.
+     *
+     * @param ex the {@link HttpMessageNotReadableException} that was thrown
+     * @return a {@link ResponseEntity} containing an error response with
+     *         details about the exception
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex) {
+        ApiException apiEx = new BadRequestException("Invalid JSON format: " + ex.getMessage());
         return buildResponse(apiEx);
     }
 
