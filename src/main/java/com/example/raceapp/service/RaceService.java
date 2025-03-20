@@ -4,14 +4,10 @@ import com.example.raceapp.dto.PilotSimpleResponse;
 import com.example.raceapp.dto.RaceDto;
 import com.example.raceapp.dto.RaceResponse;
 import com.example.raceapp.exception.NotFoundException;
-import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.RaceRepository;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
@@ -129,53 +125,6 @@ public class RaceService {
             race.setYear(request.getYear());
             race.setPilots(pilotService.getPilotsByIds(request.getPilotIds()));
             race.setCars(carService.getCarsByIds(request.getCarIds()));
-            return mapToResponse(raceRepository.save(race));
-        });
-    }
-
-    /**
-     * Partially updates a race identified by its ID using a map of updates.
-     *
-     * @param id the race ID
-     * @param updates a map of fields to be updated and their new values
-     * @return an Optional containing the updated RaceResponse DTO if the race was found
-     */
-    @Caching(evict = {
-        @CacheEvict(value = "races", allEntries = true),
-        @CacheEvict(value = "pilots", allEntries = true),
-        @CacheEvict(value = "cars", allEntries = true)
-    })
-    public Optional<RaceResponse> partialUpdateRace(Long id, Map<String, Object> updates) {
-        return raceRepository.findById(id).map(race -> {
-            updates.forEach((key, value) -> {
-                switch (key) {
-                    case "name" -> race.setName((String) value);
-                    case "year" -> race.setYear((Integer) value);
-                    case "pilotIds" -> {
-                        if (value instanceof Collection<?> pilotIdsCollection) {
-                            Set<Long> pilotIds = pilotIdsCollection.stream()
-                                    .map(idObj -> ((Number) idObj).longValue())
-                                    .collect(Collectors.toSet());
-                            race.setPilots(pilotService.getPilotsByIds(pilotIds));
-                        } else {
-                            throw new ValidationException(Map.of("pilotIds", "Invalid format."
-                                    + "Expected an array of pilot IDs."));
-                        }
-                    }
-                    case "carIds" -> {
-                        if (value instanceof Collection<?> carIdsCollection) {
-                            Set<Long> carIds = carIdsCollection.stream()
-                                    .map(idObj -> ((Number) idObj).longValue())
-                                    .collect(Collectors.toSet());
-                            race.setCars(carService.getCarsByIds(carIds));
-                        } else {
-                            throw new ValidationException(Map.of("carIds", "Invalid format."
-                                    + "Expected an array of car IDs."));
-                        }
-                    }
-                    default -> throw new ValidationException(Map.of(key, "Invalid field: " + key));
-                }
-            });
             return mapToResponse(raceRepository.save(race));
         });
     }

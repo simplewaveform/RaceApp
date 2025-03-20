@@ -3,9 +3,7 @@ package com.example.raceapp.service;
 import com.example.raceapp.dto.CarSimpleResponse;
 import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.dto.PilotResponse;
-import com.example.raceapp.exception.BadRequestException;
 import com.example.raceapp.exception.NotFoundException;
-import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.repository.PilotRepository;
@@ -14,7 +12,6 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -175,33 +172,6 @@ public class PilotService {
             pilot.setName(request.getName());
             pilot.setAge(request.getAge());
             pilot.setExperience(request.getExperience());
-            return mapToResponse(pilotRepository.save(pilot));
-        });
-    }
-
-    /**
-     * Partially updates a pilot with the fields provided in the {@link Map} of updates.
-     *
-     * @param id      the ID of the pilot to update
-     * @param updates a map of fields to update with their new values
-     * @return an {@link Optional} containing the updated {@link PilotResponse} if successful
-     */
-    @Caching(evict = {
-        @CacheEvict(value = "pilots", allEntries = true),
-        @CacheEvict(value = "cars", allEntries = true)
-    })
-    public Optional<PilotResponse> partialUpdatePilot(Long id, Map<String, Object> updates) {
-        return pilotRepository.findById(id).map(pilot -> {
-            updates.forEach((key, value) -> {
-                switch (key) {
-                    case "name" -> pilot.setName((String) value);
-                    case "age" -> pilot.setAge((Integer) value);
-                    case "experience" -> pilot.setExperience((Integer) value);
-                    default -> throw new ValidationException(Map.of(key, "Invalid field: "
-                            + key));
-
-                }
-            });
             return mapToResponse(pilotRepository.save(pilot));
         });
     }

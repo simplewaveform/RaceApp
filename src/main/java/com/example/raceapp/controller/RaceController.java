@@ -3,7 +3,6 @@ package com.example.raceapp.controller;
 import com.example.raceapp.dto.RaceDto;
 import com.example.raceapp.dto.RaceResponse;
 import com.example.raceapp.exception.NotFoundException;
-import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.service.RaceService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -151,47 +148,6 @@ public class RaceController {
             @Valid @RequestBody RaceDto raceDto) {
         return raceService.updateRace(id, raceDto)
                 .orElseThrow(() -> new NotFoundException(RACE_NOT_FOUND));
-    }
-
-    /**
-     * Partially updates an existing race by its ID.
-     *
-     * @param id the ID of the race to partially update
-     * @param updates the map of fields to be updated
-     * @return the updated race
-     */
-    @Operation(
-            summary = "Partially update race by ID",
-            description = "Updates specific fields of an existing race",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "Fields to update",
-                    content = @Content(
-                            schema = @Schema(example = "{\n\"pilotIds\": [1, 3]\n}")
-                    )
-            ),
-            responses = {
-                @ApiResponse(responseCode = "200", description = "Race partially updated",
-                            content = @Content(schema = @Schema(implementation =
-                                    RaceResponse.class))),
-                @ApiResponse(responseCode = "404", description = RACE_NOT_FOUND,
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Race not found\" }"))),
-                @ApiResponse(responseCode = "400", description = "Invalid input",
-                            content = @Content(schema = @Schema(example = "{ \"error\":"
-                                    + "\"Invalid input data\" }")))
-            }
-    )
-    @PatchMapping("/{id}")
-    public RaceResponse partialUpdateRace(
-            @Parameter(description = "ID of the race to update", required = true, example = "1")
-            @PathVariable Long id,
-            @RequestBody Map<String, Object> updates) {
-        try {
-            return raceService.partialUpdateRace(id, updates)
-                    .orElseThrow(() -> new NotFoundException(RACE_NOT_FOUND));
-        } catch (IllegalArgumentException | ValidationException e) {
-            throw new ValidationException(Map.of("error", e.getMessage()));
-        }
     }
 
     /**

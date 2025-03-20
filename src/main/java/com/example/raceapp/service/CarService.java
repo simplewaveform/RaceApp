@@ -3,7 +3,6 @@ package com.example.raceapp.service;
 import com.example.raceapp.dto.CarDto;
 import com.example.raceapp.dto.CarResponse;
 import com.example.raceapp.exception.NotFoundException;
-import com.example.raceapp.exception.ValidationException;
 import com.example.raceapp.model.Car;
 import com.example.raceapp.model.Pilot;
 import com.example.raceapp.repository.CarRepository;
@@ -13,7 +12,6 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -176,37 +174,6 @@ public class CarService {
     })
     public Optional<CarResponse> updateCar(Long id, CarDto request) {
         return carRepository.findById(id).map(car -> getCarResponse(request, car));
-    }
-
-    /**
-     * Partially updates a car with new data for specific fields.
-     *
-     * @param id the ID of the car to update
-     * @param updates a map containing field names and values to update
-     * @return an Optional containing the updated CarResponse DTO
-     */
-    @Caching(evict = {
-        @CacheEvict(value = "cars", allEntries = true),
-        @CacheEvict(value = "pilots", allEntries = true)
-    })
-    public Optional<CarResponse> partialUpdateCar(Long id, Map<String, Object> updates) {
-        return carRepository.findById(id).map(car -> {
-            updates.forEach((key, value) -> {
-                switch (key) {
-                    case "brand" -> car.setBrand((String) value);
-                    case "model" -> car.setModel((String) value);
-                    case "power" -> car.setPower((Integer) value);
-                    case "ownerId" -> {
-                        Pilot owner = pilotRepository.findById(((Number) value).longValue())
-                                .orElseThrow(() -> new NotFoundException("Pilot not found"));
-                        car.setOwner(owner);
-                    }
-                    default -> throw new ValidationException(Map.of(key, "Invalid field: "
-                            + key));
-                }
-            });
-            return mapToResponse(carRepository.save(car));
-        });
     }
 
     /**
