@@ -4,14 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * DTO for creating or updating a car.
  */
-@Getter
-@Setter
 @Schema(description = "Data Transfer Object for car creation and updates")
 public class CarDto {
 
@@ -30,4 +26,16 @@ public class CarDto {
     @Schema(description = "Owner ID (pilot ID)", example = "3")
     @NotNull(message = "Owner ID is required")
     private Long ownerId;
+
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+
+    public int getPower() { return power; }
+    public void setPower(int power) { this.power = power; }
+
+    public Long getOwnerId() { return ownerId; }
+    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
 }

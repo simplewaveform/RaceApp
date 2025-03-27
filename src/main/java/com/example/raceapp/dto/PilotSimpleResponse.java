@@ -1,15 +1,11 @@
 package com.example.raceapp.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Simplified DTO for pilot references in other responses.
  */
 @Schema(description = "Simplified Pilot Response")
-@Getter
-@Setter
 public class PilotSimpleResponse {
     @Schema(description = "Pilot ID", example = "3")
     private Long id;
@@ -19,4 +15,14 @@ public class PilotSimpleResponse {
 
     @Schema(description = "Pilot's experience in years", example = "5")
     private Integer experience;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getExperience() { return experience; }
+    public void setExperience(int experience) { this.experience = experience; }
+
 }

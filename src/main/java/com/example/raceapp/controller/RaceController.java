@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -33,10 +33,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Races", description = "API for managing races")
 @RestController
 @RequestMapping("/races")
-@RequiredArgsConstructor
 public class RaceController {
     public static final String RACE_NOT_FOUND = "Race not found";
     private final RaceService raceService;
+
+    @Autowired
+    public RaceController(RaceService raceService) {
+        this.raceService = raceService;
+    }
 
     /**
      * Creates a new race with the specified parameters.

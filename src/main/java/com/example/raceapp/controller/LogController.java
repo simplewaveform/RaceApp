@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -26,10 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/logs")
 @Tag(name = "Log API", description = "Get API Logs")
-@RequiredArgsConstructor
 public class LogController {
 
     private final LogService logService;
+
+    @Autowired
+    public LogController(LogService logService) {
+        this.logService = logService;
+    }
 
     /**
      * Downloader of log file.

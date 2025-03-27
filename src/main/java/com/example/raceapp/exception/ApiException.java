@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
  * All custom exceptions in the application should extend this class
  * to ensure consistent error responses.
  */
-@Getter
 public abstract class ApiException extends RuntimeException {
 
     private final HttpStatus status;
@@ -58,4 +57,7 @@ public abstract class ApiException extends RuntimeException {
         this.details.putAll(details);
         return this;
     }
+
+    public HttpStatus getStatus() { return status; }
+    public String getDetails() { return details.toString(); }
 }

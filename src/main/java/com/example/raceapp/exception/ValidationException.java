@@ -15,20 +15,17 @@ import org.springframework.http.HttpStatus;
  */
 public class ValidationException extends ApiException {
 
-    /**
-     * Constructs a new validation exception with field-specific errors.
-     *
-     * @param errors Map containing validation errors where:
-     *        Key: Field name with validation failure
-     *        Value: Human-readable error description
-     *           
-     * @throws IllegalArgumentException if errors map is null
-     */
+    private final Map<String, String> errors;
+
     public ValidationException(Map<String, String> errors) {
         super("Validation failed", HttpStatus.BAD_REQUEST, "validation_error");
         if (errors == null) {
             throw new IllegalArgumentException("Errors map cannot be null");
         }
-        this.getDetails().putAll(errors);
+        this.errors = errors;
+    }
+
+    public Map<String, String> getErrors() {
+        return errors;
     }
 }

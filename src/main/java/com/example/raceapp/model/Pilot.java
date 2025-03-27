@@ -8,16 +8,11 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Represents a pilot (driver) entity in the system.
  */
-@Getter
-@Setter
 @Entity
 @Table(name = "pilots")
 public class Pilot {
@@ -34,20 +29,21 @@ public class Pilot {
     @ManyToMany(mappedBy = "pilots")
     private Set<Race> races = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Pilot pilot = (Pilot) o;
-        return id != null && id.equals(pilot.id);
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
+
+    public Integer getExperience() { return experience; }
+    public void setExperience(Integer experience) { this.experience = experience; }
+
+    public Set<Car> getCars() { return cars; }
+    public void setCars(Set<Car> cars) { this.cars = cars; }
+
+    public Set<Race> getRaces() { return races; }
+    public void setRaces(Set<Race> races) { this.races = races; }
 }

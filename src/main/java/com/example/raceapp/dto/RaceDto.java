@@ -5,14 +5,10 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * DTO for creating or updating a race.
  */
-@Getter
-@Setter
 @Schema(description = "Data Transfer Object for race creation and updates")
 public class RaceDto {
 
@@ -31,4 +27,16 @@ public class RaceDto {
     @Schema(description = "Set of car IDs participating in the race", example = "[1, 2, 3]")
     @NotEmpty(message = "Car IDs cannot be empty")
     private Set<Long> carIds;
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
+
+    public Set<Long> getPilotIds() { return pilotIds; }
+    public void setPilotIds(Set<Long> pilotIds) { this.pilotIds = pilotIds; }
+
+    public Set<Long> getCarIds() { return carIds; }
+    public void setCarIds(Set<Long> carIds) { this.carIds = carIds; }
 }

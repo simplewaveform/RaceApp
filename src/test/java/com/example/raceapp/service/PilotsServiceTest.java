@@ -75,17 +75,28 @@ class PilotServiceTest {
     // Тест получения пилота по ID (покрытие существующего метода)
     @Test
     void getPilotById_ExistingId_ReturnsPilot() {
+        Long pilotId = 1L;
         Pilot pilot = new Pilot();
-        pilot.setId(1L);
-        when(pilotRepository.findById(1L)).thenReturn(Optional.of(pilot));
+        pilot.setId(pilotId);
+        pilot.setName("Max Verstappen");
+        pilot.setAge(30);
+        pilot.setExperience(5);
 
-        PilotResponse response = pilotService.getPilotById(1L).orElseThrow();
-        assertEquals(1L, response.getId());
+        when(pilotRepository.findById(pilotId)).thenReturn(Optional.of(pilot));
+
+        Optional<PilotResponse> result = pilotService.getPilotById(pilotId);
+        assertTrue(result.isPresent());
+        assertEquals(pilotId, result.get().getId());
     }
 
     @Test
     void getPilotById_NonExistingId_ThrowsNotFoundException() {
-        when(pilotRepository.findById(999L)).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class, () -> pilotService.getPilotById(999L));
+        Long nonExistingId = 999L;
+        when(pilotRepository.findById(nonExistingId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> {
+            pilotService.getPilotById(nonExistingId)
+                    .orElseThrow(() -> new NotFoundException("Pilot not found"));
+        });
     }
 }

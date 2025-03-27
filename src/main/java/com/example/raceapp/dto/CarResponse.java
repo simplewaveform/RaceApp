@@ -1,15 +1,11 @@
 package com.example.raceapp.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Detailed DTO for car responses with owner information.
  */
 @Schema(description = "Detailed Car Response")
-@Getter
-@Setter
 public class CarResponse {
     @Schema(description = "Car ID", example = "3")
     private Long id;
@@ -25,4 +21,19 @@ public class CarResponse {
 
     @Schema(description = "Owner information")
     private PilotSimpleResponse owner;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+
+    public int getPower() { return power; }
+    public void setPower(int power) { this.power = power; }
+
+    public PilotSimpleResponse getOwner() { return owner; }
+    public void setOwner(PilotSimpleResponse owner) { this.owner = owner; }
 }

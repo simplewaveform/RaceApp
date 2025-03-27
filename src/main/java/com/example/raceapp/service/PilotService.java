@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -31,10 +32,15 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class PilotService {
+
     private final PilotRepository pilotRepository;
     private final RaceRepository raceRepository;
+    @Autowired
+    public PilotService(PilotRepository pilotRepository, RaceRepository raceRepository) {
+        this.pilotRepository = pilotRepository;
+        this.raceRepository = raceRepository;
+    }
 
     /**
      * Maps a {@link Pilot} entity to a {@link PilotResponse} DTO.

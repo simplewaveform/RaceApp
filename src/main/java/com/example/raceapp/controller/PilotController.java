@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -37,11 +37,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Pilots", description = "API for managing pilots")
 @RestController
 @RequestMapping("/pilots")
-@RequiredArgsConstructor
 public class PilotController {
     public static final String PILOT_NOT_FOUND = "Pilot not found";
     private final PilotService pilotService;
 
+    @Autowired
+    public PilotController(PilotService pilotService) {
+        this.pilotService = pilotService;
+    }
     /**
      * Creates a new pilot.
      *

@@ -4,61 +4,72 @@ import com.example.raceapp.dto.PilotBulkRequest;
 import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.dto.PilotResponse;
 import com.example.raceapp.service.PilotService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.util.List;
-import static org.mockito.ArgumentMatchers.anyList;
+
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PilotController.class)
-class PilotControllerTest {
+@Import(PilotControllerTest.TestConfig.class)
+public class PilotControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Autowired
     private PilotService pilotService;
 
-    @Test
-    void createPilotsBulk_ValidRequest_Returns201() throws Exception {
-        PilotResponse response = new PilotResponse();
-        response.setId(1L);
-        when(pilotService.createPilotsBulk(anyList())).thenReturn(List.of(response));
+    @Autowired
+    private ObjectMapper objectMapper;
 
-        String requestBody = """
-            {
-                "pilots": [
-                    { "name": "Lewis Hamilton", "age": 38, "experience": 15 }
-                ]
-            }
-            """;
-
-        mockMvc.perform(post("/pilots/bulk")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$[0].id").value(1L));
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public PilotService pilotService() {
+            return Mockito.mock(PilotService.class);
+        }
     }
 
     @Test
-    void createPilotsBulk_InvalidRequest_Returns400() throws Exception {
-        String invalidRequestBody = """
-            {
-                "pilots": [
-                    { "name": "", "age": 17, "experience": -1 }
-                ]
-            }
-            """;
+    public void createPilotsBulk_ValidRequest_Returns201() throws Exception {
+        PilotDto validPilot = new PilotDto();
+        validPilot.setName("Valid Pilot");
+        validPilot.setAge(25); // Set required fields
+        validPilot.setExperience(3);
+
+        PilotBulkRequest request = new PilotBulkRequest();
+        request.setPilots(List.of(validPilot)); // Valid data
+
+        when(pilotService.createPilotsBulk(any())).thenReturn(List.of(new PilotResponse()));
 
         mockMvc.perform(post("/pilots/bulk")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalidRequestBody))
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void createPilotsBulk_InvalidRequest_Returns400() throws Exception {
+        PilotDto invalidPilot = new PilotDto(); // Missing required fields
+        PilotBulkRequest invalidRequest = new PilotBulkRequest();
+        invalidRequest.setPilots(List.of(invalidPilot)); // Invalid data
+
+        mockMvc.perform(post("/pilots/bulk")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
     }
 }

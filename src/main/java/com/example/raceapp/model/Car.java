@@ -10,16 +10,11 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Represents a car entity in the system.
  */
-@Getter
-@Setter
 @Entity
 @Table(name = "cars")
 public class Car {
@@ -37,20 +32,22 @@ public class Car {
     @ManyToMany(mappedBy = "cars")
     private Set<Race> races = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Car car = (Car) o;
-        return id != null && id.equals(car.id);
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
+
+    public int getPower() { return power; }
+    public void setPower(int power) { this.power = power; }
+
+    public Pilot getOwner() { return owner; }
+    public void setOwner(Pilot owner) { this.owner = owner; }
+
+    public Set<Race> getRaces() { return races; }
+    public void setRaces(Set<Race> races) { this.races = races; }
+
 }

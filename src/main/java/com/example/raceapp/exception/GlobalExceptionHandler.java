@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -20,9 +22,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
  * Global exception handler for REST controllers. Centralizes exception handling
  * and returns standardized error responses in JSON format.
  */
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class); // <--- Добавил логгер
 
     /**
      * Handles all custom exceptions derived from {@link ApiException}.

@@ -10,16 +10,11 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Represents a race event in the system.
  */
-@Getter
-@Setter
 @Entity
 @Table(name = "races")
 public class Race {
@@ -45,20 +40,18 @@ public class Race {
     )
     private Set<Car> cars = new HashSet<>();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Race race = (Race) o;
-        return id != null && id.equals(race.id);
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
+
+    public Set<Pilot> getPilots() { return pilots; }
+    public void setPilots(Set<Pilot> pilots) { this.pilots = pilots; }
+
+    public Set<Car> getCars() { return cars; }
+    public void setCars(Set<Car> cars) { this.cars = cars; }
 }

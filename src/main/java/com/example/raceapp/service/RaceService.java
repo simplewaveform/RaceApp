@@ -10,6 +10,7 @@ import com.example.raceapp.repository.RaceRepository;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -24,12 +25,18 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-@RequiredArgsConstructor
 public class RaceService {
 
     private final RaceRepository raceRepository;
     private final PilotService pilotService;
     private final CarService carService;
+
+    @Autowired
+    public RaceService(RaceRepository raceRepository, PilotService pilotService, CarService carService) {
+        this.raceRepository = raceRepository;
+        this.pilotService = pilotService;
+        this.carService = carService;
+    }
 
     /**
      * Maps a {@link Pilot} entity to a {@link PilotSimpleResponse} DTO.

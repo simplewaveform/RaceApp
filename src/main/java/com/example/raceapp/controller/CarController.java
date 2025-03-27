@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -34,11 +34,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Cars", description = "API for managing cars")
 @RestController
 @RequestMapping("/cars")
-@RequiredArgsConstructor
 public class CarController {
     public static final String CAR_NOT_FOUND = "Car not found";
     private final CarService carService;
 
+    @Autowired
+    public CarController(CarService carService) {
+        this.carService = carService;
+    }
     /**
      * Creates a new car.
      *
