@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -84,6 +85,23 @@ public class PilotService {
         pilot.setAge(request.getAge());
         pilot.setExperience(request.getExperience());
         return mapToResponse(pilotRepository.save(pilot));
+    }
+
+    @Caching(evict = {
+        @CacheEvict(value = "pilots", allEntries = true),
+        @CacheEvict(value = "cars", allEntries = true)
+    })
+    public List<PilotResponse> createPilotsBulk(List<PilotDto> requests) {
+        return requests.stream()
+                .map(request -> {
+                    Pilot pilot = new Pilot();
+                    pilot.setName(request.getName());
+                    pilot.setAge(request.getAge());
+                    pilot.setExperience(request.getExperience());
+                    return pilotRepository.save(pilot);
+                })
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     /**

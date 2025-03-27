@@ -73,4 +73,5 @@ public class LogService {
             throw new BadRequestException("Invalid date format. Use dd.MM.yyyy");
         }
     }
+
 }

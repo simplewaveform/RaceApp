@@ -1,16 +1,19 @@
 package com.example.raceapp.controller;
 
+import com.example.raceapp.dto.PilotBulkRequest;
 import com.example.raceapp.dto.PilotDto;
 import com.example.raceapp.dto.PilotResponse;
 import com.example.raceapp.exception.NotFoundException;
 import com.example.raceapp.service.PilotService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -70,6 +73,24 @@ public class PilotController {
     @PostMapping
     public ResponseEntity<PilotResponse> createPilot(@Valid @RequestBody PilotDto pilotDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pilotService.createPilot(pilotDto));
+    }
+
+    @Operation(
+            summary = "Bulk create pilots",
+            description = "Creates multiple pilots in a single request",
+            responses = {
+                @ApiResponse(responseCode = "201", description = "Pilots created",
+                            content = @Content(array = @ArraySchema(schema = @Schema(implementation
+                                    = PilotResponse.class)))),
+                @ApiResponse(responseCode = "400", description = "Invalid input",
+                            content = @Content(schema = @Schema(example = "{ \"error\":"
+                                    + "\"Validation failed\" }")))
+            })
+    @PostMapping("/bulk")
+    public ResponseEntity<List<PilotResponse>> createPilotsBulk(
+            @Valid @RequestBody PilotBulkRequest bulkRequest) {
+        List<PilotResponse> responses = pilotService.createPilotsBulk(bulkRequest.getPilots());
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     /**
