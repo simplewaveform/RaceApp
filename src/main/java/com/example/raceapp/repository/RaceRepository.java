@@ -1,5 +1,6 @@
 package com.example.raceapp.repository;
 
+import com.example.raceapp.model.Pilot;
 import com.example.raceapp.model.Race;
 import java.util.List;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 /**
  * Repository interface for managing {@link Race} entities.
@@ -48,9 +50,11 @@ public interface RaceRepository extends JpaRepository<Race, Long> {
      * @return A paginated list of races that fall within the specified year range.
      */
     @Query(value = "SELECT * FROM races WHERE year BETWEEN :start AND :end", nativeQuery = true)
-    Page<Race> findRacesByYearRangeNative(@Param("start") int start,
-                                    @Param("end") int end,
+    Page<Race> findRacesByYearRangeNative(@Param("start") Integer start,
+                                    @Param("end") Integer end,
                                     Pageable pageable);
+
+    List<Race> findByPilotsContaining(Pilot pilot);
 
     /**
      * Retrieves races that occurred within the specified year range.
@@ -62,8 +66,8 @@ public interface RaceRepository extends JpaRepository<Race, Long> {
      * @return A paginated list of races that fall within the specified year range.
      */
     @Query("SELECT r FROM Race r WHERE r.year BETWEEN :start AND :end")
-    Page<Race> findRacesByYearRange(@Param("start") int start,
-                                    @Param("end") int end,
+    Page<Race> findRacesByYearRange(@Param("start") Integer start,
+                                    @Param("end") Integer end,
                                     Pageable pageable);
 
 }

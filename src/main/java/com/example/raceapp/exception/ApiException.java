@@ -2,7 +2,6 @@ package com.example.raceapp.exception;
 
 import java.util.HashMap;
 import java.util.Map;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -15,7 +14,6 @@ import org.springframework.http.HttpStatus;
 public abstract class ApiException extends RuntimeException {
 
     private final HttpStatus status;
-    private final String errorCode;
     private final Map<String, Object> details = new HashMap<>();
 
     /**
@@ -28,7 +26,6 @@ public abstract class ApiException extends RuntimeException {
     protected ApiException(String message, HttpStatus status, String errorCode) {
         super(message);
         this.status = status;
-        this.errorCode = errorCode;
     }
 
     /**

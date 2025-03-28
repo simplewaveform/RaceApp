@@ -72,4 +72,37 @@ public class PilotControllerTest {
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void createPilot_ValidRequest_Returns201() throws Exception {
+        PilotDto pilotDto = new PilotDto();
+        pilotDto.setName("New Pilot");
+        pilotDto.setAge(25);
+        pilotDto.setExperience(3);
+
+        PilotResponse pilotResponse = new PilotResponse();
+        pilotResponse.setId(1L);
+        pilotResponse.setName("New Pilot");
+        pilotResponse.setAge(25);
+        pilotResponse.setExperience(3);
+
+        when(pilotService.createPilot(any(PilotDto.class))).thenReturn(pilotResponse);
+
+        mockMvc.perform(post("/pilots")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(pilotDto)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void createPilot_InvalidRequest_Returns400() throws Exception {
+        PilotDto invalidPilot = new PilotDto(); // Missing required fields
+
+        mockMvc.perform(post("/pilots")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidPilot)))
+                .andExpect(status().isBadRequest());
+    }
+
+
 }

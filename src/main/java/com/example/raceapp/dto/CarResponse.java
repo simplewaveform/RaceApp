@@ -31,8 +31,8 @@ public class CarResponse {
     public String getModel() { return model; }
     public void setModel(String model) { this.model = model; }
 
-    public int getPower() { return power; }
-    public void setPower(int power) { this.power = power; }
+    public Integer getPower() { return power; }
+    public void setPower(Integer power) { this.power = power; }
 
     public PilotSimpleResponse getOwner() { return owner; }
     public void setOwner(PilotSimpleResponse owner) { this.owner = owner; }
