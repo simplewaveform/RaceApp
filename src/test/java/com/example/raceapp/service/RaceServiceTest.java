@@ -9,6 +9,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.*;
 
@@ -181,4 +184,80 @@ class RaceServiceTest {
             raceService.deleteRace(nonExistingId);
         });
     }
+
+    @Test
+    void getAllRaces_ReturnsPage() {
+        Pageable pageable = Pageable.unpaged();
+        Race race = new Race();
+        race.setId(1L);
+
+        when(raceRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(race)));
+
+        Page<RaceResponse> result = raceService.getAllRaces(pageable);
+
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+    }
+
+    @Test
+    void mapToPilotSimpleResponse_ValidPilot_ReturnsResponse() {
+        Pilot pilot = new Pilot();
+        pilot.setId(1L);
+        pilot.setName("Lewis Hamilton");
+        pilot.setExperience(15);
+
+        PilotSimpleResponse response = RaceService.mapToPilotSimpleResponse(pilot);
+
+        assertNotNull(response);
+        assertEquals(pilot.getId(), response.getId());
+        assertEquals(pilot.getName(), response.getName());
+        assertEquals(pilot.getExperience(), response.getExperience());
+    }
+
+    @Test
+    void mapToResponse_WithPilotsAndCars_ReturnsCompleteResponse() {
+        Race race = new Race();
+        race.setId(1L);
+
+        Pilot pilot = new Pilot();
+        pilot.setId(1L);
+        race.getPilots().add(pilot);
+
+        Car car = new Car();
+        car.setId(1L);
+        race.getCars().add(car);
+
+        when(pilotService.mapToResponse(any(Pilot.class))).thenReturn(new PilotResponse());
+        when(carService.mapToResponse(any(Car.class))).thenReturn(new CarResponse());
+
+        RaceResponse response = raceService.mapToResponse(race);
+
+        assertNotNull(response);
+        assertEquals(1, response.getPilots().size());
+        assertEquals(1, response.getCars().size());
+    }
+
+    @Test
+    void deleteRace_WithPilotsAndCars_CleansUpRelations() {
+        Long raceId = 1L;
+        Race race = new Race();
+        race.setId(raceId);
+
+        Pilot pilot = new Pilot();
+        pilot.setId(1L);
+        race.getPilots().add(pilot);
+
+        Car car = new Car();
+        car.setId(1L);
+        race.getCars().add(car);
+
+        when(raceRepository.findById(raceId)).thenReturn(Optional.of(race));
+
+        raceService.deleteRace(raceId);
+
+        assertTrue(race.getPilots().isEmpty());
+        assertTrue(race.getCars().isEmpty());
+        verify(raceRepository).delete(race);
+    }
+
 }

@@ -3,13 +3,18 @@ package com.example.raceapp.exception;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -48,17 +53,20 @@ public class GlobalExceptionHandler {
      * @return ResponseEntity containing validation errors and HTTP status
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, Object>> handleValidationException(MethodArgumentNotValidException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Validation failed");
 
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            errors.put(fieldName, error.getDefaultMessage());
-        });
+        // Convert errors to Map<String, List<String>> (field → list of messages)
+        Map<String, List<String>> errors = ex.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.groupingBy(
+                        FieldError::getField,
+                        Collectors.mapping(FieldError::getDefaultMessage, Collectors.toList())
+                ));
 
-        ValidationException exception = new ValidationException(errors);
-        return handleApiExceptions(exception);
+        body.put("errors", errors); // Provide a Map instead of a List
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
     /**
@@ -91,6 +99,13 @@ public class GlobalExceptionHandler {
         return buildResponse(apiEx);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingParams(MissingServletRequestParameterException ex) {
+        String message = "Required parameter '" + ex.getParameterName() + "' is not present";
+        ApiException apiEx = new BadRequestException(message);
+        return buildResponse(apiEx);
+    }
+
     /**
      * Constructs a standardized error response body.
      *
@@ -101,8 +116,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now());
         body.put("status", ex.getStatus().value());
-        body.put("error", ex.getStatus().getReasonPhrase());
-        body.put("message", ex.getMessage());
+        body.put("error", ex.getMessage());
 
         if (!ex.getDetails().isEmpty()) {
             body.put("errors", ex.getDetails());

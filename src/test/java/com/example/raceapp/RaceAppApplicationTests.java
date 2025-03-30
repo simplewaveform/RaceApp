@@ -4,11 +4,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RaceAppApplicationTests {
+class RaceAppApplicationTest {
 
     @Test
     void contextLoads() {
-        //dummy while tests are not used
+        // This test will verify that the Spring context loads successfully
     }
 
+    @Test
+    void main_ShouldStartApplication() {
+        // This test verifies that the main method can be invoked
+        RaceAppApplication.main(new String[]{});
+    }
 }

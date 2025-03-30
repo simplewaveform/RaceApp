@@ -57,7 +57,7 @@ public class RaceService {
      * @param race the race entity
      * @return the mapped RaceResponse DTO
      */
-    private RaceResponse mapToResponse(Race race) {
+    RaceResponse mapToResponse(Race race) {
         RaceResponse response = new RaceResponse();
         response.setId(race.getId());
         response.setName(race.getName());

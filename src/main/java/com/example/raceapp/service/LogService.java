@@ -38,6 +38,10 @@ public class LogService {
      *         format is invalid.
      */
     public Resource getLogFileForDate(String date) {
+
+        if (date == null || date.isEmpty()) {
+            throw new BadRequestException("Date cannot be null or empty");
+        }
         LocalDate targetDate = parseDate(date);
 
         try (Stream<String> stream = Files.lines(Paths.get(LOG_FILE_PATH))) {

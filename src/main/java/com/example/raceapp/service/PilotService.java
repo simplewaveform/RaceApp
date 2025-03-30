@@ -65,7 +65,7 @@ public class PilotService {
      * @param car the car entity to map
      * @return a {@link CarSimpleResponse} containing the mapped car details
      */
-    private CarSimpleResponse mapToCarSimpleResponse(Car car) {
+    CarSimpleResponse mapToCarSimpleResponse(Car car) {
         CarSimpleResponse response = new CarSimpleResponse();
         response.setId(car.getId());
         response.setBrand(car.getBrand());
@@ -93,18 +93,22 @@ public class PilotService {
     }
 
     @Caching(evict = {
-        @CacheEvict(value = "pilots", allEntries = true),
-        @CacheEvict(value = "cars", allEntries = true)
+            @CacheEvict(value = "pilots", allEntries = true),
+            @CacheEvict(value = "cars", allEntries = true)
     })
     public List<PilotResponse> createPilotsBulk(List<PilotDto> requests) {
-        return requests.stream()
+        List<Pilot> pilots = requests.stream()
                 .map(request -> {
                     Pilot pilot = new Pilot();
                     pilot.setName(request.getName());
                     pilot.setAge(request.getAge());
                     pilot.setExperience(request.getExperience());
-                    return pilotRepository.save(pilot);
+                    return pilot;
                 })
+                .collect(Collectors.toList());
+
+        List<Pilot> savedPilots = pilotRepository.saveAll(pilots);
+        return savedPilots.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

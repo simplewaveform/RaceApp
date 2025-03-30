@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
  * @see ApiException Base class for API exceptions
  */
 public class ValidationException extends ApiException {
-
     private final Map<String, String> errors;
 
     public ValidationException(Map<String, String> errors) {
@@ -23,6 +22,7 @@ public class ValidationException extends ApiException {
             throw new IllegalArgumentException("Errors map cannot be null");
         }
         this.errors = errors;
+        withDetails(errors); // Add this line to populate details
     }
 
     public Map<String, String> getErrors() {

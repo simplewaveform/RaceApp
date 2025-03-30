@@ -56,5 +56,5 @@ public abstract class ApiException extends RuntimeException {
     }
 
     public HttpStatus getStatus() { return status; }
-    public String getDetails() { return details.toString(); }
+    public Map<String, Object> getDetails() { return details; }
 }

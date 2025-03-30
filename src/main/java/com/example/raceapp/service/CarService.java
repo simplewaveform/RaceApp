@@ -81,7 +81,7 @@ public class CarService {
      * @param car the Car entity to be populated and saved
      * @return a CarResponse DTO of the saved car
      */
-    private CarResponse getCarResponse(CarDto request, Car car) {
+    CarResponse getCarResponse(CarDto request, Car car) {
         car.setBrand(request.getBrand());
         car.setModel(request.getModel());
         car.setPower(request.getPower());
