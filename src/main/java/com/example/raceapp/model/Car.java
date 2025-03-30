@@ -32,22 +32,52 @@ public class Car {
     @ManyToMany(mappedBy = "cars")
     private Set<Race> races = new HashSet<>();
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getBrand() { return brand; }
-    public void setBrand(String brand) { this.brand = brand; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getModel() { return model; }
-    public void setModel(String model) { this.model = model; }
+    public String getBrand() {
+        return brand;
+    }
 
-    public Integer getPower() { return power; }
-    public void setPower(Integer power) { this.power = power; }
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
 
-    public Pilot getOwner() { return owner; }
-    public void setOwner(Pilot owner) { this.owner = owner; }
+    public String getModel() {
+        return model;
+    }
 
-    public Set<Race> getRaces() { return races; }
-    public void setRaces(Set<Race> races) { this.races = races; }
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Integer getPower() {
+        return power;
+    }
+
+    public void setPower(Integer power) {
+        this.power = power;
+    }
+
+    public Pilot getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Pilot owner) {
+        this.owner = owner;
+    }
+
+    public Set<Race> getRaces() {
+        return races;
+    }
+
+    public void setRaces(Set<Race> races) {
+        this.races = races;
+    }
 
 }

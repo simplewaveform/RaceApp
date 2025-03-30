@@ -27,15 +27,35 @@ public class CarDto {
     @NotNull(message = "Owner ID is required")
     private Long ownerId;
 
-    public String getBrand() { return brand; }
-    public void setBrand(String brand) { this.brand = brand; }
+    public String getBrand() {
+        return brand;
+    }
 
-    public String getModel() { return model; }
-    public void setModel(String model) { this.model = model; }
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
 
-    public Integer getPower() { return power; }
-    public void setPower(Integer power) { this.power = power; }
+    public String getModel() {
+        return model;
+    }
 
-    public Long getOwnerId() { return ownerId; }
-    public void setOwnerId(Long ownerId) { this.ownerId = ownerId; }
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Integer getPower() {
+        return power;
+    }
+
+    public void setPower(Integer power) {
+        this.power = power;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
 }

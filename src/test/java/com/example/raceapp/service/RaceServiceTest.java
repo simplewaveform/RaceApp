@@ -1,9 +1,18 @@
 package com.example.raceapp.service;
 
-import com.example.raceapp.dto.*;
+import com.example.raceapp.dto.CarResponse;
+import com.example.raceapp.dto.PilotResponse;
+import com.example.raceapp.dto.PilotSimpleResponse;
+import com.example.raceapp.dto.RaceDto;
+import com.example.raceapp.dto.RaceResponse;
 import com.example.raceapp.exception.NotFoundException;
-import com.example.raceapp.model.*;
+import com.example.raceapp.model.Car;
+import com.example.raceapp.model.Pilot;
+import com.example.raceapp.model.Race;
 import com.example.raceapp.repository.RaceRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,11 +22,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RaceServiceTest {
@@ -57,7 +69,6 @@ class RaceServiceTest {
         car2.setId(2L);
         car2.setBrand("Red Bull");
 
-        // Мокируем вызовы зависимостей
         when(pilotService.getPilotsByIds(dto.getPilotIds())).thenReturn(Set.of(pilot1, pilot2));
         when(carService.getCarsByIds(dto.getCarIds())).thenReturn(Set.of(car1, car2));
         when(pilotService.mapToResponse(any(Pilot.class))).thenAnswer(inv -> {
@@ -90,7 +101,6 @@ class RaceServiceTest {
         assertEquals(2, result.getPilots().size());
         assertEquals(2, result.getCars().size());
 
-        // Проверяем, что сервисы были вызваны с правильными параметрами
         verify(pilotService).getPilotsByIds(dto.getPilotIds());
         verify(carService).getCarsByIds(dto.getCarIds());
         verify(raceRepository).save(any(Race.class));
@@ -115,7 +125,6 @@ class RaceServiceTest {
         assertEquals(raceId, result.get().getId());
         assertEquals("Spanish Grand Prix", result.get().getName());
 
-        // Проверяем, что репозиторий был вызван
         verify(raceRepository).findById(raceId);
     }
 
@@ -180,9 +189,7 @@ class RaceServiceTest {
         when(raceRepository.findById(nonExistingId)).thenReturn(Optional.empty());
 
         // Then
-        assertThrows(NotFoundException.class, () -> {
-            raceService.deleteRace(nonExistingId);
-        });
+        assertThrows(NotFoundException.class, () -> raceService.deleteRace(nonExistingId));
     }
 
     @Test

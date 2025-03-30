@@ -5,6 +5,9 @@ import com.example.raceapp.dto.RaceResponse;
 import com.example.raceapp.exception.NotFoundException;
 import com.example.raceapp.service.RaceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +19,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import static org.mockito.ArgumentMatchers.*;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RaceController.class)
 public class RaceControllerTest {
@@ -92,16 +98,13 @@ public class RaceControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    // RaceControllerTest.java
     @Test
     void getAllRaces_ReturnsPaginatedResults() throws Exception {
-        // Указываем параметры пагинации в запросе
         mockMvc.perform(get("/races")
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk());
 
-        // Мокируем вызов сервиса с Pageable
         Pageable pageable = PageRequest.of(0, 10);
         when(raceService.getAllRaces(pageable)).thenReturn(new PageImpl<>(List.of()));
     }
@@ -134,24 +137,20 @@ public class RaceControllerTest {
     void updateRace_ValidRequest_ReturnsUpdatedRace() throws Exception {
         Long raceId = 1L;
 
-        // Создаем валидный DTO с обязательными полями
         RaceDto updateDto = new RaceDto();
         updateDto.setName("Updated Race");
         updateDto.setYear(2026);
-        updateDto.setPilotIds(Set.of(1L, 2L)); // Обязательное поле
-        updateDto.setCarIds(Set.of(3L, 4L));   // Обязательное поле
+        updateDto.setPilotIds(Set.of(1L, 2L));
+        updateDto.setCarIds(Set.of(3L, 4L));
 
-        // Создаем ожидаемый ответ
         RaceResponse updatedRace = new RaceResponse();
         updatedRace.setId(raceId);
         updatedRace.setName("Updated Race");
         updatedRace.setYear(2026);
 
-        // Мокируем сервис
         when(raceService.updateRace(eq(raceId), any(RaceDto.class)))
                 .thenReturn(Optional.of(updatedRace));
 
-        // Отправляем запрос с полным телом, включая pilotIds и carIds
         mockMvc.perform(put("/races/{id}", raceId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Updated Race\",\"year\":2026,\"pilotIds\":[1,2],\"carIds\":[3,4]}"))
@@ -188,11 +187,10 @@ public class RaceControllerTest {
     void deleteRace_NonExistingId_ReturnsNotFound() throws Exception {
         Long nonExistingId = 999L;
 
-        // Мокируем исключение
         doThrow(new NotFoundException("Race not found"))
                 .when(raceService).deleteRace(nonExistingId);
 
         mockMvc.perform(delete("/races/{id}", nonExistingId))
-                .andExpect(status().isNotFound()); // Ожидаем 404
+                .andExpect(status().isNotFound());
     }
 }

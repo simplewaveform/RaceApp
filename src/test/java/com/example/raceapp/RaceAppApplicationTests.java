@@ -13,7 +13,6 @@ class RaceAppApplicationTest {
 
     @Test
     void main_ShouldStartApplication() {
-        // This test verifies that the main method can be invoked
-        RaceAppApplication.main(new String[]{});
+        RaceAppApplication.main(new String[]{}); // This test verifies that the main method can be invoked
     }
 }

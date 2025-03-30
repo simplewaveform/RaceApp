@@ -37,7 +37,7 @@ class LogServiceTest {
     }
 
     @Test
-    void getLogFileForDate_ValidDate_ReturnsResource() throws IOException {
+    void getLogFileForDate_ValidDate_ReturnsResource() {
         String date = "01.01.2023";
         String logLine = "2023-01-01 INFO Some log message";
 
@@ -51,7 +51,7 @@ class LogServiceTest {
     }
 
     @Test
-    void getLogFileForDate_NoLogsForDate_ThrowsException() throws IOException {
+    void getLogFileForDate_NoLogsForDate_ThrowsException() {
         String date = "01.01.2023";
 
         try (var mockedFiles = mockStatic(Files.class)) {
@@ -63,7 +63,7 @@ class LogServiceTest {
     }
 
     @Test
-    void getLogFileForDate_IOException_ThrowsInternalServerException() throws IOException {
+    void getLogFileForDate_IOException_ThrowsInternalServerException() {
         String date = "01.01.2023";
 
         try (var mockedFiles = mockStatic(Files.class)) {

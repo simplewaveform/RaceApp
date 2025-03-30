@@ -102,7 +102,7 @@ class PilotServiceTest {
         // Assert
         assertNotNull(responses);
         assertEquals(2, responses.size());
-        assertEquals("Test Pilot 1", responses.get(0).getName());
+        assertEquals("Test Pilot 1", responses.getFirst().getName());
         assertEquals("Test Pilot 2", responses.get(1).getName());
         verify(pilotRepository).saveAll(anyList());
     }
@@ -309,7 +309,7 @@ class PilotServiceTest {
         Page<PilotResponse> result = pilotService.searchPilotsWithPagination(name, null, null, pageable);
 
         assertEquals(1, result.getContent().size());
-        assertEquals(name, result.getContent().get(0).getName());
+        assertEquals(name, result.getContent().getFirst().getName());
     }
 
     @Test
@@ -325,7 +325,7 @@ class PilotServiceTest {
         Page<PilotResponse> result = pilotService.searchPilotsWithPagination(null, age, null, pageable);
 
         assertEquals(1, result.getContent().size());
-        assertEquals(age, result.getContent().get(0).getAge());
+        assertEquals(age, result.getContent().getFirst().getAge());
     }
 
     @Test
@@ -341,7 +341,7 @@ class PilotServiceTest {
         Page<PilotResponse> result = pilotService.searchPilotsWithPagination(null, null, experience, pageable);
 
         assertEquals(1, result.getContent().size());
-        assertEquals(experience, result.getContent().get(0).getExperience());
+        assertEquals(experience, result.getContent().getFirst().getExperience());
     }
 
     @Test
@@ -402,8 +402,8 @@ class PilotServiceTest {
         Page<PilotResponse> result = pilotService.searchPilotsWithPagination(name, age, null, pageable);
 
         assertEquals(1, result.getContent().size());
-        assertEquals(name, result.getContent().get(0).getName());
-        assertEquals(age, result.getContent().get(0).getAge());
+        assertEquals(name, result.getContent().getFirst().getName());
+        assertEquals(age, result.getContent().getFirst().getAge());
     }
 
     @Test
@@ -511,7 +511,7 @@ class PilotServiceTest {
 
         Specification<Pilot> spec = specCaptor.getValue();
         CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        Root<Pilot> root = mock(Root.class);
+        Root root = mock(Root.class);
         CriteriaQuery<?> query = mock(CriteriaQuery.class);
 
         when(root.get(any(String.class))).thenReturn(mock(Path.class));
@@ -537,7 +537,7 @@ class PilotServiceTest {
 
         Specification<Pilot> spec = specCaptor.getValue();
         CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        Root<Pilot> root = mock(Root.class);
+        Root root = mock(Root.class);
         CriteriaQuery<?> query = mock(CriteriaQuery.class);
 
         when(root.get(any(String.class))).thenReturn(mock(Path.class));
@@ -570,7 +570,7 @@ class PilotServiceTest {
         // Assert
         Specification<Pilot> spec = specCaptor.getValue();
         CriteriaBuilder cb = mock(CriteriaBuilder.class);
-        Root<Pilot> root = mock(Root.class);
+        Root root = mock(Root.class);
         CriteriaQuery<?> query = mock(CriteriaQuery.class);
         Path path = mock(Path.class);
 

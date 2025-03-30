@@ -1,14 +1,14 @@
 package com.example.raceapp.exception;
 
-import static org.junit.jupiter.api.Assertions.*;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.example.raceapp.exception.ApiException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class ValidationExceptionTest {
@@ -30,7 +30,6 @@ class ValidationExceptionTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         assertEquals(errors, exception.getErrors());
 
-        // Проверка, что детали переданы в родительский класс
         assertEquals(errors, exception.getDetails());
     }
 

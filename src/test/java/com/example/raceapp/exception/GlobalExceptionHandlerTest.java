@@ -1,29 +1,23 @@
 package com.example.raceapp.exception;
 
+import java.util.Map;
+import java.util.Objects;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -68,7 +62,7 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleNotFoundException_ReturnsNotFound() throws Exception {
+    void handleNotFoundException_ReturnsNotFound() {
         NotFoundException ex = new NotFoundException("Test message");
         ResponseEntity<Map<String, Object>> response = exceptionHandler.handleApiExceptions(ex);
 
@@ -105,8 +99,7 @@ class GlobalExceptionHandlerTest {
         ResponseEntity<Map<String, Object>> response = exceptionHandler.handleMissingParams(ex);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Required parameter 'param' is not present", response.getBody().get("error"));
+        assertEquals("Required parameter 'param' is not present", Objects.requireNonNull(response.getBody()).get("error"));
     }
-
 
 }
