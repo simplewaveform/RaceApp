@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
  * All custom exceptions in the application should extend this class
  * to ensure consistent error responses.
  */
-public abstract class ApiException extends RuntimeException {
+public class ApiException extends RuntimeException {
 
     private final HttpStatus status;
     private final Map<String, Object> details = new HashMap<>();

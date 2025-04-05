@@ -1,10 +1,8 @@
 package com.example.raceapp.exception;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -25,7 +23,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class); // <--- Добавил логгер
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      * Handles all custom exceptions derived from {@link ApiException}.
@@ -123,5 +121,21 @@ public class GlobalExceptionHandler {
         }
 
         return new ResponseEntity<>(body, ex.getStatus());
+    }
+
+    @ExceptionHandler(ConcurrentModificationException.class)
+    public ResponseEntity<Map<String, Object>> handleConcurrentModification() {
+        ApiException apiEx = new InternalServerException("Concurrent access error");
+        return buildResponse(apiEx);
+    }
+
+    @ExceptionHandler(TimeoutException.class)
+    public ResponseEntity<Map<String, Object>> handleTimeout() {
+        ApiException apiEx = new ApiException(
+                "Operation timed out",
+                HttpStatus.REQUEST_TIMEOUT,
+                "timeout"
+        );
+        return buildResponse(apiEx);
     }
 }
