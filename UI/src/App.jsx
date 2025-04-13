@@ -11,6 +11,23 @@ import RaceDialog from './components/RaceDialog';
 import axios from 'axios';
 
 const theme = createTheme({
+    palette: {
+        mode: 'dark', // Включаем тёмный режим
+        primary: {
+            main: '#90caf9', // Голубой акцентный цвет
+        },
+        secondary: {
+            main: '#f48fb1', // Розовый акцентный цвет
+        },
+        background: {
+            default: '#121212', // Основной тёмный фон
+            paper: '#1e1e1e', // Цвет для компонентов Paper
+        },
+        text: {
+            primary: '#ffffff', // Основной белый текст
+            secondary: 'rgba(255, 255, 255, 0.7)', // Вторичный текст
+        },
+    },
     breakpoints: {
         values: {
             xs: 0,
@@ -21,13 +38,25 @@ const theme = createTheme({
         },
     },
     components: {
+        MuiMenuItem: {
+            styleOverrides: {
+                root: {
+                    color: '#fff !important',
+                    backgroundColor: '#1e1e1e !important',
+                    '&:hover': {
+                        backgroundColor: 'rgba(63, 81, 181, 0.5) !important'
+                    },
+                    '&.Mui-selected': {
+                        backgroundColor: '#3f51b5 !important'
+                    }
+                }
+            }
+        },
         MuiTableCell: {
             styleOverrides: {
                 root: {
-                    padding: '8px',
-                    '@media (max-width:600px)': {
-                        padding: '4px'
-                    }
+                    color: '#ffffff !important', // Белый текст в таблицах
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.12)'
                 }
             }
         },
@@ -48,12 +77,19 @@ const theme = createTheme({
         },
         MuiPagination: {
             styleOverrides: {
-                ul: {
-                    flexWrap: 'nowrap',
+                root: {
+                    color: '#fff',
+                    '& .MuiButtonBase-root': {
+                        color: '#fff',
+                        border: '1px solid rgba(255, 255, 255, 0.23)',
+                        '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.08)'
+                        }
+                    },
                     '& .Mui-selected': {
-                        background: '#3f51b5 !important',
-                        color: 'white',
-                        boxShadow: 2
+                        backgroundColor: '#3f51b5 !important',
+                        color: '#fff !important',
+                        borderColor: 'transparent'
                     }
                 }
             }
@@ -61,23 +97,32 @@ const theme = createTheme({
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'rgba(255,255,255,0.4)', // Уменьшите непрозрачность
-                    backdropFilter: 'blur(12px)', // Усильте размытие
-                    border: '1px solid rgba(255,255,255,0.2)' // Добавьте границу
+                    backgroundColor: 'rgba(30, 30, 30, 0.8)', // Тёмный полупрозрачный фон
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)' // Светлая граница
                 }
             }
         },
         MuiSelect: {
             styleOverrides: {
                 select: {
-                    '@media (max-width:600px)': {
-                        padding: '6px 32px 6px 12px',
-                        fontSize: '0.875rem'
+                    color: '#fff',
+                    backgroundColor: 'rgba(255, 255, 255, 0.09)',
+                    '&:focus': {
+                        backgroundColor: 'rgba(255, 255, 255, 0.09)'
                     }
                 },
                 icon: {
-                    '@media (max-width:600px)': {
-                        right: 4
+                    color: '#fff'
+                }
+            }
+        },
+        MuiInputBase: {
+            styleOverrides: {
+                root: {
+                    color: '#fff',
+                    '&::before': {
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.7)'
                     }
                 }
             }

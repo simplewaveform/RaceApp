@@ -65,7 +65,7 @@ export default function PilotsTable({ onError, onSuccess }) {
             }
         }}>
             <TableContainer component={Paper} sx={{
-                background: 'rgba(255, 255, 255, 0.7)', // Полупрозрачный белый
+                background: 'rgba(0, 0, 0, 0.7)', // Полупрозрачный белый
                 backdropFilter: 'blur(8px)', // Эффект размытия
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)', // Статичная тень
                 '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' } // Убираем изменение при наведении
@@ -74,18 +74,20 @@ export default function PilotsTable({ onError, onSuccess }) {
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                         '& .MuiTableRow-root': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)', // Единый полупрозрачный фон
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)', // Единый полупрозрачный фон
                             transition: 'background-color 0.3s'
                         },
                         '& .MuiTableRow-root:hover': {
-                            backgroundColor: 'rgba(245, 245, 245, 0.7)' // Легкое затемнение при наведении
+                            backgroundColor: 'rgba(15, 15, 15, 0.7)' // Легкое затемнение при наведении
                         }
                     }}
                 >
                     <TableHead sx={{
-                        background: 'rgba(63,81,181,0.1)', // Полупрозрачный фон
-                        backdropFilter: 'blur(4px)', // Размытие
-                        borderBottom: '2px solid rgba(63,81,181,0.2)'
+                        background: 'rgba(144, 202, 249, 0.1)',
+                        borderBottom: '2px solid rgba(144, 202, 249, 0.2)',
+                        '& .MuiTableCell-root': {
+                            color: '#90caf9 !important' // Цвет акцента
+                        }
                     }}>
                         <TableRow>
                             <TableCell sx={{ color: 'black' }}>Имя</TableCell>
@@ -109,10 +111,11 @@ export default function PilotsTable({ onError, onSuccess }) {
                                                         key={car.id}
                                                         label={`${car.brand} ${car.model}`}
                                                         size="small"
+                                                        color={black}
                                                         sx={{
-                                                            background: 'rgba(63,81,181,0.1)',
-                                                            backdropFilter: 'blur(4px)', // Добавьте размытие
-                                                            border: '1px solid rgba(63,81,181,0.3)' // Полупрозрачная граница
+                                                            background: 'rgba(0, 0, 0, 0.1)',
+                                                            color: '#fff',
+                                                            border: '1px solid rgba(255, 255, 255, 0.2)'
                                                         }}
                                                     />
                                                 ))}
@@ -185,7 +188,7 @@ export default function PilotsTable({ onError, onSuccess }) {
                 alignItems: 'center',
                 mt: 2,
                 p: 1,
-                background: 'rgba(255,255,255,0.9)',
+                background: 'rgba(0,0,0,0.5)',
                 borderRadius: 2,
                 boxShadow: 1
             }}>
@@ -193,7 +196,11 @@ export default function PilotsTable({ onError, onSuccess }) {
                     count={totalPages}
                     page={page}
                     onChange={handlePageChange}
-                    sx={{ flexGrow: 1 }}
+                    sx={{
+                        '& .MuiButtonBase-root': {
+                            color: theme => theme.palette.text.primary
+                        }
+                    }}
                     size={isMobile ? 'small' : 'medium'}
                     showFirstButton
                     showLastButton
@@ -208,8 +215,13 @@ export default function PilotsTable({ onError, onSuccess }) {
                         fetchPilots(1, newSize);
                     }}
                     size={isMobile ? 'small' : 'medium'}
-                    sx={{ ml: 2, minWidth: 120 }}
-                >
+                    sx={{
+                        ml: 2,
+                        minWidth: 120,
+                        '& .MuiSelect-icon': {
+                            color: theme => theme.palette.text.primary
+                        }
+                    }}                >
                     <MenuItem value={5}>5</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
                     <MenuItem value={20}>20</MenuItem>

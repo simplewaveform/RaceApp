@@ -70,7 +70,7 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
             {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
             <TableContainer component={Paper} sx={{
-                background: 'rgba(255, 255, 255, 0.3)',
+                background: 'rgba(0, 0, 0, 0.3)',
                 backdropFilter: 'blur(8px)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }
@@ -79,18 +79,20 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                         '& .MuiTableRow-root': {
-                            backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
                             transition: 'background-color 0.3s'
                         },
                         '& .MuiTableRow-root:hover': {
-                            backgroundColor: 'rgba(245, 245, 245, 0.7)'
+                            backgroundColor: 'rgba(15, 15, 15, 0.7)'
                         }
                     }}
                 >
                     <TableHead sx={{
-                        background: 'rgba(63,81,181,0.1)',
-                        backdropFilter: 'blur(4px)',
-                        borderBottom: '2px solid rgba(63,81,181,0.2)'
+                        background: 'rgba(144, 202, 249, 0.1)',
+                        borderBottom: '2px solid rgba(144, 202, 249, 0.2)',
+                        '& .MuiTableCell-root': {
+                            color: '#90caf9 !important' // Цвет акцента
+                        }
                     }}>
                         <TableRow>
                             <TableCell sx={{ color: 'black' }}>Гонка</TableCell>
@@ -139,10 +141,9 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
                                                     label={`${car?.brand || 'Без марки'} ${car?.model || 'Без модели'}`}
                                                     size="small"
                                                     sx={{
-                                                        background: 'rgba(63,81,181,0.1)',
-                                                        backdropFilter: 'blur(4px)',
-                                                        border: '1px solid rgba(63,81,181,0.3)',
-                                                        color: 'black'
+                                                        background: 'rgba(255, 255, 255, 0.1)',
+                                                        color: '#fff',
+                                                        border: '1px solid rgba(255, 255, 255, 0.2)'
                                                     }}
                                                 />
                                             ))}
@@ -198,7 +199,7 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
                 alignItems: 'center',
                 mt: 2,
                 p: 1,
-                background: 'rgba(255,255,255,0.9)',
+                background: 'rgba(0,0,0,0.5)',
                 borderRadius: 2,
                 boxShadow: 1
             }}>
@@ -206,7 +207,11 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
                     count={totalPages}
                     page={page}
                     onChange={handlePageChange}
-                    sx={{ flexGrow: 1 }}
+                    sx={{
+                        '& .MuiButtonBase-root': {
+                            color: theme => theme.palette.text.primary
+                        }
+                    }}
                     size={isMobile ? 'small' : 'medium'}
                     showFirstButton
                     showLastButton
@@ -221,8 +226,13 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
                         fetchRaces(1, newSize);
                     }}
                     size={isMobile ? 'small' : 'medium'}
-                    sx={{ ml: 2, minWidth: 120 }}
-                >
+                    sx={{
+                        ml: 2,
+                        minWidth: 120,
+                        '& .MuiSelect-icon': {
+                            color: theme => theme.palette.text.primary
+                        }
+                    }}                >
                     <MenuItem value={5}>5</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
                     <MenuItem value={20}>20</MenuItem>
