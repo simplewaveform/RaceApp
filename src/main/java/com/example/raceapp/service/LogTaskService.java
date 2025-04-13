@@ -28,6 +28,7 @@ public class LogTaskService {
         String taskId = generateShortId();
         CompletableFuture<Resource> future = CompletableFuture.supplyAsync(() -> {
             try {
+                Thread.sleep(5000);
                 return logService.getLogFileForDate(date);
             } catch (NotFoundException | BadRequestException e) {
                 throw new CompletionException(e);
