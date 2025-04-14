@@ -84,6 +84,7 @@ export default function RaceDialog({
 
                 <TextField
                     label="Название"
+                    sx={{ mb: 2, mt: 2 }}
                     fullWidth
                     error={!!errors.name}
                     value={form.name}

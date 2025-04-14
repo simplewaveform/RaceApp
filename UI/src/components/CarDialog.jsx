@@ -77,7 +77,7 @@ export default function CarDialog({
                 {isEditMode ? 'Редактировать автомобиль' : 'Добавить автомобиль'}
             </DialogTitle>
 
-            <DialogContent sx={{ pt: 2 }}>
+            <DialogContent sx={{ pt: 2}}>
                 {Object.values(errors).map((error, i) => (
                     <Alert key={i} severity="error" sx={{ mb: 2 }}>{error}</Alert>
                 ))}
@@ -85,7 +85,7 @@ export default function CarDialog({
                 <TextField
                     label="Марка"
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 2, mt: 2 }}
                     error={!!errors.brand}
                     value={form.brand}
                     onChange={e => setForm({...form, brand: e.target.value})}

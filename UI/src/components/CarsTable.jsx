@@ -56,18 +56,16 @@ export default function CarsTable({ onError, onSuccess, loadRelations, relations
 
     return (
         <Box sx={{
-            overflowX: 'auto',
-            maxHeight: 'calc(80vh - 60px)',
-            overflowY: 'auto',
+            height: 'calc(100vh - 200px)',
             position: 'relative',
-            pb: 7,
             '& .MuiTableContainer-root': {
-                backgroundColor: 'transparent !important',
-                boxShadow: 'none !important'
+                backgroundColor: 'transparent important',
+                boxShadow: 'none !important',
+                height: '100%'
             }
         }}>
             <TableContainer component={Paper} sx={{
-                background: 'rgba(0, 0, 0, 0.7)',
+                background: 'rgba(40, 40, 40, 0.9)',
                 backdropFilter: 'blur(8px)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }
@@ -76,19 +74,23 @@ export default function CarsTable({ onError, onSuccess, loadRelations, relations
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
                         '& .MuiTableRow-root': {
-                            backgroundColor: 'rgba(0, 0, 0, 0.4)', // Единый полупрозрачный фон
+                            backgroundColor: 'rgba(0, 0, 0, 0.4)',
                             transition: 'background-color 0.3s'
                         },
                         '& .MuiTableRow-root:hover': {
-                            backgroundColor: 'rgba(15, 15, 15, 0.7)' // Легкое затемнение при наведении
+                            backgroundColor: 'rgba(15, 15, 15, 0.7)'
                         }
                     }}
                 >
                     <TableHead sx={{
-                        background: 'rgba(144, 202, 249, 0.1)',
+                        position: 'sticky',
+                        top: 0, // Фиксация сверху
+                        zIndex: 2, // Поверх скроллящегося контента
+                        background: 'rgba(30, 30, 30, 0.8)',
                         borderBottom: '2px solid rgba(144, 202, 249, 0.2)',
+                        backdropFilter: 'blur(12px)', // Добавляем размытие под шапкой
                         '& .MuiTableCell-root': {
-                            color: '#90caf9 !important' // Цвет акцента
+                            color: '#90caf9 !important'
                         }
                     }}>
                         <TableRow>
@@ -186,14 +188,15 @@ export default function CarsTable({ onError, onSuccess, loadRelations, relations
 
             <Box sx={{
                 position: 'fixed',
-                bottom: 0,
-                left: 0,
-                right: 0,
+                bottom: 20,
+                left: '50%', // Центрируем по горизонтали
+                transform: 'translateX(-50%)', // Корректируем позицию
+                maxWidth: 'calc(100vw - 50px)', // Устанавливаем ту же максимальную ширину, что и таблица
+                width: '100%', // Занимаем всю доступную ширину контейнера
                 zIndex: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                p: 2,
                 background: 'rgba(0, 0, 0, 0.4)',
                 backdropFilter: 'blur(8px)',
                 borderTop: '1px solid rgba(255, 255, 255, 0.12)',
@@ -223,6 +226,7 @@ export default function CarsTable({ onError, onSuccess, loadRelations, relations
                     }}
                     size={isMobile ? 'small' : 'medium'}
                     sx={{
+                        scale: 0.8,
                         ml: 2,
                         minWidth: 120,
                         '& .MuiSelect-icon': {

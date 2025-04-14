@@ -77,7 +77,7 @@ export default function PilotDialog({
                 <TextField
                     label="Имя"
                     fullWidth
-                    sx={{ mb: 2 }}
+                    sx={{ mb: 2, mt: 2 }}
                     error={!!errors.name}
                     value={form.name}
                     onChange={e => setForm({...form, name: e.target.value})}

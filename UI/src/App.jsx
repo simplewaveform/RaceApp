@@ -214,7 +214,7 @@ export default function App() {
                         position: 'relative',
                         zIndex: 2,
                         '& .MuiTabs-indicator': {
-                            background: 'linear-gradient(45deg, #3f51b5 30%, #2196f3 90%)'
+                            background: 'linear-gradient(45deg, #2f51b5 30%, #2196f3 90%)'
                         }
                     }}
                     variant="scrollable"
@@ -274,8 +274,8 @@ export default function App() {
                 <Fab
                     sx={{
                         position: 'fixed',
-                        bottom: 16,
-                        left: '50%',
+                        top: 16,
+                        right: 16,
                         background: 'linear-gradient(45deg, #3f51b5 30%, #2196f3 90%)',
                         transition: 'transform 0.3s',
                         zIndex: 3,
