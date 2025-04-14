@@ -57,18 +57,20 @@ export default function CarsTable({ onError, onSuccess, loadRelations, relations
     return (
         <Box sx={{
             overflowX: 'auto',
-            maxHeight: '70vh',
+            maxHeight: 'calc(80vh - 60px)',
             overflowY: 'auto',
             position: 'relative',
+            pb: 7,
             '& .MuiTableContainer-root': {
                 backgroundColor: 'transparent !important',
                 boxShadow: 'none !important'
-            } }}>
+            }
+        }}>
             <TableContainer component={Paper} sx={{
-                background: 'rgba(0, 0, 0, 0.7)', // Полупрозрачный белый
-                backdropFilter: 'blur(8px)', // Эффект размытия
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)', // Статичная тень
-                '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' } // Убираем изменение при наведении
+                background: 'rgba(0, 0, 0, 0.7)',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }
             }}>
                 <Table
                     size={isMobile ? 'small' : 'medium'}
@@ -183,14 +185,19 @@ export default function CarsTable({ onError, onSuccess, loadRelations, relations
             </TableContainer>
 
             <Box sx={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                mt: 2,
-                p: 1,
-                background: 'rgba(0, 0, 0, 0.5)',
-                borderRadius: 2,
-                boxShadow: 1
+                p: 2,
+                background: 'rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(8px)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 -4px 20px rgba(0,0,0,0.2)',
             }}>
                 <Pagination
                     count={totalPages}
@@ -234,6 +241,7 @@ export default function CarsTable({ onError, onSuccess, loadRelations, relations
                 onClose={() => setEditCar(null)}
                 carToEdit={editCar}
                 onError={onError}
+                fetchCars={fetchCars}
                 onSuccess={(msg) => {
                     onSuccess(msg);
                     fetchCars();

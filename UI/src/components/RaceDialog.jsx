@@ -11,7 +11,8 @@ export default function RaceDialog({
                                        relations = { pilots: [], cars: [] },
                                        onError,
                                        onSuccess,
-                                       raceToEdit
+                                       raceToEdit,
+                                       fetchRaces
                                    }) {
     const [form, setForm] = useState({
         name: '',

@@ -55,7 +55,7 @@ const theme = createTheme({
         MuiTableCell: {
             styleOverrides: {
                 root: {
-                    color: '#ffffff !important', // Белый текст в таблицах
+                    color: '#ffffff !important',
                     borderBottom: '1px solid rgba(255, 255, 255, 0.12)'
                 }
             }
@@ -97,7 +97,7 @@ const theme = createTheme({
         MuiPaper: {
             styleOverrides: {
                 root: {
-                    backgroundColor: 'rgba(30, 30, 30, 0.8)', // Тёмный полупрозрачный фон
+                    backgroundColor: 'rgba(0, 0, 0, 0.1)', // Тёмный полупрозрачный фон
                     backdropFilter: 'blur(12px)',
                     border: '1px solid rgba(255, 255, 255, 0.12)' // Светлая граница
                 }
@@ -107,9 +107,9 @@ const theme = createTheme({
             styleOverrides: {
                 select: {
                     color: '#fff',
-                    backgroundColor: 'rgba(255, 255, 255, 0.09)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     '&:focus': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.09)'
+                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
                     }
                 },
                 icon: {
@@ -275,12 +275,12 @@ export default function App() {
                     sx={{
                         position: 'fixed',
                         bottom: 16,
-                        right: 16,
+                        left: '50%',
                         background: 'linear-gradient(45deg, #3f51b5 30%, #2196f3 90%)',
                         transition: 'transform 0.3s',
                         zIndex: 3,
                         '&:hover': {
-                            transform: 'scale(1.1)'
+                            transform: 'scale(1.2)'
                         }
                     }}
                     onClick={async () => {

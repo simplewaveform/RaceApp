@@ -11,7 +11,8 @@ export default function CarDialog({
                                       relations = { pilots: [], cars: [] },
                                       onError,
                                       onSuccess,
-                                      carToEdit
+                                      carToEdit,
+                                      fetchCars
                                   }) {
     const [form, setForm] = useState({
         brand: '',

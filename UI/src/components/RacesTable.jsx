@@ -59,18 +59,17 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
     return (
         <Box sx={{
             overflowX: 'auto',
-            maxHeight: '70vh',
+            maxHeight: 'calc(80vh - 60px)',
             overflowY: 'auto',
             position: 'relative',
+            pb: 7,
             '& .MuiTableContainer-root': {
                 backgroundColor: 'transparent !important',
                 boxShadow: 'none !important'
             }
         }}>
-            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-
             <TableContainer component={Paper} sx={{
-                background: 'rgba(0, 0, 0, 0.3)',
+                background: 'rgba(0, 0, 0, 0.7)',
                 backdropFilter: 'blur(8px)',
                 boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }
@@ -194,14 +193,19 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
             </TableContainer>
 
             <Box sx={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 2,
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                mt: 2,
-                p: 1,
-                background: 'rgba(0,0,0,0.5)',
-                borderRadius: 2,
-                boxShadow: 1
+                p: 2,
+                background: 'rgba(0, 0, 0, 0.4)',
+                backdropFilter: 'blur(8px)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.12)',
+                boxShadow: '0 -4px 20px rgba(0,0,0,0.2)',
             }}>
                 <Pagination
                     count={totalPages}
@@ -232,7 +236,8 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
                         '& .MuiSelect-icon': {
                             color: theme => theme.palette.text.primary
                         }
-                    }}                >
+                    }}
+                >
                     <MenuItem value={5}>5</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
                     <MenuItem value={20}>20</MenuItem>
@@ -244,6 +249,7 @@ export default function RacesTable({ onError, onSuccess, relations, loadRelation
                 onClose={() => setEditRace(null)}
                 raceToEdit={editRace}
                 onError={onError}
+                fetchRaces={fetchRaces}
                 onSuccess={(msg) => {
                     onSuccess(msg);
                     fetchRaces();

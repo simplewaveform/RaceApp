@@ -56,19 +56,20 @@ export default function PilotsTable({ onError, onSuccess }) {
     return (
         <Box sx={{
             overflowX: 'auto',
-            maxHeight: '70vh',
+            maxHeight: 'calc(80vh - 60px)',
             overflowY: 'auto',
             position: 'relative',
+            pb: 7,
             '& .MuiTableContainer-root': {
                 backgroundColor: 'transparent !important',
                 boxShadow: 'none !important'
             }
         }}>
             <TableContainer component={Paper} sx={{
-                background: 'rgba(0, 0, 0, 0.7)', // Полупрозрачный белый
-                backdropFilter: 'blur(8px)', // Эффект размытия
-                boxShadow: '0 4px 20px rgba(0,0,0,0.08)', // Статичная тень
-                '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' } // Убираем изменение при наведении
+                background: 'rgba(0, 0, 0, 0.7)',
+                backdropFilter: 'blur(8px)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                '&:hover': { boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }
             }}>
                 <Table
                     size={isMobile ? 'small' : 'medium'}
@@ -183,23 +184,26 @@ export default function PilotsTable({ onError, onSuccess }) {
             </TableContainer>
 
             <Box sx={{
+                position: 'fixed', // Фиксируем
+                bottom: 0, // Прижимаем к низу
+                left: 0,
+                right: 0,
+                zIndex: 2, // Чтобы панель была поверх других элементов
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                mt: 2,
-                p: 1,
-                background: 'rgba(0,0,0,0.5)',
-                borderRadius: 2,
-                boxShadow: 1
+                p: 2,
+                background: 'rgba(0, 0, 0, 0.4)', // Полупрозрачный фон
+                backdropFilter: 'blur(8px)', // Эффект размытия
+                borderTop: '1px solid rgba(255, 255, 255, 0.12)', // Граница
+                boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.2)' // Тень
             }}>
                 <Pagination
                     count={totalPages}
                     page={page}
                     onChange={handlePageChange}
                     sx={{
-                        '& .MuiButtonBase-root': {
-                            color: theme => theme.palette.text.primary
-                        }
+                        '& .MuiButtonBase-root': { color: theme => theme.palette.text.primary }
                     }}
                     size={isMobile ? 'small' : 'medium'}
                     showFirstButton
@@ -218,10 +222,9 @@ export default function PilotsTable({ onError, onSuccess }) {
                     sx={{
                         ml: 2,
                         minWidth: 120,
-                        '& .MuiSelect-icon': {
-                            color: theme => theme.palette.text.primary
-                        }
-                    }}                >
+                        '& .MuiSelect-icon': { color: theme => theme.palette.text.primary }
+                    }}
+                >
                     <MenuItem value={5}>5</MenuItem>
                     <MenuItem value={10}>10</MenuItem>
                     <MenuItem value={20}>20</MenuItem>
@@ -233,6 +236,7 @@ export default function PilotsTable({ onError, onSuccess }) {
                 onClose={() => setEditPilot(null)}
                 pilotToEdit={editPilot}
                 onError={onError}
+                fetchPilots={fetchPilots}
                 onSuccess={(msg) => {
                     onSuccess(msg);
                     fetchPilots();

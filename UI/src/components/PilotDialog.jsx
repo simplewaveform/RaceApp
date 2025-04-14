@@ -10,7 +10,8 @@ export default function PilotDialog({
                                         onClose,
                                         onError,
                                         onSuccess,
-                                        pilotToEdit
+                                        pilotToEdit,
+                                        fetchPilots
                                     }) {
     const [form, setForm] = useState({
         name: '',
